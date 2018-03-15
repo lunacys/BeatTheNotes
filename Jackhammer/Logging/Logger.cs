@@ -1,7 +1,7 @@
 ﻿
 using System.Threading.Tasks;
 
-namespace Jackhammer.Logging
+namespace Jackhammer
 {
     // TODO: Implement Event Queue
     public abstract class Logger

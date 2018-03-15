@@ -1,9 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using Jackhammer.Logging;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
@@ -18,28 +15,23 @@ namespace Jackhammer.Screens
         public Skin.Skin CurrentSkin { get; }
 
         public int CurrentTime { get; private set; }
-        public float ScrollingSpeed { get; private set; }
-        public bool IsUpsideDown { get; private set; }
+
+        public float ScrollingSpeed => _game.Settings.ScrollingSpeed;
+        public bool ReverseDirection => _game.Settings.IsReversedDirection;
 
         private SpriteBatch _spriteBatch;
-        private readonly Game _game;
+        private readonly Jackhammer _game;
 
         private Texture2D _background;
 
         private Song _song;
  
-        public GameplayScreen(Game game, string beatmapName, Skin.Skin skin)
+        public GameplayScreen(Jackhammer game, string beatmapName)
         {
             _game = game;
             BeatmapName = beatmapName;
-            CurrentSkin = skin;
+            CurrentSkin = game.UsedSkin;
             CurrentTime = 0;
-            
-            ScrollingSpeed = 1.4f;
-
-            IsUpsideDown = false;
-
-            LogHelper.LogAsync("We're in GameplayScreen class..");
         }
 
         public override void Initialize()
@@ -52,26 +44,35 @@ namespace Jackhammer.Screens
             }
             catch (Exception e)
             {
-                Console.WriteLine($"ERROR WHILE OPENING BEATMAP FILE: {e}");
-                throw;
+                LogHelper.Log($"GameplayScreen: Error while loading Beatmap. Backing to the Song Choose Screen: {e}", LogLevel.Error);
+                ScreenManager.FindScreen<PlaySongSelectScreen>().Show();
             }
 
             // Load Background
-            FileStream fs =
-                new FileStream(
-                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", BeatmapName,
-                        CurrentBeatmap.Settings.General.BackgroundFileName), FileMode.Open);
-            _background = Texture2D.FromStream(_game.GraphicsDevice, fs);
-            fs.Dispose();
-
+            try
+            {
+                FileStream fs =
+                    new FileStream(
+                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", BeatmapName,
+                            CurrentBeatmap.Settings.General.BackgroundFileName), FileMode.Open);
+                _background = Texture2D.FromStream(_game.GraphicsDevice, fs);
+                fs.Dispose();
+            }
+            catch (Exception e)
+            {
+                LogHelper.Log($"GameplayScreen: Error while opening Background file. Using empty background instead: {e}");
+                _background = CurrentSkin.DefaultBackground;
+            }
+            
             _song = Song.FromUri("BrainPower.ogg",
                 new Uri(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", BeatmapName, "BrainPower.ogg")));
-
+            
             MediaPlayer.Play(_song);
+            MediaPlayer.Volume = 0.1f; // TODO: FIX 
 
             base.Initialize();
 
-            LogHelper.LogAsync("Sucessfully Initialized GameplayScreen");
+            LogHelper.Log("GameplayScreen: Sucessfully Initialized");
         }
         
         public override void Update(GameTime gameTime)
@@ -80,13 +81,13 @@ namespace Jackhammer.Screens
 
             if (InputManager.WasKeyPressed(Keys.F4))
                 if (ScrollingSpeed < 10.0f)
-                    ScrollingSpeed += 0.1f;
+                    _game.Settings.ScrollingSpeed += 0.1f;
             if (InputManager.WasKeyPressed(Keys.F3))
                 if (ScrollingSpeed > 0.2f)
-                    ScrollingSpeed -= 0.1f;
+                    _game.Settings.ScrollingSpeed -= 0.1f;
             if (InputManager.WasKeyPressed(Keys.F5))
             {
-                IsUpsideDown = !IsUpsideDown;
+                _game.Settings.IsReversedDirection = !ReverseDirection;
             }
 
             if (InputManager.WasKeyPressed(Keys.OemTilde))
@@ -105,12 +106,12 @@ namespace Jackhammer.Screens
             _spriteBatch.Draw(CurrentSkin.PlayfieldLineTexture, new Vector2(200, 0), Color.White);
             // TODO: Remake 720 literal to the window width
             _spriteBatch.Draw(CurrentSkin.ButtonTexture,
-                IsUpsideDown ? new Vector2(200, 0) : new Vector2(200, 720 - CurrentSkin.ButtonTexture.Height),
+                ReverseDirection ? new Vector2(200, 0) : new Vector2(200, 720 - CurrentSkin.ButtonTexture.Height),
                 Color.White);
 
             foreach (var o in CurrentBeatmap.HitObjects)
             {
-                int k = IsUpsideDown ? -1 : 1;
+                int k = ReverseDirection ? -1 : 1;
                 // TODO: Remake 720 literal to the window width
                 _spriteBatch.Draw(CurrentSkin.NoteClickTexture,
                     new Vector2((o.Line + 1) * 100,
@@ -119,7 +120,7 @@ namespace Jackhammer.Screens
             }
 
             _spriteBatch.DrawString(CurrentSkin.Font, CurrentTime.ToString(), new Vector2(12, 12), Color.Red);
-            _spriteBatch.DrawString(CurrentSkin.Font, IsUpsideDown.ToString(), new Vector2(12, 30), Color.Red);
+            _spriteBatch.DrawString(CurrentSkin.Font, ReverseDirection.ToString(), new Vector2(12, 30), Color.Red);
             _spriteBatch.DrawString(CurrentSkin.Font, ScrollingSpeed.ToString("F1"), new Vector2(12, 48), Color.Red);
 
             _spriteBatch.End();

@@ -1,4 +1,4 @@
-﻿namespace Jackhammer.Logging
+﻿namespace Jackhammer
 {
     public enum LogLevel
     {

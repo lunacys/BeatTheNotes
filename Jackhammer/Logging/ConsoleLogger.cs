@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace Jackhammer.Logging
+namespace Jackhammer
 {
     public class ConsoleLogger : Logger
     {

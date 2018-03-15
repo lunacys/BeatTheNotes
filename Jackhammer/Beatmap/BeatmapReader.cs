@@ -149,6 +149,8 @@ namespace Jackhammer
         /// <returns>Beatmap</returns>
         public static Beatmap LoadFromFile(string mapname)
         {
+            LogHelper.LogAsync($"BeatmapReader: Load Beatmap from file '{mapname}'");
+
             // TODO: Encapsulate "Maps"
             string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", mapname, mapname + ".jmap");
 
@@ -159,6 +161,8 @@ namespace Jackhammer
             using (StreamReader sr = new StreamReader(file))
                 str = sr.ReadToEnd();
 
+
+            LogHelper.LogAsync($"BeatmapReader: Parsing Beatmap '{mapname}'");
 
             Console.WriteLine(str);
             JObject obj = JObject.Parse(str);
@@ -181,6 +185,8 @@ namespace Jackhammer
 
             List<TimingPoint> timingPoints = new List<TimingPoint>();
             List<HitObject> hitObjects = new List<HitObject>();
+
+            LogHelper.LogAsync($"BeatmapReader: Reading Beatmap Timing Points '{mapname}'");
 
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", mapname,
                 settings.TimingPointsFilename);
@@ -213,6 +219,8 @@ namespace Jackhammer
                 }
             }
 
+
+            LogHelper.LogAsync($"BeatmapReader: Reading Beatmap Hit Objects '{mapname}'");
             path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", mapname,
                 settings.HitObjectsFilename);
             // Reading HitObjects file, which contans all the objects used in the beatmap
@@ -240,6 +248,8 @@ namespace Jackhammer
             }
 
             Beatmap bm = new Beatmap(settings, timingPoints, hitObjects);
+
+            LogHelper.LogAsync($"BeatmapReader: Sucessfully Read Beatmap '{mapname}'");
 
             return bm;
         }
