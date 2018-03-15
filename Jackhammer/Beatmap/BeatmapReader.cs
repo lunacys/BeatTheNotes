@@ -134,10 +134,7 @@ namespace Jackhammer
                 }
 
                 Beatmap bm = new Beatmap(
-                    general,
-                    editor,
-                    metadata,
-                    difficulty,
+                    new BeatmapSettings(general, editor, metadata, difficulty), 
                     timingPoints,
                     hitObjects
                 );
@@ -177,9 +174,9 @@ namespace Jackhammer
                 throw new FileLoadException("HitObjectsFilename is null");
             if (string.IsNullOrEmpty(settings.TimingPointsFilename))
                 throw new FileLoadException("TimingPointsFilename is null");
-            if (!File.Exists(settings.HitObjectsFilename))
+            if (!File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", mapname, settings.HitObjectsFilename)))
                 throw new FileNotFoundException("HitObjects file not found");
-            if (!File.Exists(settings.TimingPointsFilename))
+            if (!File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", mapname, settings.TimingPointsFilename)))
                 throw new FileNotFoundException("TimingPoints file not found");
 
             List<TimingPoint> timingPoints = new List<TimingPoint>();
@@ -242,8 +239,7 @@ namespace Jackhammer
                 }
             }
 
-            Beatmap bm = new Beatmap(settings.General, settings.Editor, settings.Metadata,
-                settings.Difficulty, timingPoints, hitObjects);
+            Beatmap bm = new Beatmap(settings, timingPoints, hitObjects);
 
             return bm;
         }

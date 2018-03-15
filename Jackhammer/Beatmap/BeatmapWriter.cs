@@ -16,8 +16,8 @@ namespace Jackhammer
             // TODO: Encapsulate "Maps", maybe got to create a ContentMap class
             string file = Path.Combine("Maps", mapname, mapname + ".jmap");
 
-            BeatmapSettings bms = new BeatmapSettings(bm.SettingsGeneral, bm.SettingsEditor,
-                bm.SettingsMetadata, bm.SettingsDifficulty);
+            BeatmapSettings bms = new BeatmapSettings(bm.Settings.General, bm.Settings.Editor,
+                bm.Settings.Metadata, bm.Settings.Difficulty);
 
             string str = JsonConvert.SerializeObject(bms, Formatting.Indented);
 
