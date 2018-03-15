@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Jackhammer.Logging;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,9 +18,7 @@ namespace Jackhammer.Screens
         public Skin.Skin CurrentSkin { get; }
 
         public int CurrentTime { get; private set; }
-
         public float ScrollingSpeed { get; private set; }
-
         public bool IsUpsideDown { get; private set; }
 
         private SpriteBatch _spriteBatch;
@@ -27,7 +26,7 @@ namespace Jackhammer.Screens
 
         private Texture2D _background;
 
-        private SoundEffect _song;
+        private Song _song;
  
         public GameplayScreen(Game game, string beatmapName, Skin.Skin skin)
         {
@@ -39,6 +38,8 @@ namespace Jackhammer.Screens
             ScrollingSpeed = 1.4f;
 
             IsUpsideDown = false;
+
+            LogHelper.LogAsync("We're in GameplayScreen class..");
         }
 
         public override void Initialize()
@@ -55,6 +56,7 @@ namespace Jackhammer.Screens
                 throw;
             }
 
+            // Load Background
             FileStream fs =
                 new FileStream(
                     Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", BeatmapName,
@@ -62,13 +64,14 @@ namespace Jackhammer.Screens
             _background = Texture2D.FromStream(_game.GraphicsDevice, fs);
             fs.Dispose();
 
-            FileStream fs2 = new FileStream(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", BeatmapName,
-                CurrentBeatmap.Settings.General.AudioFileName), FileMode.Open);
-            _song = SoundEffect.FromStream(fs2);
+            _song = Song.FromUri("BrainPower.ogg",
+                new Uri(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", BeatmapName, "BrainPower.ogg")));
 
-            _song.Play();
+            MediaPlayer.Play(_song);
 
             base.Initialize();
+
+            LogHelper.LogAsync("Sucessfully Initialized GameplayScreen");
         }
         
         public override void Update(GameTime gameTime)
@@ -88,9 +91,9 @@ namespace Jackhammer.Screens
 
             if (InputManager.WasKeyPressed(Keys.OemTilde))
             {
-                
                 CurrentTime = 0;
-                _song.Play();
+                MediaPlayer.Stop();
+                MediaPlayer.Play(_song);
             }
         }
 
@@ -101,13 +104,18 @@ namespace Jackhammer.Screens
             
             _spriteBatch.Draw(CurrentSkin.PlayfieldLineTexture, new Vector2(200, 0), Color.White);
             // TODO: Remake 720 literal to the window width
-            _spriteBatch.Draw(CurrentSkin.ButtonTexture, IsUpsideDown ? new Vector2(200, 0) : new Vector2(200, 720 - CurrentSkin.ButtonTexture.Height), Color.White);
+            _spriteBatch.Draw(CurrentSkin.ButtonTexture,
+                IsUpsideDown ? new Vector2(200, 0) : new Vector2(200, 720 - CurrentSkin.ButtonTexture.Height),
+                Color.White);
 
             foreach (var o in CurrentBeatmap.HitObjects)
             {
                 int k = IsUpsideDown ? -1 : 1;
                 // TODO: Remake 720 literal to the window width
-                _spriteBatch.Draw(CurrentSkin.NoteClickTexture, new Vector2((o.Line + 1) * 100, k * (CurrentTime - o.Position + 720 - CurrentSkin.ButtonTexture.Height) * ScrollingSpeed), Color.White);
+                _spriteBatch.Draw(CurrentSkin.NoteClickTexture,
+                    new Vector2((o.Line + 1) * 100,
+                        k * (CurrentTime - o.Position + 720 - CurrentSkin.ButtonTexture.Height) * ScrollingSpeed),
+                    Color.White);
             }
 
             _spriteBatch.DrawString(CurrentSkin.Font, CurrentTime.ToString(), new Vector2(12, 12), Color.Red);

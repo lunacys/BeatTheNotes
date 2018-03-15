@@ -22,6 +22,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)InputManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Jackhammer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beatmap\TimingPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\ConsoleLogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\FileLogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\LogHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\Logger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\LogLevel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\LogTarget.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Screens\EditSongSelectScreen.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Screens\GameplayScreen.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Screens\MenuScreen.cs" />

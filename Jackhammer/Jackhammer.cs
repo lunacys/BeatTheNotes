@@ -1,5 +1,7 @@
 ﻿#region Using Statements
 using System;
+using System.Diagnostics;
+using Jackhammer.Logging;
 using Jackhammer.Screens;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -20,12 +22,13 @@ namespace Jackhammer
         private FramesPerSecondCounter fps;
         Beatmap bm;
         private ScreenGameComponent _screenComponent;
-        
 
         public Skin.Skin DefaultSkin { get; private set; }
 
         public Jackhammer()
         {
+            LogHelper.LogAsync($"======= Starting Jackhammer at {DateTime.Now} =======");
+
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             fps = new FramesPerSecondCounter();
@@ -35,13 +38,12 @@ namespace Jackhammer
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
 
-
 #if WIN || LINUX
             graphics.IsFullScreen = false;
 #elif ANDROID
             graphics.IsFullScreen = true;
 #endif
-
+            
             _screenComponent = new ScreenGameComponent(this);
             Components.Add(_screenComponent);
         }
@@ -57,13 +59,14 @@ namespace Jackhammer
 
         protected override void LoadContent()
         {
+            LogHelper.LogAsync("Loading Content..");
+
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             DefaultSkin = SkinLoader.Load(Content, GraphicsDevice, "Default");
             font = Content.Load<SpriteFont>(@"Fonts/MainFont");
             //bm = BeatmapReader.LoadFromFile("test");
             //BeatmapWriter.WriteToFile(bm, "test-saved");
-            
             _screenComponent.Register(new GameplayScreen(this, "test", DefaultSkin));
             _screenComponent.FindScreen<GameplayScreen>().Show();
         }
