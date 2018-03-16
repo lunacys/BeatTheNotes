@@ -17,7 +17,7 @@ namespace Jackhammer.Screens
         public Beatmap Beatmap { get; private set; }
 
         private readonly string _beatmapName;
-        private readonly Skin _skin;
+        public Skin Skin { get; }
 
         /// <summary>
         /// Current time used in the game as starting point for all the hit objects and the song
@@ -33,7 +33,9 @@ namespace Jackhammer.Screens
         private Texture2D _background;
         private Song _song;
 
+        public List<GameSystem> GameSystems { get; }
         private ScoreSystem _scoreSystem;
+        private ScoremeterSystem _scoremeterSystem;
 
         public List<HitObject>[] SeparatedLines { get; private set; }
 
@@ -41,10 +43,12 @@ namespace Jackhammer.Screens
         {
             _game = game;
             _beatmapName = beatmapName;
-            _skin = game.UsedSkin;
+            Skin = game.UsedSkin;
             Time = 0;
 
             _scoreSystem = new ScoreSystem(this);
+            GameSystems = new List<GameSystem>();
+            
         }
 
         public override void Initialize()
@@ -66,6 +70,10 @@ namespace Jackhammer.Screens
                 ScreenManager.FindScreen<PlaySongSelectScreen>().Show();
             }
 
+            _scoremeterSystem = new ScoremeterSystem(this);
+            GameSystems.Add(_scoreSystem);
+            GameSystems.Add(_scoremeterSystem);
+
             // Create separated lines collections and fill it
             SeparatedLines = new List<HitObject>[Beatmap.Settings.Difficulty.KeyAmount];
             for (int i = 0; i < SeparatedLines.Length; i++)
@@ -84,7 +92,7 @@ namespace Jackhammer.Screens
             catch (Exception e)
             {
                 LogHelper.Log($"GameplayScreen: Error while opening Background file. Using empty background instead: {e}");
-                _background = _skin.DefaultBackground;
+                _background = Skin.DefaultBackground;
             }
 
             // Load and play the song
@@ -134,39 +142,51 @@ namespace Jackhammer.Screens
 
             if (InputManager.WasKeyPressed(_game.Settings.N1))
             {
-                _skin.HitNormal.Play();
+                Skin.HitNormal.Play();
 
                 var nearest = GetNearestHitObjectOnLine(1);
 
                 if (nearest != null && _scoreSystem.Calculate(nearest))
+                {
                     nearest.IsPressed = true;
+                    _scoremeterSystem.AddScore(nearest);
+                }
             }
             if (InputManager.WasKeyPressed(_game.Settings.N2))
             {
-                _skin.HitNormal.Play();
+                Skin.HitNormal.Play();
 
                 var nearest = GetNearestHitObjectOnLine(2);
 
                 if (nearest != null && _scoreSystem.Calculate(nearest))
+                {
                     nearest.IsPressed = true;
+                    _scoremeterSystem.AddScore(nearest);
+                }
             }
             if (InputManager.WasKeyPressed(_game.Settings.N3))
             {
-                _skin.HitNormal.Play();
+                Skin.HitNormal.Play();
 
                 var nearest = GetNearestHitObjectOnLine(3);
 
                 if (nearest != null && _scoreSystem.Calculate(nearest))
+                {
                     nearest.IsPressed = true;
+                    _scoremeterSystem.AddScore(nearest);
+                }
             }
             if (InputManager.WasKeyPressed(_game.Settings.N4))
             {
-                _skin.HitNormal.Play();
+                Skin.HitNormal.Play();
 
                 var nearest = GetNearestHitObjectOnLine(4);
 
                 if (nearest != null && _scoreSystem.Calculate(nearest))
+                {
                     nearest.IsPressed = true;
+                    _scoremeterSystem.AddScore(nearest);
+                }
             }
 
             if (InputManager.IsKeyDown(Keys.Space))
@@ -180,7 +200,10 @@ namespace Jackhammer.Screens
                 MediaPlayer.Stop();
             }
 
-            _scoreSystem.Update(gameTime);
+            foreach (var gameSystem in GameSystems)
+            {
+                gameSystem.Update(gameTime);
+            }
         }
 
         public override void Draw(GameTime gameTime)
@@ -189,13 +212,13 @@ namespace Jackhammer.Screens
             
             _spriteBatch.Draw(_background, Vector2.Zero, Color.White);
             
-            _spriteBatch.Draw(_skin.PlayfieldLineTexture, new Vector2(_skin.Settings.PlayfieldPositionX, 0), Color.White);
+            _spriteBatch.Draw(Skin.PlayfieldLineTexture, new Vector2(Skin.Settings.PlayfieldPositionX, 0), Color.White);
 
-            _spriteBatch.Draw(_skin.ButtonTexture,
+            _spriteBatch.Draw(Skin.ButtonTexture,
                 IsUpsideDown
-                    ? new Vector2(_skin.Settings.PlayfieldPositionX, 0)
-                    : new Vector2(_skin.Settings.PlayfieldPositionX,
-                        _game.Settings.WindowHeight - _skin.ButtonTexture.Height),
+                    ? new Vector2(Skin.Settings.PlayfieldPositionX, 0)
+                    : new Vector2(Skin.Settings.PlayfieldPositionX,
+                        _game.Settings.WindowHeight - Skin.ButtonTexture.Height),
                 Color.White);
 
             foreach (var lines in SeparatedLines)
@@ -209,37 +232,41 @@ namespace Jackhammer.Screens
                     // Set correct position for the object
                     Vector2 position = new Vector2(
                         // x
-                        _skin.Settings.PlayfieldPositionX +
-                        ((o.Line - 1) * (_skin.PlayfieldLineTexture.Width / 4.0f)),
+                        Skin.Settings.PlayfieldPositionX +
+                        ((o.Line - 1) * (Skin.PlayfieldLineTexture.Width / 4.0f)),
                         // y
                         (ScrollingSpeed * (Time - o.Position) +
-                         (_game.Settings.WindowHeight - _skin.ButtonTexture.Height)) +
-                        _skin.Settings.HitPosition
+                         (_game.Settings.WindowHeight - Skin.ButtonTexture.Height)) +
+                        Skin.Settings.HitPosition
                     );
 
-                    Texture2D hitObjectTexture = _skin.NoteClickTexture;
+                    Texture2D hitObjectTexture = Skin.NoteClickTexture;
 
-                    if (_skin.Settings.NoteType.ToLower() == "arrow")
+                    if (Skin.Settings.NoteType.ToLower() == "arrow")
                     {
                         // For 'arrow' skin type use texture collection
                         switch (o.Line)
                         {
-                            case 1: hitObjectTexture = _skin.NoteClickTextures[0]; break;
-                            case 2: hitObjectTexture = _skin.NoteClickTextures[1]; break;
-                            case 3: hitObjectTexture = _skin.NoteClickTextures[2]; break;
-                            case 4: hitObjectTexture = _skin.NoteClickTextures[3]; break;
+                            case 1: hitObjectTexture = Skin.NoteClickTextures[0]; break;
+                            case 2: hitObjectTexture = Skin.NoteClickTextures[1]; break;
+                            case 3: hitObjectTexture = Skin.NoteClickTextures[2]; break;
+                            case 4: hitObjectTexture = Skin.NoteClickTextures[3]; break;
                         }
                     }
 
                     _spriteBatch.Draw(hitObjectTexture, position, o.IsPressed ? Color.Black : Color.White);
                 }
             }
-            
+
+            foreach (var gameSystem in GameSystems)
+            {
+                gameSystem.Draw(_spriteBatch);
+            }
 
             // Debug things
-            _spriteBatch.DrawString(_skin.Font, Time.ToString(), new Vector2(12, 12), Color.Red);
-            _spriteBatch.DrawString(_skin.Font, IsUpsideDown.ToString(), new Vector2(12, 30), Color.Red);
-            _spriteBatch.DrawString(_skin.Font, ScrollingSpeed.ToString("F1"), new Vector2(12, 48), Color.Red);
+            _spriteBatch.DrawString(Skin.Font, Time.ToString(), new Vector2(12, 12), Color.Red);
+            _spriteBatch.DrawString(Skin.Font, IsUpsideDown.ToString(), new Vector2(12, 30), Color.Red);
+            _spriteBatch.DrawString(Skin.Font, ScrollingSpeed.ToString("F1"), new Vector2(12, 48), Color.Red);
 
             string scores = $"Marvelous: {_scoreSystem.MarvelousCount}\n" +
                             $"Perfect: {_scoreSystem.PerfectCount}\n" +
@@ -247,8 +274,8 @@ namespace Jackhammer.Screens
                             $"Good: {_scoreSystem.GoodCount}\n" +
                             $"Bad: {_scoreSystem.BadCount}\n" +
                             $"Miss: {_scoreSystem.MissCount}";
-            _spriteBatch.DrawString(_skin.Font, scores, new Vector2(800, 10), Color.Black);
-            _spriteBatch.DrawString(_skin.Font, $"Score: {_scoreSystem.Score}\nCombo: {_scoreSystem.Combo}\nAcc: {_scoreSystem.Accuracy * 100:F2}%", new Vector2(15, 300), Color.Black);
+            _spriteBatch.DrawString(Skin.Font, scores, new Vector2(800, 10), Color.Black);
+            _spriteBatch.DrawString(Skin.Font, $"Score: {_scoreSystem.Score}\nCombo: {_scoreSystem.Combo}\nAcc: {_scoreSystem.Accuracy * 100:F2}%", new Vector2(15, 300), Color.Black);
 
 
 
@@ -274,6 +301,7 @@ namespace Jackhammer.Screens
             MediaPlayer.Stop();
             MediaPlayer.Play(_song);
             _scoreSystem.Reset();
+            _scoremeterSystem.Reset();
         }
 
         /// <summary>
@@ -284,7 +312,7 @@ namespace Jackhammer.Screens
         {
             Time = ms;
             MediaPlayer.Stop();
-            MediaPlayer.Play(_song, TimeSpan.FromMilliseconds(ms + _skin.Settings.HitPosition * 2));
+            MediaPlayer.Play(_song, TimeSpan.FromMilliseconds(ms + Skin.Settings.HitPosition * 2));
         }
 
         /// <summary>
@@ -295,6 +323,9 @@ namespace Jackhammer.Screens
         private HitObject GetNearestHitObjectOnLine(int line)
         {
             if (SeparatedLines[line - 1].Count == 0)
+                return null;
+
+            if (SeparatedLines[line - 1].Count(o => !o.IsPressed) == 0)
                 return null;
 
             return SeparatedLines[line - 1].First(o => !o.IsPressed);

@@ -44,6 +44,7 @@ namespace Jackhammer.GameSystems
                         o.IsPressed = true;
                         MissCount++;
                         Combo = 0;
+                        CalculateAccuracy();
                     }
                 }
             }
@@ -64,7 +65,7 @@ namespace Jackhammer.GameSystems
             return true;
         }
 
-        public void Reset()
+        public override void Reset()
         {
             Score = Combo =
                 MaxCombo = MarvelousCount = PerfectCount = GreatCount = GoodCount = BadCount = MissCount = 0;

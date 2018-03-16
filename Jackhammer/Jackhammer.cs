@@ -29,6 +29,8 @@ namespace Jackhammer
 
         InputListenerComponent _ilc;
 
+        private int _minFps = Int32.MaxValue, _maxFps = 0;
+
         public Jackhammer()
         {
             LogHelper.Log($"======= Starting Jackhammer at {DateTime.Now} =======");
@@ -163,9 +165,13 @@ namespace Jackhammer
 
                 SoundEffect.MasterVolume = Settings.HitsoundVolume;
             }
-
-
+            
             fps.Update(gameTime);
+            if (fps.FramesPerSecond < _minFps)
+                _minFps = fps.FramesPerSecond;
+            if (fps.FramesPerSecond > _maxFps)
+                _maxFps = fps.FramesPerSecond;
+
             base.Update(gameTime);
         }
 
@@ -175,6 +181,13 @@ namespace Jackhammer
 
             fps.Draw(gameTime);
             base.Draw(gameTime);
+
+            _spriteBatch.Begin();
+            _spriteBatch.DrawString(UsedSkin.Font, $"FPS: {fps.FramesPerSecond}\nMin: {_minFps}\nMax: {_maxFps}",
+                new Vector2(Settings.WindowWidth - 80, Settings.WindowHeight - 18 * 3), Color.Red);
+            _spriteBatch.End();
+
+            
         }
     }
 }
