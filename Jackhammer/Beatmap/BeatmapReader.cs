@@ -149,7 +149,7 @@ namespace Jackhammer
         /// <returns>Beatmap</returns>
         public static Beatmap LoadFromFile(string mapname)
         {
-            LogHelper.LogAsync($"BeatmapReader: Load Beatmap from file '{mapname}'");
+            LogHelper.Log($"BeatmapReader: Load Beatmap from file '{mapname}'");
 
             // TODO: Encapsulate "Maps"
             string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", mapname, mapname + ".jmap");
@@ -162,9 +162,8 @@ namespace Jackhammer
                 str = sr.ReadToEnd();
 
 
-            LogHelper.LogAsync($"BeatmapReader: Parsing Beatmap '{mapname}'");
-
-            Console.WriteLine(str);
+            LogHelper.Log($"BeatmapReader: Parsing Beatmap '{mapname}'");
+            
             JObject obj = JObject.Parse(str);
 
             BeatmapSettings settings =
@@ -186,13 +185,14 @@ namespace Jackhammer
             List<TimingPoint> timingPoints = new List<TimingPoint>();
             List<HitObject> hitObjects = new List<HitObject>();
 
-            LogHelper.LogAsync($"BeatmapReader: Reading Beatmap Timing Points '{mapname}'");
+            LogHelper.Log($"BeatmapReader: Reading Beatmap Timing Points '{mapname}'");
 
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", mapname,
                 settings.TimingPointsFilename);
             // Reading TimingPoints file, which contains all the timing points used in the beatmap
             using (StreamReader sr = new StreamReader(path))
             {
+                LogHelper.Log($"BeatmapReader: Found Beatmap Timing Points file '{settings.TimingPointsFilename}'");
                 string full = sr.ReadToEnd();
                 string[] lines = full.Split('\n');
                 foreach (var line in lines)
@@ -218,15 +218,17 @@ namespace Jackhammer
                     timingPoints.Add(tp);
                 }
             }
+            LogHelper.Log($"BeatmapReader: Sucessfully Read Beatmap Timing Points. Total Timing Point count: {timingPoints.Count}");
 
-
-            LogHelper.LogAsync($"BeatmapReader: Reading Beatmap Hit Objects '{mapname}'");
+            LogHelper.Log($"BeatmapReader: Reading Beatmap Hit Objects '{mapname}'");
             path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", mapname,
                 settings.HitObjectsFilename);
             // Reading HitObjects file, which contans all the objects used in the beatmap
             // HitObjects file uses this format: "Line Position" for a Click, and "Line Position EndPosition" for a Hold
             using (StreamReader sr = new StreamReader(path))
             {
+                LogHelper.Log($"BeatmapReader: Found Beatmap Hit Objects file '{settings.HitObjectsFilename}'");
+
                 string full = sr.ReadToEnd();
                 string[] lines = full.Split('\n');
                 foreach (var line in lines)
@@ -246,10 +248,11 @@ namespace Jackhammer
                     hitObjects.Add(ho);
                 }
             }
+            LogHelper.Log($"BeatmapReader: Sucessfully Read Beatmap Hit Objects. Total Hit Objects count: {hitObjects.Count}");
 
             Beatmap bm = new Beatmap(settings, timingPoints, hitObjects);
 
-            LogHelper.LogAsync($"BeatmapReader: Sucessfully Read Beatmap '{mapname}'");
+            LogHelper.Log($"BeatmapReader: Sucessfully Read Beatmap '{mapname}'");
 
             return bm;
         }

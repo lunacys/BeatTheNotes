@@ -12,6 +12,8 @@
         public int Position { get; }
         public int EndPosition { get; }
 
+        public bool IsPressed { get; set; }
+
         public HitObject(int line, int position, int endPosition = 0)
         {
             Line = line;
@@ -20,6 +22,8 @@
                 EndPosition = position;
             else
                 EndPosition = endPosition;
+
+            IsPressed = false;
         }
 
         public override string ToString()

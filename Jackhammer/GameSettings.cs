@@ -1,6 +1,7 @@
-﻿using Jackhammer.Skin;
+﻿using Jackhammer.Skins;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Jackhammer
 {
@@ -20,6 +21,23 @@ namespace Jackhammer
         public float SongVolume { get; set; }
 
         public string Skin { get; set; }
+
+        /// <summary>
+        /// Key for the first line
+        /// </summary>
+        public Keys N1 { get; set; }
+        /// <summary>
+        /// Key for the second line
+        /// </summary>
+        public Keys N2 { get; set; }
+        /// <summary>
+        /// Key for the third line
+        /// </summary>
+        public Keys N3 { get; set; }
+        /// <summary>
+        /// Key for the fourth line
+        /// </summary>
+        public Keys N4 { get; set; }
 
         public GameSettings()
         {
@@ -42,6 +60,11 @@ namespace Jackhammer
             SongVolume = 1.0f;
 
             Skin = "Default";
+
+            N1 = Keys.Z;
+            N2 = Keys.X;
+            N3 = Keys.OemPeriod;
+            N4 = Keys.OemQuestion;
         }
     }
 }

@@ -80,3 +80,9 @@
 /processorParam:TextureFormat=Color
 /build:Images/PlayfieldLine.png
 
+#begin Sfx/HitNormal.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sfx/HitNormal.wav
+

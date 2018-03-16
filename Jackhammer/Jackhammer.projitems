@@ -32,16 +32,23 @@
     <Compile Include="$(MSBuildThisFileDirectory)Logging\LogTarget.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Screens\EditSongSelectScreen.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Screens\GameplayScreen.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\GameSystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Screens\MenuScreen.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Screens\PauseScreen.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Screens\PlaySongSelectScreen.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSettingsSerializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Skin\Skin.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Skin\SkinLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\ScoreSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Skins\Skin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Skins\SkinLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Skins\SkinSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)GameSystems\" />
   </ItemGroup>
 </Project>
