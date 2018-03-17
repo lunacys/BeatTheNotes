@@ -34,7 +34,7 @@ namespace Jackhammer.Screens
                 Show<GameplayScreen>(true);
                 MediaPlayer.Resume();
             }
-
+            
             base.Update(gameTime);
         }
 

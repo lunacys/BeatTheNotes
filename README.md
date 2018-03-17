@@ -1,11 +1,50 @@
 # Jackhammer
-Пока пусть будет на русском, позже переведу. Для начала так проще.
+
+## Description
+
+Jackhammer is a Stepmania or osu!mania-like game which is a 'reincarnation' of my university course work [Notemania](https://github.com/lunacys/Notemania).
+
+Jackhammer is fully written in C# using [MonoGame framework](https://github.com/mono/MonoGame).
+
+Jackhammer is available in Windows, Linux and OS X systems.
+
+## Building
+
+To be able to build the Desktop project you need only [Visual Studio 2015](https://www.visualstudio.com/) or higher.
+
+If you want to build Android project, you'll need to get [Visual Studio](https://www.visualstudio.com/) with Android Tools (Xamarin for Android).
+
+### Deps
+
+Following frameworks are used in the project as NuGet packages:
+
+- MonoGame
+- MonoGame.Extended
+- MonoGame.Extended.Input
+- Newton.Json
+
+## Resources
+
+Currently all the game resources are in under work. They will be available as soon as possible.
+
+Plans on game resorces:
+
+- Website
+- Discord Channel
+- Game Wiki
+
+## License
+
+All the source code is under [MIT](LICENSE.txt) license.
+
 ## Описание
-Jackhammer представляет собой игру наподобии Stepmania или osu!mania. 
-Фактически является продолжением моего проекта, сделанного для университетской практики 
+
+Jackhammer представляет собой игру наподобии Stepmania или osu!mania.
+Фактически является продолжением моего проекта, сделанного для университетской практики
 [Notemania](https://github.com/lunacys/Notemania). В том же репозитории есть подробное описание механики игры.
 
 Главные особенности заключаются в следующем:
+
 - Удобный красочный интерфейс.
 - Возможность смены и редактирования скина (внешнего вида игры).
 - Подробная статистика после каждой игры.
@@ -17,7 +56,8 @@ Jackhammer представляет собой игру наподобии Stepm
 - Версия под Linux.
 - Поддержка импорта карт из [osu!](https://osu.ppy.sh) (формат .osu).
 
-## Техническая сторона
+### Техническая сторона
+
 Любая карта, называемая Beatmap, сохраняется в трёх различных файлах: ```[mapname].jmap```, ```timing_points``` и ```hit_objects```. 
 
 В первом файле хранится основная информация о карте: создатель трека, название трека, данные о сложности и т.д.
@@ -31,13 +71,16 @@ Jackhammer представляет собой игру наподобии Stepm
 
 Каждая карта хранится в своей папке в директории ```Maps```.
 
-## TODO
+### TODO
+
+Здесь указаны лишь цели. Прогресс их выполнения можно найти в файле [TODO](TODO).
+
 - [ ] Технические вещи
   - [x] Система логгинга (Log) в файл и консоль с синхроном и асинхроном
   - [x] Система игровых установок (GameSettings), сериализация и десериализация
   - [ ] Поддержка графиков (Graphs):
-  	- [ ] FpsGraph
-  	- [ ] AccuracyGraph
+    - [ ] FpsGraph
+    - [ ] AccuracyGraph
   - [ ] Логи, больше логов
   - [ ] Рефакторинг (особенно важно в GameplayScreen)
   - [ ] Поддержка анимации (игра + скины):
@@ -45,12 +88,12 @@ Jackhammer представляет собой игру наподобии Stepm
     - [ ] Кнопок
     - [ ] Нот (Click & Hold)
   - [ ] GUI:
-  	- [ ] Canvas
-  	- [ ] Button
-  	- [ ] Window
-  	- [ ] TextBox
-  	- [ ] Slider
-  	- [ ] ComboBox
+    - [ ] Canvas
+    - [ ] Button
+    - [ ] Window
+    - [ ] TextBox
+    - [ ] Slider
+    - [ ] ComboBox
   - [ ] Sprite fonts:
     - [ ] Для игры
     - [ ] Для скинов
@@ -76,8 +119,8 @@ Jackhammer представляет собой игру наподобии Stepm
   - [x] Загрузка и проигрывание музыки в формате ```.ogg```
   - [ ] Перемотка музыки в нужное положение
   - [ ] Игровое поле, содержащее от 4 до 7 линий в зависимости от сложности:
-    - [x] 4k 
-	- [ ] 5k-7k
+    - [x] 4k
+    - [ ] 5k-7k
   - [x] Управление на заданные клавиши, их настройка (по умолчанию D F J K для 4 кнопок (4k))
   - [x] Поддержка ноты Click
   - [x] Scoremeter
@@ -101,5 +144,3 @@ Jackhammer представляет собой игру наподобии Stepm
   - [ ] Сохранение очков игрока
   - [ ] Сохранение очков для кажой карты
 - [ ] Соединение клиент-сервер-сайт
-  
-  

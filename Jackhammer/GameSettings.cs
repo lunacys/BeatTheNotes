@@ -2,6 +2,9 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Jackhammer
 {
@@ -14,11 +17,33 @@ namespace Jackhammer
         public bool IsUsedVSync { get; set; }
         public int TargetFramesPerSecond { get; set; }
 
-        public float ScrollingSpeed { get; set; }
+        
         public bool IsReversedDirection { get; set; }
 
-        public float HitsoundVolume { get; set; }
-        public float SongVolume { get; set; }
+        [JsonIgnore]
+        public float HitsoundVolumeF
+        {
+            get => HitsoundVolume / 100.0f;
+            set => HitsoundVolume = (int)(value * 100.0f);
+        }
+
+        [JsonIgnore]
+        public float SongVolumeF
+        {
+            get => SongVolume / 100.0f;
+            set => SongVolume = (int) (value * 100.0f);
+        }
+
+        [JsonIgnore]
+        public float ScrollingSpeedF
+        {
+            get => ScrollingSpeed / 10.0f;
+            set => ScrollingSpeed = (int) (value * 10.0f);
+        }
+
+        public int HitsoundVolume { get; set; }
+        public int SongVolume { get; set; }
+        public int ScrollingSpeed { get; set; }
 
         public string Skin { get; set; }
 
@@ -53,11 +78,11 @@ namespace Jackhammer
             IsUsedVSync = false;
             TargetFramesPerSecond = 240;
 
-            ScrollingSpeed = 1.0f;
+            ScrollingSpeedF = 1.0f;
             IsReversedDirection = false;
 
-            HitsoundVolume = 1.0f;
-            SongVolume = 1.0f;
+            HitsoundVolumeF = 1.0f;
+            SongVolumeF = 1.0f;
 
             Skin = "Default";
 

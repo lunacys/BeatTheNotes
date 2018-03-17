@@ -32,6 +32,7 @@ namespace Jackhammer.GameSystems
 
         public override void Update(GameTime gameTime)
         {
+            // TODO: Rework this
             foreach (var line in _gameplay.SeparatedLines)
             {
                 foreach (var o in line)
@@ -45,6 +46,7 @@ namespace Jackhammer.GameSystems
                         MissCount++;
                         Combo = 0;
                         CalculateAccuracy();
+                        GameSystemManager.FindSystem<ScoremeterSystem>().AddScore(o);
                     }
                 }
             }

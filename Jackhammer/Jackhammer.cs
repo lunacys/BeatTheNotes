@@ -1,6 +1,7 @@
 ﻿#region Using Statements
 using System;
 using System.IO;
+using Jackhammer.GameSystems;
 using Jackhammer.Screens;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -48,7 +49,6 @@ namespace Jackhammer
 
             MediaPlayer.Volume = Settings.SongVolume;
             
-
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             fps = new FramesPerSecondCounter();
@@ -63,6 +63,7 @@ namespace Jackhammer
             kl.KeyPressed += (sender, args) =>
             {
                 //Console.WriteLine($"Pressed Key '{args.Key}'");
+                
             };
             _ilc = new InputListenerComponent(this, kl);
             
@@ -138,32 +139,32 @@ namespace Jackhammer
 
             if (InputManager.WasKeyPressed(Keys.Left))
             {
-                Settings.SongVolume -= 0.1f;
-                Settings.SongVolume = MathHelper.Clamp(Settings.SongVolume, 0.0f, 1.0f);
-                MediaPlayer.Volume = Settings.SongVolume;
+                Settings.SongVolumeF -= 0.1f;
+                Settings.SongVolumeF = MathHelper.Clamp(Settings.SongVolumeF, 0.0f, 1.0f);
+                MediaPlayer.Volume = Settings.SongVolumeF;
             }
 
             if (InputManager.WasKeyPressed(Keys.Right))
             {
-                Settings.SongVolume += 0.1f;
-                Settings.SongVolume = MathHelper.Clamp(Settings.SongVolume, 0.0f, 1.0f);
-                MediaPlayer.Volume = Settings.SongVolume;
+                Settings.SongVolumeF += 0.1f;
+                Settings.SongVolumeF = MathHelper.Clamp(Settings.SongVolumeF, 0.0f, 1.0f);
+                MediaPlayer.Volume = Settings.SongVolumeF;
             }
 
             if (InputManager.WasKeyPressed(Keys.Down))
             {
-                Settings.HitsoundVolume -= 0.1f;
-                Settings.HitsoundVolume = MathHelper.Clamp(Settings.HitsoundVolume, 0.0f, 1.0f);
+                Settings.HitsoundVolumeF -= 0.1f;
+                Settings.HitsoundVolumeF = MathHelper.Clamp(Settings.HitsoundVolumeF, 0.0f, 1.0f);
 
-                SoundEffect.MasterVolume = Settings.HitsoundVolume;
+                SoundEffect.MasterVolume = Settings.HitsoundVolumeF;
             }
 
             if (InputManager.WasKeyPressed(Keys.Up))
             {
-                Settings.HitsoundVolume += 0.1f;
-                Settings.HitsoundVolume = MathHelper.Clamp(Settings.HitsoundVolume, 0.0f, 1.0f);
+                Settings.HitsoundVolumeF += 0.1f;
+                Settings.HitsoundVolumeF = MathHelper.Clamp(Settings.HitsoundVolumeF, 0.0f, 1.0f);
 
-                SoundEffect.MasterVolume = Settings.HitsoundVolume;
+                SoundEffect.MasterVolume = Settings.HitsoundVolumeF;
             }
             
             fps.Update(gameTime);

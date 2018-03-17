@@ -1,0 +1,25 @@
+
+Todo:
+  ☐ Поддержка графиков (Graphs):
+    ☐ FpsGraph
+    ☐ AccuracyGraph
+  ☐ Рефакторинг:
+    ☐ Использование паттернов Command, ServiceLocator и Component
+    ☐ GameplaySystem.cs
+    ☐ Jackhammer.cs
+  ☐ Поддержка ноты Hold
+  ☐ Поддержка анимации
+    ☐ Элементов игрового поля (линии)
+    ☐ Кнопок
+    ☐ Ноты Click
+    ☐ Ноты Hold
+  ☐ GUI
+    ☐ Canvas
+    ☐ Button
+    ☐ Window
+    ☐ TextBox
+    ☐ Slider
+    ☐ ComboBox
+  ☐ BeatmapFonts
+    ☐ Для игры
+    ☐ Для скинов

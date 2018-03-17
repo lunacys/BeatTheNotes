@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Jackhammer.Screens;
 using Microsoft.Xna.Framework;
@@ -55,8 +56,13 @@ namespace Jackhammer.GameSystems
 
             foreach (var t in _scores)
             {
+                // TODO: Add colors for every score
                 Vector2 pos = new Vector2((Position.X + Size.X / 2 + t.Position) * SizeMultiplier, Position.Y - 15);
-                spriteBatch.FillRectangle(pos, new Vector2(3, 40), Color.Orange * (t.MsBeforeExpire / 1000.0f));
+                Vector2 off = new Vector2(Position.X + Size.X / 2, Position.Y);
+                spriteBatch.FillRectangle(pos, new Vector2(3, 40),
+                    ((pos.X > off.X - ((151 - (3 * Od))) && pos.X < off.X + ((151 - (3 * Od)))
+                        ? Color.Orange * (t.MsBeforeExpire / 1000.0f)
+                        : Color.Red * (t.MsBeforeExpire / 1000.0f))));
             }
         }
 
@@ -65,22 +71,22 @@ namespace Jackhammer.GameSystems
             Vector2 offset;
 
             // miss
-            spriteBatch.FillRectangle(Position, Size, Color.Red);
+            spriteBatch.FillRectangle(Position, Size, new Color(199, 0, 0));
             // bad
             offset = new Vector2((Size.X / 2 - (151 - (3 * Od))), 0);
-            spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), Color.Orange);
+            spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), new Color(229, 0, 151));
             // good
             offset = new Vector2((Size.X / 2 - (127 - (3 * Od))), 0);
-            spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), Color.GreenYellow);
+            spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), new Color(0, 185, 231));
             // great
             offset = new Vector2(Size.X / 2 - ((97 - (3 * Od))), 0);
-            spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), Color.Green);
+            spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), new Color(0, 231, 33));
             // perfect
             offset = new Vector2(Size.X / 2 - ((64 - (3 * Od))), 0);
-            spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), Color.CornflowerBlue);
+            spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), new Color(233, 201, 27));
             // marvelous
             offset = new Vector2(Size.X / 2 - 16, 0);
-            spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), Color.Blue);
+            spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), new Color(255, 255, 255));
 
             spriteBatch.FillRectangle(Position + new Vector2(Size.X / 2.0f - 1, -6), new Vector2(2, 24), Color.Black);
         }

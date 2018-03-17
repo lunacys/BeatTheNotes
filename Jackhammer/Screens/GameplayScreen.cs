@@ -8,13 +8,22 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using MonoGame.Extended.Input.InputListeners;
 using MonoGame.Extended.Screens;
 
 namespace Jackhammer.Screens
 {
     public class GameplayScreen : Screen
     {
-        public Beatmap Beatmap { get; private set; }
+        public GameplayScreen(Beatmap beatmap, Skin skin, int time, GameSystemManager gameSystemManager) 
+        {
+            this.Beatmap = beatmap;
+                this.Skin = skin;
+                this.Time = time;
+                this.GameSystemManager = gameSystemManager;
+               
+        }
+                public Beatmap Beatmap { get; private set; }
 
         private readonly string _beatmapName;
         public Skin Skin { get; }
@@ -24,18 +33,17 @@ namespace Jackhammer.Screens
         /// </summary>
         public int Time { get; private set; }
 
-        private float ScrollingSpeed => _game.Settings.ScrollingSpeed;
-        private bool IsUpsideDown => _game.Settings.IsReversedDirection;
+        public float ScrollingSpeed => _game.Settings.ScrollingSpeedF;
+        public bool IsUpsideDown => _game.Settings.IsReversedDirection;
+        public GameSettings Settings => _game.Settings;
 
         private SpriteBatch _spriteBatch;
         private readonly Jackhammer _game;
 
         private Texture2D _background;
         private Song _song;
-
-        public List<GameSystem> GameSystems { get; }
-        private ScoreSystem _scoreSystem;
-        private ScoremeterSystem _scoremeterSystem;
+        
+        public GameSystemManager GameSystemManager { get; }
 
         public List<HitObject>[] SeparatedLines { get; private set; }
 
@@ -45,10 +53,9 @@ namespace Jackhammer.Screens
             _beatmapName = beatmapName;
             Skin = game.UsedSkin;
             Time = 0;
-
-            _scoreSystem = new ScoreSystem(this);
-            GameSystems = new List<GameSystem>();
             
+            
+            GameSystemManager = new GameSystemManager();
         }
 
         public override void Initialize()
@@ -69,10 +76,10 @@ namespace Jackhammer.Screens
                 LogHelper.Log($"GameplayScreen: Error while loading Beatmap. Backing to the Song Choose Screen: {e}", LogLevel.Error);
                 ScreenManager.FindScreen<PlaySongSelectScreen>().Show();
             }
-
-            _scoremeterSystem = new ScoremeterSystem(this);
-            GameSystems.Add(_scoreSystem);
-            GameSystems.Add(_scoremeterSystem);
+            
+            GameSystemManager.Register(new ScoreSystem(this));
+            GameSystemManager.Register(new ScoremeterSystem(this));
+            //GameSystems.Add(_beatDivisorSystem);
 
             // Create separated lines collections and fill it
             SeparatedLines = new List<HitObject>[Beatmap.Settings.Difficulty.KeyAmount];
@@ -100,7 +107,7 @@ namespace Jackhammer.Screens
                 new Uri(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", _beatmapName, "BrainPower.ogg")));
 
             MediaPlayer.Play(_song);
-            MediaPlayer.Volume = _game.Settings.SongVolume;
+            MediaPlayer.Volume = _game.Settings.SongVolumeF;
 
             LogHelper.Log("GameplayScreen: Sucessfully Initialized");
         }
@@ -115,7 +122,7 @@ namespace Jackhammer.Screens
         public override void Update(GameTime gameTime)
         {
             InputManager.Update(_game);
-
+            
             Time += gameTime.ElapsedGameTime.Milliseconds;
 
             if (InputManager.WasKeyPressed(Keys.Escape))
@@ -126,10 +133,10 @@ namespace Jackhammer.Screens
 
             if (InputManager.WasKeyPressed(Keys.F4))
                 if (ScrollingSpeed < 10.0f)
-                    _game.Settings.ScrollingSpeed += 0.1f;
+                    _game.Settings.ScrollingSpeedF += 0.1f;
             if (InputManager.WasKeyPressed(Keys.F3))
                 if (ScrollingSpeed > 0.2f)
-                    _game.Settings.ScrollingSpeed -= 0.1f;
+                    _game.Settings.ScrollingSpeedF -= 0.1f;
             if (InputManager.WasKeyPressed(Keys.F5))
             {
                 _game.Settings.IsReversedDirection = !IsUpsideDown;
@@ -140,16 +147,19 @@ namespace Jackhammer.Screens
                 Restart();
             }
 
+            var scoreSystem = GameSystemManager.FindSystem<ScoreSystem>();
+            var scoremeterSystem = GameSystemManager.FindSystem<ScoremeterSystem>();
+
             if (InputManager.WasKeyPressed(_game.Settings.N1))
             {
                 Skin.HitNormal.Play();
 
                 var nearest = GetNearestHitObjectOnLine(1);
 
-                if (nearest != null && _scoreSystem.Calculate(nearest))
+                if (nearest != null && scoreSystem.Calculate(nearest))
                 {
                     nearest.IsPressed = true;
-                    _scoremeterSystem.AddScore(nearest);
+                    scoremeterSystem.AddScore(nearest);
                 }
             }
             if (InputManager.WasKeyPressed(_game.Settings.N2))
@@ -158,10 +168,10 @@ namespace Jackhammer.Screens
 
                 var nearest = GetNearestHitObjectOnLine(2);
 
-                if (nearest != null && _scoreSystem.Calculate(nearest))
+                if (nearest != null && scoreSystem.Calculate(nearest))
                 {
                     nearest.IsPressed = true;
-                    _scoremeterSystem.AddScore(nearest);
+                    scoremeterSystem.AddScore(nearest);
                 }
             }
             if (InputManager.WasKeyPressed(_game.Settings.N3))
@@ -170,10 +180,10 @@ namespace Jackhammer.Screens
 
                 var nearest = GetNearestHitObjectOnLine(3);
 
-                if (nearest != null && _scoreSystem.Calculate(nearest))
+                if (nearest != null && scoreSystem.Calculate(nearest))
                 {
                     nearest.IsPressed = true;
-                    _scoremeterSystem.AddScore(nearest);
+                    scoremeterSystem.AddScore(nearest);
                 }
             }
             if (InputManager.WasKeyPressed(_game.Settings.N4))
@@ -182,15 +192,15 @@ namespace Jackhammer.Screens
 
                 var nearest = GetNearestHitObjectOnLine(4);
 
-                if (nearest != null && _scoreSystem.Calculate(nearest))
+                if (nearest != null && scoreSystem.Calculate(nearest))
                 {
                     nearest.IsPressed = true;
-                    _scoremeterSystem.AddScore(nearest);
+                    scoremeterSystem.AddScore(nearest);
                 }
             }
 
             if (InputManager.IsKeyDown(Keys.Space))
-                MoveSongTo(23000);
+                Restart(23000);
 
             // Updating..
 
@@ -200,10 +210,8 @@ namespace Jackhammer.Screens
                 MediaPlayer.Stop();
             }
 
-            foreach (var gameSystem in GameSystems)
-            {
-                gameSystem.Update(gameTime);
-            }
+            GameSystemManager.Update(gameTime);
+            base.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
@@ -227,6 +235,7 @@ namespace Jackhammer.Screens
                 {
                     // TODO: Make more precise work on the numbers
                     // TODO: Make _isUpsideDown (upside down) work
+                    // TODO: Skip unnecessary loops
                     //int k = IsUpsideDown ? -1 : 1;
 
                     // Set correct position for the object
@@ -253,14 +262,28 @@ namespace Jackhammer.Screens
                             case 4: hitObjectTexture = Skin.NoteClickTextures[3]; break;
                         }
                     }
+                    
+                    /*if (o.Position - Beatmap.TimingPoints[0].Position % (int)Math.Floor(Beatmap.TimingPoints[0].MsPerBeat * 4) <= 10)
+                    {
+                        Console.WriteLine($"Line!");
+                        //_spriteBatch.DrawLine(position, position + (Vector2.UnitX * Skin.PlayfieldLineTexture.Width), Color.Gray, 3.0f);
+                    }*/
 
                     _spriteBatch.Draw(hitObjectTexture, position, o.IsPressed ? Color.Black : Color.White);
                 }
             }
-
-            foreach (var gameSystem in GameSystems)
+            GameSystemManager.Draw(_spriteBatch);
+            // Draw Beat Divisors
+            // TODO: Skip unnecessary loops
+            var tp = Beatmap.TimingPoints[0];
+            for (int i = tp.Position; i <= Beatmap.HitObjects.Last().Position; i += (int) Math.Floor(tp.MsPerBeat * 4))
             {
-                gameSystem.Draw(_spriteBatch);
+                float posY = (ScrollingSpeed * (Time - i) +
+                              (_game.Settings.WindowHeight - Skin.ButtonTexture.Height) + Skin.NoteClickTexture.Height +
+                              Skin.Settings.HitPosition);
+                _spriteBatch.DrawLine(new Vector2(Skin.Settings.PlayfieldPositionX, posY),
+                    new Vector2(Skin.Settings.PlayfieldPositionX + Skin.PlayfieldLineTexture.Width, posY), Color.Gray,
+                    3.0f);
             }
 
             // Debug things
@@ -268,51 +291,38 @@ namespace Jackhammer.Screens
             _spriteBatch.DrawString(Skin.Font, IsUpsideDown.ToString(), new Vector2(12, 30), Color.Red);
             _spriteBatch.DrawString(Skin.Font, ScrollingSpeed.ToString("F1"), new Vector2(12, 48), Color.Red);
 
-            string scores = $"Marvelous: {_scoreSystem.MarvelousCount}\n" +
-                            $"Perfect: {_scoreSystem.PerfectCount}\n" +
-                            $"Great: {_scoreSystem.GreatCount}\n" +
-                            $"Good: {_scoreSystem.GoodCount}\n" +
-                            $"Bad: {_scoreSystem.BadCount}\n" +
-                            $"Miss: {_scoreSystem.MissCount}";
+            var scoreSystem = GameSystemManager.FindSystem<ScoreSystem>();
+
+            string scores = $"Marvelous: {scoreSystem.MarvelousCount}\n" +
+                            $"Perfect: {scoreSystem.PerfectCount}\n" +
+                            $"Great: {scoreSystem.GreatCount}\n" +
+                            $"Good: {scoreSystem.GoodCount}\n" +
+                            $"Bad: {scoreSystem.BadCount}\n" +
+                            $"Miss: {scoreSystem.MissCount}";
             _spriteBatch.DrawString(Skin.Font, scores, new Vector2(800, 10), Color.Black);
-            _spriteBatch.DrawString(Skin.Font, $"Score: {_scoreSystem.Score}\nCombo: {_scoreSystem.Combo}\nAcc: {_scoreSystem.Accuracy * 100:F2}%", new Vector2(15, 300), Color.Black);
-
-
+            _spriteBatch.DrawString(Skin.Font, $"Score: {scoreSystem.Score}\nCombo: {scoreSystem.Combo}\nAcc: {scoreSystem.Accuracy * 100:F2}%", new Vector2(15, 300), Color.Black);
 
             _spriteBatch.End();
+
+            
+            base.Draw(gameTime);
         }
 
         /// <summary>
         /// Restart the game. It means reset the time and the song
         /// </summary>
-        private void Restart()
+        private void Restart(int ms = 0)
         {
             foreach (var o in Beatmap.HitObjects)
             {
                 o.IsPressed = false;
             }
-
-            // Create separated lines collections and fill it
-            SeparatedLines = new List<HitObject>[Beatmap.Settings.Difficulty.KeyAmount];
-            for (int i = 0; i < SeparatedLines.Length; i++)
-                SeparatedLines[i] = Beatmap.HitObjects.FindAll(o => o.Line == i + 1);
-
-            Time = 0;
-            MediaPlayer.Stop();
-            MediaPlayer.Play(_song);
-            _scoreSystem.Reset();
-            _scoremeterSystem.Reset();
-        }
-
-        /// <summary>
-        /// Move song position to needed position
-        /// </summary>
-        /// <param name="ms">Milliseconds</param>
-        private void MoveSongTo(int ms)
-        {
+            
             Time = ms;
             MediaPlayer.Stop();
             MediaPlayer.Play(_song, TimeSpan.FromMilliseconds(ms + Skin.Settings.HitPosition * 2));
+
+            GameSystemManager.Reset();
         }
 
         /// <summary>
