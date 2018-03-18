@@ -21,11 +21,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)Beatmap\HitObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSettingsDeserializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\GameSystemManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\GameplaySystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\GameSystemComponent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\IGameSystemManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\Score.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\ScoremeterSystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\Splash.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\SystemAddedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Graphs\Graph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Input\InputManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Jackhammer.cs" />

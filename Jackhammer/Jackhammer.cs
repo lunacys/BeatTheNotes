@@ -25,9 +25,9 @@ namespace Jackhammer
         private SpriteBatch _spriteBatch;
         private FramesPerSecondCounter fps;
         private ScreenGameComponent _screenComponent;
-        
-        public Skin UsedSkin { get; private set; }
-        public GameSettings Settings { get; }
+
+        private Skin _usedSkin;
+        private GameSettings _settings;
 
         InputListenerComponent _ilc;
         
@@ -41,25 +41,30 @@ namespace Jackhammer
             if (File.Exists("settings.json"))
             {
                 LogHelper.Log($"Found settings.json file. Loading settings from the file.");
-                Settings = GameSettingsDeserializer.Deserialize();
+                _settings = GameSettingsDeserializer.Deserialize();
             }
             else
             {
                 LogHelper.Log($"settings.json file not found. Taking default settings.");
-                Settings = new GameSettings();
+                _settings = new GameSettings();
             }
 
-            MediaPlayer.Volume = Settings.SongVolume;
+
+            Components.ComponentAdded += (sender, args) => { LogHelper.Log($"Game Root: Adding Component {args.GameComponent}"); };
+
+            Services.AddService(_settings);
+
+            MediaPlayer.Volume = _settings.SongVolume;
             
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             fps = new FramesPerSecondCounter();
 
-            _graphics.SynchronizeWithVerticalRetrace = Settings.IsUsedVSync;
-            TargetElapsedTime = TimeSpan.FromSeconds(1.0f / Settings.TargetFramesPerSecond);
+            _graphics.SynchronizeWithVerticalRetrace = _settings.IsUsedVSync;
+            TargetElapsedTime = TimeSpan.FromSeconds(1.0f / _settings.TargetFramesPerSecond);
 
-            _graphics.PreferredBackBufferWidth = Settings.WindowWidth;
-            _graphics.PreferredBackBufferHeight = Settings.WindowHeight;
+            _graphics.PreferredBackBufferWidth = _settings.WindowWidth;
+            _graphics.PreferredBackBufferHeight = _settings.WindowHeight;
 
             KeyboardListener kl = new KeyboardListener();
             kl.KeyPressed += (sender, args) =>
@@ -68,11 +73,13 @@ namespace Jackhammer
                 
             };
             _ilc = new InputListenerComponent(this, kl);
+
             
+
             Components.Add(_ilc);
 
 #if WIN || LINUX
-            _graphics.IsFullScreen = Settings.IsFullscreen;
+            _graphics.IsFullScreen = _settings.IsFullscreen;
 #elif ANDROID
             _graphics.IsFullScreen = true;
 #endif
@@ -95,19 +102,21 @@ namespace Jackhammer
             
             try
             {
-                UsedSkin = SkinLoader.Load(Content, GraphicsDevice, Settings.Skin);
+                _usedSkin = SkinLoader.Load(Content, GraphicsDevice, _settings.Skin);
             }
             catch (Exception e)
             {
                 LogHelper.Log($"GameRoot: Error while opening Skin, using Default skin instead: {e}");
-                UsedSkin = SkinLoader.Load(Content, GraphicsDevice, "Default");
-                Settings.Skin = "Default";
+                _usedSkin = SkinLoader.Load(Content, GraphicsDevice, "Default");
+                _settings.Skin = "Default";
             }
+
+            Services.AddService(_usedSkin);
 
             //bm = BeatmapReader.LoadTextureFromFile("test");
             //BeatmapWriter.WriteToFile(bm, "test-saved");
             _screenComponent = new ScreenGameComponent(this);
-            LogHelper.Log($"Game Root: Add Component ScreenComponent");
+            //LogHelper.Log($"Game Root: Add Component ScreenComponent");
             Components.Add(_screenComponent);
             GameplayScreen gameplayScreen = new GameplayScreen(this, "test");
             _screenComponent.Register(gameplayScreen);
@@ -123,7 +132,7 @@ namespace Jackhammer
         {
             LogHelper.Log("Game Root: Unloading Content");
 
-            GameSettingsSerializer.Serialize(Settings);
+            GameSettingsSerializer.Serialize(_settings);
 
             base.UnloadContent();
         }
@@ -139,32 +148,32 @@ namespace Jackhammer
 
             if (InputManager.WasKeyPressed(Keys.Left))
             {
-                Settings.SongVolumeF -= 0.1f;
-                Settings.SongVolumeF = MathHelper.Clamp(Settings.SongVolumeF, 0.0f, 1.0f);
-                MediaPlayer.Volume = Settings.SongVolumeF;
+                _settings.SongVolumeF -= 0.1f;
+                _settings.SongVolumeF = MathHelper.Clamp(_settings.SongVolumeF, 0.0f, 1.0f);
+                MediaPlayer.Volume = _settings.SongVolumeF;
             }
 
             if (InputManager.WasKeyPressed(Keys.Right))
             {
-                Settings.SongVolumeF += 0.1f;
-                Settings.SongVolumeF = MathHelper.Clamp(Settings.SongVolumeF, 0.0f, 1.0f);
-                MediaPlayer.Volume = Settings.SongVolumeF;
+                _settings.SongVolumeF += 0.1f;
+                _settings.SongVolumeF = MathHelper.Clamp(_settings.SongVolumeF, 0.0f, 1.0f);
+                MediaPlayer.Volume = _settings.SongVolumeF;
             }
 
             if (InputManager.WasKeyPressed(Keys.Down))
             {
-                Settings.HitsoundVolumeF -= 0.1f;
-                Settings.HitsoundVolumeF = MathHelper.Clamp(Settings.HitsoundVolumeF, 0.0f, 1.0f);
+                _settings.HitsoundVolumeF -= 0.1f;
+                _settings.HitsoundVolumeF = MathHelper.Clamp(_settings.HitsoundVolumeF, 0.0f, 1.0f);
 
-                SoundEffect.MasterVolume = Settings.HitsoundVolumeF;
+                SoundEffect.MasterVolume = _settings.HitsoundVolumeF;
             }
 
             if (InputManager.WasKeyPressed(Keys.Up))
             {
-                Settings.HitsoundVolumeF += 0.1f;
-                Settings.HitsoundVolumeF = MathHelper.Clamp(Settings.HitsoundVolumeF, 0.0f, 1.0f);
+                _settings.HitsoundVolumeF += 0.1f;
+                _settings.HitsoundVolumeF = MathHelper.Clamp(_settings.HitsoundVolumeF, 0.0f, 1.0f);
 
-                SoundEffect.MasterVolume = Settings.HitsoundVolumeF;
+                SoundEffect.MasterVolume = _settings.HitsoundVolumeF;
             }
             
             fps.Update(gameTime);
@@ -184,8 +193,8 @@ namespace Jackhammer
             base.Draw(gameTime);
 
             _spriteBatch.Begin();
-            _spriteBatch.DrawString(UsedSkin.Font, $"FPS: {fps.FramesPerSecond}\nMin: {_minFps}\nMax: {_maxFps}",
-                new Vector2(Settings.WindowWidth - 80, Settings.WindowHeight - 18 * 3), Color.Red);
+            _spriteBatch.DrawString(_usedSkin.Font, $"FPS: {fps.FramesPerSecond}\nMin: {_minFps}\nMax: {_maxFps}",
+                new Vector2(_settings.WindowWidth - 80, _settings.WindowHeight - 18 * 3), Color.Red);
             _spriteBatch.End();
 
             

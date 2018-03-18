@@ -15,7 +15,8 @@ namespace Jackhammer.GameSystems
         {
             return GameSystemManager?.FindSystem<T>();
         }
-
+        
+        public virtual void Initialize() { }
         public virtual void Update(GameTime gameTime) { }
         public virtual void Draw(GameTime gameTime) { }
 

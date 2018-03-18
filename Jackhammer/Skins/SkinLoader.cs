@@ -136,6 +136,7 @@ namespace Jackhammer.Skins
                     skin.Font = content.Load<SpriteFont>(Path.Combine("Fonts", "MainFont"));
 
                     skin.HitNormal = LoadSoundEffectFromFile(Path.Combine(dirPath, "HitNormal.wav"));
+                    skin.ComboBreak = LoadSoundEffectFromFile(Path.Combine(dirPath, "ComboBreak.wav"));
                 }
                 catch (Exception e)
                 {

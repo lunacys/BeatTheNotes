@@ -12,7 +12,7 @@ namespace Jackhammer.Screens
     {
         private readonly Jackhammer _game;
         private SpriteBatch _spriteBatch;
-        private Skin Skin => _game.UsedSkin;
+        private Skin Skin => _game.Services.GetService<Skin>();
 
         public PauseScreen(Jackhammer game)
         {

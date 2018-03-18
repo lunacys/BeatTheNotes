@@ -1,14 +1,16 @@
 
 Todo:
+  ✔ Splash названия очков (Marvelous, Pefrect etc) @done(18-03-18 20:48)
   ☐ Поддержка графиков (Graphs):
     ☐ FpsGraph
     ☐ AccuracyGraph
   ☐ Рефакторинг: @started(18-03-17 18:54)
-    ☐ Game Systems @started(18-03-17 18:54)
-    ☐ Использование паттернов Command, ServiceLocator и Component
-    ☐ GameplaySystem.cs
+    ✔ Game Systems @started(18-03-17 18:54) @done(18-03-18 20:44) @lasted(1 day 1 hour 50 minutes 59 seconds)
+    ✔ Использование паттернов ServiceLocator и Component @done(18-03-18 20:45)
+    ✔ GameplayScreen.cs @started(18-03-18 20:45) @done(18-03-18 20:45) @lasted(19 seconds)
+    ☐ GameplaySystem.cs @started(18-03-18 20:47)
     ☐ Jackhammer.cs
-    ☐ Перевод игрового времени в GameService (или Component?)
+    ☐ Перевод игрового времени в GameSystem (а может GameService или Component?)
   ☐ Поддержка ноты Hold
   ☐ Поддержка анимации
     ☐ Элементов игрового поля (линии)

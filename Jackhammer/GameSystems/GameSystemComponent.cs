@@ -5,17 +5,19 @@ using Microsoft.Xna.Framework;
 
 namespace Jackhammer.GameSystems
 {
-    public class GameSystemManager : DrawableGameComponent, IGameSystemManager
+    public class GameSystemComponent : DrawableGameComponent, IGameSystemManager
     {
         private readonly List<GameSystem> _gameSystems;
 
-        public GameSystemManager(Game game, IEnumerable<GameSystem> systems) : base(game)
+        public event EventHandler<SystemAddedEventArgs> SystemAdded;
+
+        public GameSystemComponent(Game game, IEnumerable<GameSystem> systems) : base(game)
         {
             foreach (var gameSystem in systems)
                 Register(gameSystem);
         }
 
-        public GameSystemManager(Game game) : base(game) 
+        public GameSystemComponent(Game game) : base(game) 
         {
             _gameSystems = new List<GameSystem>();
         }
@@ -32,6 +34,9 @@ namespace Jackhammer.GameSystems
 
         public T Register<T>(T system) where T : GameSystem
         {
+            LogHelper.Log($"GameSystemManager: Registering System {typeof(T)}");
+            SystemAdded?.Invoke(this, new SystemAddedEventArgs(this));
+
             system.GameSystemManager = this;
             system.IsWorking = true;
             _gameSystems.Add(system);
@@ -44,6 +49,16 @@ namespace Jackhammer.GameSystems
             foreach (var gameSystem in _gameSystems)
             {
                 gameSystem.Reset();
+            }
+        }
+
+        public override void Initialize()
+        {
+            foreach (var gameSystem in _gameSystems)
+            {
+                LogHelper.Log($"GameSystemManager: Initializing System {gameSystem}");
+                gameSystem.Initialize();
+                LogHelper.Log($"GameSystemManager: End Initializing System {gameSystem}");
             }
         }
 

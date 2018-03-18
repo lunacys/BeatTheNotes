@@ -27,6 +27,7 @@ namespace Jackhammer.Skins
         public SpriteFont Font { get; set; }
 
         public SoundEffect HitNormal { get; set; }
+        public SoundEffect ComboBreak { get; set; }
 
         public List<Texture2D> NoteClickTextures { get; } = new List<Texture2D>(8);
         public List<Texture2D> NoteHoldTextures { get; } = new List<Texture2D>(8);

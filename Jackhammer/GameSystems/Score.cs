@@ -4,8 +4,8 @@ namespace Jackhammer.GameSystems
 {
     public class Score
     {
-        public int Position { get; set; }
-        public int MsBeforeExpire { get; set; }
+        public int Position { get; }
+        public int MsBeforeExpire { get; private set; }
 
         public bool IsExpired => MsBeforeExpire <= 0;
 
