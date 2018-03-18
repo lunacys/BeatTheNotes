@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,10 +8,28 @@ namespace Jackhammer.GameSystems
 {
     public class ScoreSystem : GameSystem
     {
-        public int Score { get; private set; }
+        public const string ScoreMarvelous = "Marvelous";
+        public const string ScorePerfect = "Perfect";
+        public const string ScoreGreat = "Great";
+        public const string ScoreGood = "Good";
+        public const string ScoreBad = "Bad";
+        public const string ScoreMiss = "Miss";
+
+        public const int MaxScore = 1000000;
+
+        private double _score;
+        public int Score => (int)Math.Ceiling(_score);
 
         public int Combo { get; private set; }
         public int MaxCombo { get; private set; }
+
+        public Dictionary<string, double> HitThresholds;
+        public Dictionary<string, int> HitValues;
+        public Dictionary<string, int> HitPunishments;
+        public Dictionary<string, int> HitBonuses;
+        public Dictionary<string, int> HitBonusValues;
+
+        public int CurrentBonus;
 
         public int MarvelousCount { get; private set; }
         public int PerfectCount { get; private set; }
@@ -22,13 +41,6 @@ namespace Jackhammer.GameSystems
         public float Accuracy { get; private set; }
 
         public float Od => _gameplay.Beatmap.Settings.Difficulty.OverallDifficutly;
-
-        public float MarvelousThreshold { get; private set; }
-        public float PerfectThreshold { get; private set; } 
-        public float GreatThreshold { get; private set; }
-        public float GoodThreshold { get; private set; }
-        public float BadThreshold { get; private set; }
-        public float MissThreshold { get; private set; }
 
         public Splash CurrentSplash { get; private set; }
 
@@ -54,12 +66,57 @@ namespace Jackhammer.GameSystems
 
         private void InitValues()
         {
-            MarvelousThreshold = 16.0f;
-            PerfectThreshold = 64 - (3 * Od);
-            GreatThreshold = 97 - (3 * Od);
-            GoodThreshold = 127 - (3 * Od);
-            BadThreshold = 151 - (3 * Od);
-            MissThreshold = 188 - (3 * Od);
+            CurrentBonus = 100;
+
+            HitThresholds = new Dictionary<string, double>()
+            {
+                { ScoreMarvelous, 16.0},
+                { ScorePerfect, 64 - (3 * Od)},
+                { ScoreGreat, 97 - (3 * Od)},
+                { ScoreGood, 127 - (3 * Od)},
+                { ScoreBad, 151 - (3 * Od)},
+                { ScoreMiss, 188 - (3 * Od)},
+            };
+
+            HitValues = new Dictionary<string, int>()
+            {
+                { ScoreMarvelous, 320 },
+                { ScorePerfect, 300 },
+                { ScoreGreat, 200 },
+                { ScoreGood, 100 },
+                { ScoreBad, 50 },
+                { ScoreMiss, 0 }
+            };
+
+            HitBonusValues = new Dictionary<string, int>()
+            {
+                { ScoreMarvelous, 32 },
+                { ScorePerfect, 32 },
+                { ScoreGreat, 16 },
+                { ScoreGood, 8 },
+                { ScoreBad, 4 },
+                { ScoreMiss, 0 }
+            };
+
+            HitBonuses = new Dictionary<string, int>()
+            {
+                { ScoreMarvelous, 2 },
+                { ScorePerfect, 1 },
+                { ScoreGreat, 0 },
+                { ScoreGood, 0 },
+                { ScoreBad, 0 },
+                { ScoreMiss, 0 }
+            };
+
+            HitPunishments = new Dictionary<string, int>()
+            {
+                { ScoreMarvelous, 0 },
+                { ScorePerfect, 0 },
+                { ScoreGreat, 8 },
+                { ScoreGood, 24 },
+                { ScoreBad, 44 },
+                { ScoreMiss, Int32.MaxValue } // Infinity
+            };
         }
 
         public override void Update(GameTime gameTime)
@@ -95,20 +152,31 @@ namespace Jackhammer.GameSystems
 
         public override void Reset()
         {
-            Score = Combo =
-                MaxCombo = MarvelousCount = PerfectCount = GreatCount = GoodCount = BadCount = MissCount = 0;
+            _score = Combo = MaxCombo = 0;
+            MarvelousCount = PerfectCount = GreatCount = GoodCount = BadCount = MissCount = 0;
+            CurrentBonus = 100;
 
             Accuracy = 1.0f;
 
             CurrentSplash = null;
         }
 
-        private void CalculateScore(int hitValue)
+        private void CalculateScore(string hitValueName)
         {
-            float baseScore = (1000000.0f / _gameplay.Beatmap.HitObjects.Count) * (hitValue / 320.0f);
-            float totalScore = baseScore;
+            var hitValue = HitValues[hitValueName];
 
-            Score += (int)totalScore;
+            var totalNotes = _gameplay.Beatmap.HitObjects.Count;
+
+            var baseScore = (MaxScore * 0.5 / totalNotes) * (hitValue / 320.0);
+            var bonus = CurrentBonus + HitBonuses[hitValueName] - HitPunishments[hitValueName];
+
+            CurrentBonus -= HitPunishments[hitValueName];
+            bonus = MathHelper.Clamp(bonus, 1, 100);
+
+            var bonusScore = (MaxScore * 0.5f / totalNotes) * (HitBonusValues[hitValueName] * Math.Sqrt(bonus) / 320.0);
+            var totalScore = baseScore + bonusScore;
+
+            _score += totalScore;
         }
 
         private void ProceedCombo(int hitValue)
@@ -143,18 +211,18 @@ namespace Jackhammer.GameSystems
             
             int score = 0;
             
-            if (absTimeOffset <= MarvelousThreshold)
-                score = 320;
-            else if (absTimeOffset <= PerfectThreshold) 
-                score = 300;
-            else if (absTimeOffset <= GreatThreshold) 
-                score = 200;
-            else if (absTimeOffset <= GoodThreshold)
-                score = 100;
-            else if (absTimeOffset <= BadThreshold)
-                score = 50;
-            else if (timeOffset <= MissThreshold)
-                score = 0;
+            if (absTimeOffset <= HitThresholds[ScoreMarvelous])
+                score = HitValues[ScoreMarvelous];
+            else if (absTimeOffset <= HitThresholds[ScorePerfect]) 
+                score = HitValues[ScorePerfect];
+            else if (absTimeOffset <= HitThresholds[ScoreGreat]) 
+                score = HitValues[ScoreGreat];
+            else if (absTimeOffset <= HitThresholds[ScoreGood])
+                score = HitValues[ScoreGood];
+            else if (absTimeOffset <= HitThresholds[ScoreBad])
+                score = HitValues[ScoreBad];
+            else if (timeOffset <= HitThresholds[ScoreMiss])
+                score = HitValues[ScoreMiss];
 
             return score;
         }
@@ -163,42 +231,53 @@ namespace Jackhammer.GameSystems
         {
             if (hitValue < 0) return;
 
+            string hitValueName;
+
             hitObject.IsPressed = true;
 
-            switch (hitValue)
+            if (hitValue == HitValues[ScoreMarvelous])
             {
-                case 320:
-                    CurrentSplash = new Splash(_gameplay.Skin.ScoreMarvelousTexture);
-                    MarvelousCount++;
-                    break;
-                case 300:
-                    CurrentSplash = new Splash(_gameplay.Skin.ScorePerfectTexture);
-                    PerfectCount++;
-                    break;
-                case 200:
-                    CurrentSplash = new Splash(_gameplay.Skin.ScoreGreatTexture);
-                    GreatCount++;
-                    break;
-                case 100:
-                    CurrentSplash = new Splash(_gameplay.Skin.ScoreGoodTexture);
-                    GoodCount++;
-                    break;
-                case 50:
-                    CurrentSplash = new Splash(_gameplay.Skin.ScoreBadTexture);
-                    BadCount++;
-                    break;
-                case 0:
-                    CurrentSplash = new Splash(_gameplay.Skin.ScoreMissTexture);
-                    MissCount++;
-                    DoBreakCombo();
-                    break;
-                default: throw new InvalidDataException("Score not found");
+                CurrentSplash = new Splash(_gameplay.Skin.ScoreMarvelousTexture);
+                MarvelousCount++;
+                hitValueName = ScoreMarvelous;
             }
-
+            else if (hitValue == HitValues[ScorePerfect])
+            {
+                CurrentSplash = new Splash(_gameplay.Skin.ScorePerfectTexture);
+                PerfectCount++;
+                hitValueName = ScorePerfect;
+            }
+            else if (hitValue == HitValues[ScoreGreat])
+            {
+                CurrentSplash = new Splash(_gameplay.Skin.ScoreGreatTexture);
+                GreatCount++;
+                hitValueName = ScoreGreat;
+            }
+            else if (hitValue == HitValues[ScoreGood])
+            {
+                CurrentSplash = new Splash(_gameplay.Skin.ScoreGoodTexture);
+                GoodCount++;
+                hitValueName = ScoreGood;
+            }
+            else if (hitValue == HitValues[ScoreBad])
+            {
+                CurrentSplash = new Splash(_gameplay.Skin.ScoreBadTexture);
+                BadCount++;
+                hitValueName = ScoreBad;
+            }
+            else if (hitValue == HitValues[ScoreMiss])
+            {
+                CurrentSplash = new Splash(_gameplay.Skin.ScoreMissTexture);
+                MissCount++;
+                DoBreakCombo();
+                hitValueName = ScoreMiss;
+            }
+            else throw new InvalidDataException("Score not found");
+            
             GameSystemManager.FindSystem<ScoremeterSystem>()?.AddScore(_gameplay.Time, hitObject.Position);
 
             ProceedCombo(hitValue);
-            CalculateScore(hitValue);
+            CalculateScore(hitValueName);
             CalculateAccuracy();
         }
 

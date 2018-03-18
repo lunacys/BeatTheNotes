@@ -11,6 +11,7 @@ Todo:
     ☐ GameplaySystem.cs @started(18-03-18 20:47)
     ☐ Jackhammer.cs
     ☐ Перевод игрового времени в GameSystem (а может GameService или Component?)
+  ✔ Переделать систему очков - добавить BonusScore @started(18-03-18 21:58) @done(18-03-18 22:57) @lasted(59 minutes 9 seconds)
   ☐ Поддержка ноты Hold
   ☐ Поддержка анимации
     ☐ Элементов игрового поля (линии)

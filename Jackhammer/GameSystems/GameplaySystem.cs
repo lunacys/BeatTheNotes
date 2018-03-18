@@ -127,18 +127,14 @@ namespace Jackhammer.GameSystems
                     if (Skin.Settings.NoteType.ToLower() == "arrow")
                     {
                         // For 'arrow' skin type use texture collection
-                        switch (o.Line)
-                        {
-                            case 1: hitObjectTexture = Skin.NoteClickTextures[0]; break;
-                            case 2: hitObjectTexture = Skin.NoteClickTextures[1]; break;
-                            case 3: hitObjectTexture = Skin.NoteClickTextures[2]; break;
-                            case 4: hitObjectTexture = Skin.NoteClickTextures[3]; break;
-                        }
+                        hitObjectTexture = Skin.NoteClickTextures[o.Line - 1];
                     }
 
                     // if it is a 'Click' note
                     if (o.Position == o.EndPosition)
+                    {
                         _spriteBatch.Draw(hitObjectTexture, position, o.IsPressed ? Color.Black : Color.White);
+                    }
                     else // if it is a 'Hold' note
                     {
                         for (int i = 0; i <= o.EndPosition - o.Position; i += 5)
@@ -153,32 +149,22 @@ namespace Jackhammer.GameSystems
                                 Skin.Settings.HitPosition
                             );
 
-                            _spriteBatch.Draw(hitObjectTexture, position, null, o.IsPressed ? Color.Black * 0.5f : Color.White);
+                            _spriteBatch.Draw(hitObjectTexture, position, null, o.IsPressed ? Color.Black : Color.White);
                         }
                     }
 
                     if (o.IsPressed) continue;
 
                     var scoreSys = GameSystemManager.FindSystem<ScoreSystem>();
-                    if (o.Position + scoreSys.MissThreshold < Time)
+                    
+                    if (o.Position + scoreSys.HitThresholds["Miss"] < Time)
                     {
                         scoreSys.Calculate(o);
                     }
                 }
             }
-
-            // Draw Beat Divisors
-            // TODO: Skip unnecessary loops
-            var tp = Beatmap.TimingPoints[0];
-            for (int i = tp.Position; i <= Beatmap.HitObjects.Last().Position; i += (int)Math.Floor(tp.MsPerBeat * 4))
-            {
-                float posY = (ScrollingSpeed * (Time - i) +
-                              (Settings.WindowHeight - Skin.ButtonTexture.Height) + Skin.NoteClickTexture.Height +
-                              Skin.Settings.HitPosition);
-                _spriteBatch.DrawLine(new Vector2(Skin.Settings.PlayfieldPositionX, posY),
-                    new Vector2(Skin.Settings.PlayfieldPositionX + Skin.PlayfieldLineTexture.Width * Beatmap.Settings.Difficulty.KeyAmount, posY), Color.Gray,
-                    3.0f);
-            }
+            
+            DrawBeatDivisors();
 
             // Debug things
             _spriteBatch.DrawString(Skin.Font, Time.ToString(), new Vector2(12, 12), Color.Red);
@@ -210,6 +196,7 @@ namespace Jackhammer.GameSystems
 
             Time = 0;
             MediaPlayer.Stop();
+            MediaPlayer.Volume = Settings.SongVolumeF;
             MediaPlayer.Play(_song);
         }
 
@@ -255,6 +242,21 @@ namespace Jackhammer.GameSystems
             }
         }
 
+        private void DrawBeatDivisors()
+        {
+            // TODO: Skip unnecessary loops
+            var tp = Beatmap.TimingPoints[0];
+            for (int i = tp.Position; i <= Beatmap.HitObjects.Last().Position; i += (int)Math.Floor(tp.MsPerBeat * 4))
+            {
+                float posY = (ScrollingSpeed * (Time - i) +
+                              (Settings.WindowHeight - Skin.ButtonTexture.Height) + Skin.NoteClickTexture.Height +
+                              Skin.Settings.HitPosition);
+                _spriteBatch.DrawLine(new Vector2(Skin.Settings.PlayfieldPositionX, posY),
+                    new Vector2(Skin.Settings.PlayfieldPositionX + Skin.PlayfieldLineTexture.Width * Beatmap.Settings.Difficulty.KeyAmount, posY), Color.Gray,
+                    3.0f);
+            }
+        }
+
         /// <summary>
         /// Find and return the nearest object on the specified line. The nearest object is the first object on the line.
         /// </summary>
@@ -270,7 +272,7 @@ namespace Jackhammer.GameSystems
 
             var first = SeparatedLines[line - 1].First(o => !o.IsPressed);
 
-            return Math.Abs(Time - first.Position) <= (GameSystemManager.FindSystem<ScoreSystem>().MissThreshold) ? first : null;
+            return Math.Abs(Time - first.Position) <= (GameSystemManager.FindSystem<ScoreSystem>().HitThresholds["Miss"]) ? first : null;
         }
 
         private Beatmap LoadBeatmap(string beatmapName)
