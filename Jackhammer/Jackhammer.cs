@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Input.InputListeners;
 using MonoGame.Extended.Screens;
+using Jackhammer.Input;
 using Exception = System.Exception;
 
 #endregion
@@ -29,6 +30,7 @@ namespace Jackhammer
         public GameSettings Settings { get; }
 
         InputListenerComponent _ilc;
+        
 
         private int _minFps = Int32.MaxValue, _maxFps = 0;
 
@@ -128,8 +130,6 @@ namespace Jackhammer
 
         protected override void Update(GameTime gameTime)
         {
-            
-
             // For Mobile devices, this logic will close the Game when the Back button is pressed
             // Exit() is obsolete on iOS
 #if !__IOS__ && !__TVOS__

@@ -10,20 +10,13 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Input.InputListeners;
 using MonoGame.Extended.Screens;
+using Jackhammer.Input;
 
 namespace Jackhammer.Screens
 {
     public class GameplayScreen : Screen
     {
-        public GameplayScreen(Beatmap beatmap, Skin skin, int time, GameSystemManager gameSystemManager) 
-        {
-            this.Beatmap = beatmap;
-                this.Skin = skin;
-                this.Time = time;
-                this.GameSystemManager = gameSystemManager;
-               
-        }
-                public Beatmap Beatmap { get; private set; }
+        public Beatmap Beatmap { get; private set; }
 
         private readonly string _beatmapName;
         public Skin Skin { get; }
@@ -55,7 +48,7 @@ namespace Jackhammer.Screens
             Time = 0;
             
             
-            GameSystemManager = new GameSystemManager();
+            GameSystemManager = new GameSystemManager(game);
         }
 
         public override void Initialize()
@@ -77,8 +70,8 @@ namespace Jackhammer.Screens
                 ScreenManager.FindScreen<PlaySongSelectScreen>().Show();
             }
             
-            GameSystemManager.Register(new ScoreSystem(this));
-            GameSystemManager.Register(new ScoremeterSystem(this));
+            GameSystemManager.Register(new ScoreSystem(this, _game.GraphicsDevice));
+            GameSystemManager.Register(new ScoremeterSystem(_game.GraphicsDevice, Skin, Beatmap));
             //GameSystems.Add(_beatDivisorSystem);
 
             // Create separated lines collections and fill it
@@ -159,7 +152,7 @@ namespace Jackhammer.Screens
                 if (nearest != null && scoreSystem.Calculate(nearest))
                 {
                     nearest.IsPressed = true;
-                    scoremeterSystem.AddScore(nearest);
+                    scoremeterSystem.AddScore(Time, nearest.Position);
                 }
             }
             if (InputManager.WasKeyPressed(_game.Settings.N2))
@@ -171,7 +164,7 @@ namespace Jackhammer.Screens
                 if (nearest != null && scoreSystem.Calculate(nearest))
                 {
                     nearest.IsPressed = true;
-                    scoremeterSystem.AddScore(nearest);
+                    scoremeterSystem.AddScore(Time, nearest.Position);
                 }
             }
             if (InputManager.WasKeyPressed(_game.Settings.N3))
@@ -183,7 +176,7 @@ namespace Jackhammer.Screens
                 if (nearest != null && scoreSystem.Calculate(nearest))
                 {
                     nearest.IsPressed = true;
-                    scoremeterSystem.AddScore(nearest);
+                    scoremeterSystem.AddScore(Time, nearest.Position);
                 }
             }
             if (InputManager.WasKeyPressed(_game.Settings.N4))
@@ -195,7 +188,7 @@ namespace Jackhammer.Screens
                 if (nearest != null && scoreSystem.Calculate(nearest))
                 {
                     nearest.IsPressed = true;
-                    scoremeterSystem.AddScore(nearest);
+                    scoremeterSystem.AddScore(Time, nearest.Position);
                 }
             }
 
@@ -219,8 +212,12 @@ namespace Jackhammer.Screens
             _spriteBatch.Begin();
             
             _spriteBatch.Draw(_background, Vector2.Zero, Color.White);
+
+            for (int i = 0; i < Beatmap.Settings.Difficulty.KeyAmount; i++)
+            {
+                _spriteBatch.Draw(Skin.PlayfieldLineTexture, new Vector2(Skin.Settings.PlayfieldPositionX + Skin.PlayfieldLineTexture.Width * i, 0), Color.White);
+            }
             
-            _spriteBatch.Draw(Skin.PlayfieldLineTexture, new Vector2(Skin.Settings.PlayfieldPositionX, 0), Color.White);
 
             _spriteBatch.Draw(Skin.ButtonTexture,
                 IsUpsideDown
@@ -242,7 +239,7 @@ namespace Jackhammer.Screens
                     Vector2 position = new Vector2(
                         // x
                         Skin.Settings.PlayfieldPositionX +
-                        ((o.Line - 1) * (Skin.PlayfieldLineTexture.Width / 4.0f)),
+                        ((o.Line - 1) * (Skin.PlayfieldLineTexture.Width)),
                         // y
                         (ScrollingSpeed * (Time - o.Position) +
                          (_game.Settings.WindowHeight - Skin.ButtonTexture.Height)) +
@@ -272,7 +269,7 @@ namespace Jackhammer.Screens
                     _spriteBatch.Draw(hitObjectTexture, position, o.IsPressed ? Color.Black : Color.White);
                 }
             }
-            GameSystemManager.Draw(_spriteBatch);
+            
             // Draw Beat Divisors
             // TODO: Skip unnecessary loops
             var tp = Beatmap.TimingPoints[0];
@@ -282,7 +279,7 @@ namespace Jackhammer.Screens
                               (_game.Settings.WindowHeight - Skin.ButtonTexture.Height) + Skin.NoteClickTexture.Height +
                               Skin.Settings.HitPosition);
                 _spriteBatch.DrawLine(new Vector2(Skin.Settings.PlayfieldPositionX, posY),
-                    new Vector2(Skin.Settings.PlayfieldPositionX + Skin.PlayfieldLineTexture.Width, posY), Color.Gray,
+                    new Vector2(Skin.Settings.PlayfieldPositionX + Skin.PlayfieldLineTexture.Width * Beatmap.Settings.Difficulty.KeyAmount, posY), Color.Gray,
                     3.0f);
             }
 
@@ -304,7 +301,7 @@ namespace Jackhammer.Screens
 
             _spriteBatch.End();
 
-            
+            GameSystemManager.Draw(gameTime);
             base.Draw(gameTime);
         }
 
@@ -338,7 +335,9 @@ namespace Jackhammer.Screens
             if (SeparatedLines[line - 1].Count(o => !o.IsPressed) == 0)
                 return null;
 
-            return SeparatedLines[line - 1].First(o => !o.IsPressed);
+            var first = SeparatedLines[line - 1].First(o => !o.IsPressed);
+            
+            return Math.Abs(Time - first.Position) <= (188 - (3 * Beatmap.Settings.Difficulty.OverallDifficutly)) ? first : null;
         }
     }
 }

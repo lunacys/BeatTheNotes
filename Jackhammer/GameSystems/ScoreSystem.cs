@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Jackhammer.Screens;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Jackhammer.GameSystems
 {
@@ -24,14 +25,38 @@ namespace Jackhammer.GameSystems
 
         public float Accuracy { get; private set; }
 
-        public ScoreSystem(GameplayScreen gameplay)
+        public float Od => _gameplay.Beatmap.Settings.Difficulty.OverallDifficutly;
+
+        public float MarvelousThreshold { get; }
+        public float PerfectThreshold { get; } 
+        public float GreatThreshold { get; }
+        public float GoodThreshold { get; }
+        public float BadThreshold { get; }
+        public float MissThreshold { get; }
+
+        private readonly SpriteBatch _spriteBatch;
+
+        public Splash CurrentSplash { get; private set; }
+
+        public ScoreSystem(GameplayScreen gameplay, GraphicsDevice graphicsDevice)
         {
             _gameplay = gameplay;
             Accuracy = 1.0f;
+
+            _spriteBatch = new SpriteBatch(graphicsDevice);
+
+            MarvelousThreshold = 16.0f;
+            PerfectThreshold = 64 - (3 * Od);
+            GreatThreshold = 97 - (3 * Od);
+            GoodThreshold = 127 - (3 * Od);
+            BadThreshold = 151 - (3 * Od);
+            MissThreshold = 188 - (3 * Od);
         }
 
         public override void Update(GameTime gameTime)
         {
+            CurrentSplash?.Update(gameTime);
+
             // TODO: Rework this
             foreach (var line in _gameplay.SeparatedLines)
             {
@@ -39,18 +64,40 @@ namespace Jackhammer.GameSystems
                 {
                     if (o.IsPressed) continue;
 
-                    if (o.Position + (188 - (3 * _gameplay.Beatmap.Settings.Difficulty.OverallDifficutly)) <
-                        _gameplay.Time)
+                    if (o.Position + MissThreshold < _gameplay.Time)
                     {
                         o.IsPressed = true;
                         MissCount++;
                         Combo = 0;
                         CalculateAccuracy();
-                        GameSystemManager.FindSystem<ScoremeterSystem>().AddScore(o);
+                        
+                        CurrentSplash = new Splash(_gameplay.Skin.ScoreMissTexture);
+
+                        GameSystemManager.FindSystem<ScoremeterSystem>().AddScore(_gameplay.Time, o.Position);
                     }
                 }
             }
             
+        }
+
+        public override void Draw(GameTime gameTime)
+        {
+            _spriteBatch.Begin();
+
+            if (CurrentSplash != null)
+            {
+                var pos = new Vector2(
+                    _gameplay.Skin.Settings.PlayfieldPositionX +
+                    (_gameplay.Skin.PlayfieldLineTexture.Width * _gameplay.Beatmap.Settings.Difficulty.KeyAmount) / 2,
+                    300);
+                var color = Color.White * (CurrentSplash.MsBeforeExpire / 1000.0f);
+                var origin = new Vector2(CurrentSplash.Texture.Width / 2.0f, CurrentSplash.Texture.Height / 2.0f);
+                var size = new Vector2(0.9f * ((CurrentSplash.MsBeforeExpire / 1000.0f)), 0.9f * ((CurrentSplash.MsBeforeExpire / 1000.0f)));
+
+                _spriteBatch.Draw(CurrentSplash.Texture, pos, null, color, 0.0f, origin, size, SpriteEffects.None, 0.0f);
+            }
+
+            _spriteBatch.End();
         }
 
         public bool Calculate(HitObject hitObject)
@@ -73,6 +120,8 @@ namespace Jackhammer.GameSystems
                 MaxCombo = MarvelousCount = PerfectCount = GreatCount = GoodCount = BadCount = MissCount = 0;
 
             Accuracy = 1.0f;
+
+            CurrentSplash = null;
         }
 
         private void CalculateScore(int hitValue)
@@ -112,45 +161,45 @@ namespace Jackhammer.GameSystems
         {
             int timeOffset = hitObject.Position - _gameplay.Time;
             int absTimeOffset = Math.Abs(timeOffset);
-            float od = _gameplay.Beatmap.Settings.Difficulty.OverallDifficutly;
-
+            
             int score = 0;
-
-            //note->press();
-            if (absTimeOffset <= 16)
+            
+            if (absTimeOffset <= MarvelousThreshold)
             {
+                CurrentSplash = new Splash(_gameplay.Skin.ScoreMarvelousTexture);
                 MarvelousCount++;
                 score = 320;
             }
-            else if (absTimeOffset <= 64 - (3 * od))
+            else if (absTimeOffset <= PerfectThreshold)
             {
+                CurrentSplash = new Splash(_gameplay.Skin.ScorePerfectTexture);
                 PerfectCount++;
                 score = 300;
             }
-            else if (absTimeOffset <= 97 - (3 * od))
+            else if (absTimeOffset <= GreatThreshold)
             {
+                CurrentSplash = new Splash(_gameplay.Skin.ScoreGreatTexture);
                 GreatCount++;
                 score = 200;
             }
-            else if (absTimeOffset <= 127 - (3 * od))
+            else if (absTimeOffset <= GoodThreshold)
             {
+                CurrentSplash = new Splash(_gameplay.Skin.ScoreGoodTexture);
                 GoodCount++;
                 score = 100;
             }
-            else if (absTimeOffset <= 151 - (3 * od))
+            else if (absTimeOffset <= BadThreshold)
             {
+                CurrentSplash = new Splash(_gameplay.Skin.ScoreBadTexture);
                 BadCount++;
                 score = 50;
             }
-            else if (timeOffset <= 188 - (3 * od))
+            else if (timeOffset <= MissThreshold)
             {
+                CurrentSplash = new Splash(_gameplay.Skin.ScoreMissTexture);
                 MissCount++;
                 Combo = 0;
                 score = 0;
-            }
-            else if (timeOffset > 188 - (3 * od))
-            {
-                return -1;
             }
             
             ProceedCombo(score);

@@ -1,4 +1,5 @@
-﻿using Jackhammer.Skins;
+﻿using Jackhammer.Input;
+using Jackhammer.Skins;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;

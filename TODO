@@ -3,10 +3,12 @@ Todo:
   ☐ Поддержка графиков (Graphs):
     ☐ FpsGraph
     ☐ AccuracyGraph
-  ☐ Рефакторинг:
+  ☐ Рефакторинг: @started(18-03-17 18:54)
+    ☐ Game Systems @started(18-03-17 18:54)
     ☐ Использование паттернов Command, ServiceLocator и Component
     ☐ GameplaySystem.cs
     ☐ Jackhammer.cs
+    ☐ Перевод игрового времени в GameService (или Component?)
   ☐ Поддержка ноты Hold
   ☐ Поддержка анимации
     ☐ Элементов игрового поля (линии)

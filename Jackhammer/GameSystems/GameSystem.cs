@@ -17,7 +17,7 @@ namespace Jackhammer.GameSystems
         }
 
         public virtual void Update(GameTime gameTime) { }
-        public virtual void Draw(SpriteBatch spriteBatch) { }
+        public virtual void Draw(GameTime gameTime) { }
 
         public virtual void Reset() { }
 

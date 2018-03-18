@@ -2,21 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Jackhammer.GameSystems
 {
-    public class GameSystemManager : IGameSystemManager
+    public class GameSystemManager : DrawableGameComponent, IGameSystemManager
     {
         private readonly List<GameSystem> _gameSystems;
 
-        public GameSystemManager(IEnumerable<GameSystem> systems)
+        public GameSystemManager(Game game, IEnumerable<GameSystem> systems) : base(game)
         {
             foreach (var gameSystem in systems)
                 Register(gameSystem);
         }
 
-        public GameSystemManager() 
+        public GameSystemManager(Game game) : base(game) 
         {
             _gameSystems = new List<GameSystem>();
         }
@@ -48,7 +47,7 @@ namespace Jackhammer.GameSystems
             }
         }
 
-        public void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
             foreach (var gameSystem in _gameSystems.Where(s => s.IsWorking))
             {
@@ -56,11 +55,11 @@ namespace Jackhammer.GameSystems
             }
         }
         
-        public void Draw(SpriteBatch spriteBatch)
+        public override void Draw(GameTime gameTime)
         {
             foreach (var gameSystem in _gameSystems.Where(s => s.IsWorking))
             {
-                gameSystem.Draw(spriteBatch);
+                gameSystem.Draw(gameTime);
             }
         }
     }

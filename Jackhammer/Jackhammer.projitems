@@ -25,7 +25,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\IGameSystemManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\Score.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\ScoremeterSystem.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)InputManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\Splash.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Graphs\Graph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Input\InputManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Jackhammer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beatmap\TimingPoint.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Logging\ConsoleLogger.cs" />
@@ -52,5 +54,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Input\" />
   </ItemGroup>
 </Project>

@@ -125,6 +125,14 @@ namespace Jackhammer.Skins
                     skin.DefaultBackground = LoadTextureFromFile(device, Path.Combine(dirPath, "DefaultBackground.png"));
                     skin.PlayfieldLineTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "PlayfieldLine.png"));
                     skin.ButtonTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "Button.png"));
+
+                    skin.ScoreMarvelousTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "HitMarvelous.png"));
+                    skin.ScorePerfectTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "HitPerfect.png"));
+                    skin.ScoreGreatTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "HitGreat.png"));
+                    skin.ScoreGoodTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "HitGood.png"));
+                    skin.ScoreBadTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "HitBad.png"));
+                    skin.ScoreMissTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "HitMiss.png"));
+
                     skin.Font = content.Load<SpriteFont>(Path.Combine("Fonts", "MainFont"));
 
                     skin.HitNormal = LoadSoundEffectFromFile(Path.Combine(dirPath, "HitNormal.wav"));
