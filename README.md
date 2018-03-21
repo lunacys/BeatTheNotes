@@ -18,10 +18,13 @@ If you want to build Android project, you'll need to get [Visual Studio](https:/
 
 Following frameworks are used in the project as NuGet packages:
 
-- MonoGame
-- MonoGame.Extended
-- MonoGame.Extended.Input
-- Newton.Json
+- ```MonoGame``` - Main framework
+- ```MonoGame.Extended``` - Screens, Viewport adapters
+- ```MonoGame.Extended.Input``` - Event-driven input
+- ```Newton.Json``` - JSON Searialization/Deserialization
+- ```NAudio``` - Audio, Music
+- ```NAudio.Vorbis``` - OGG format support
+- ```SoundTouch``` - Music Varispeed
 
 ## Resources
 
@@ -35,7 +38,7 @@ Plans on game resorces:
 
 ## License
 
-All the source code is under [MIT](LICENSE.txt) license.
+All the source code is under [MIT](LICENSE.txt) license except for SoundTouch which is under LGPL v2.1.
 
 ## Описание
 
@@ -102,7 +105,8 @@ Jackhammer представляет собой игру наподобии Stepm
   - [ ] Подстраивание игры под экран (растягивание элементов интерфейса)
     - [ ] Разрешения
     - [ ] Соотношения сторон (16:9, 4:3, 16:10, 3:2)
-  - [ ] Что-то ещё, о чём я забыл
+  - [ ] Поддержка WaveForms для редактора
+  - [ ] Поддержка изменения скорости музыки и карты
 - [ ] Загрузка/сохранение карт (Beatmap)
   - [x] Запись и чтение карты из файла в формате JSON
   - [ ] Загрузка списка всех карт в память при запуске игры

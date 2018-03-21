@@ -9,6 +9,7 @@
     <Import_RootNamespace>Jackhammer</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Audio\Music.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beatmap\Beatmap.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beatmap\BeatmapReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beatmap\BeatmapSettings.cs" />
@@ -24,6 +25,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\GameplaySystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\GameSystemComponent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\IGameSystemManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\MusicSystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\Score.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\ScoremeterSystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\Splash.cs" />
@@ -50,6 +52,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Skins\Skin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Skins\SkinLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Skins\SkinSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SoundTouch\SoundTouch.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SoundTouch\SoundTouchInterop32.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SoundTouch\SoundTouchInterop64.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SoundTouch\SoundTouchProfile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SoundTouch\SoundTouchSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SoundTouch\VarispeedSampleProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />

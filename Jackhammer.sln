@@ -7,11 +7,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Jackhammer", "Jackhammer\Ja
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jackhammer.DesktopGL", "Jackhammer.DesktopGL\Jackhammer.DesktopGL.csproj", "{896E067F-4C45-46BC-ADF5-D7E879FD6FBC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jackhammer.Android", "Jackhammer.Android\Jackhammer.Android.csproj", "{605B24B4-6958-4359-9AD4-C9EC3336B435}"
-EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Jackhammer\Jackhammer.projitems*{605b24b4-6958-4359-9ad4-c9ec3336b435}*SharedItemsImports = 4
 		Jackhammer\Jackhammer.projitems*{896e067f-4c45-46bc-adf5-d7e879fd6fbc}*SharedItemsImports = 4
 		Jackhammer\Jackhammer.projitems*{a0cdbd0e-3a41-42b7-9425-a838bc2c7383}*SharedItemsImports = 13
 	EndGlobalSection
@@ -24,12 +21,6 @@ Global
 		{896E067F-4C45-46BC-ADF5-D7E879FD6FBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{896E067F-4C45-46BC-ADF5-D7E879FD6FBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{896E067F-4C45-46BC-ADF5-D7E879FD6FBC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{605B24B4-6958-4359-9AD4-C9EC3336B435}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{605B24B4-6958-4359-9AD4-C9EC3336B435}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{605B24B4-6958-4359-9AD4-C9EC3336B435}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{605B24B4-6958-4359-9AD4-C9EC3336B435}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{605B24B4-6958-4359-9AD4-C9EC3336B435}.Release|Any CPU.Build.0 = Release|Any CPU
-		{605B24B4-6958-4359-9AD4-C9EC3336B435}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

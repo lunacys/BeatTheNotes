@@ -61,7 +61,7 @@ namespace Jackhammer
             fps = new FramesPerSecondCounter();
 
             _graphics.SynchronizeWithVerticalRetrace = _settings.IsUsedVSync;
-            TargetElapsedTime = TimeSpan.FromSeconds(1.0f / _settings.TargetFramesPerSecond);
+            TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 2000.0f);
 
             _graphics.PreferredBackBufferWidth = _settings.WindowWidth;
             _graphics.PreferredBackBufferHeight = _settings.WindowHeight;

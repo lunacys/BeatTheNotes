@@ -62,7 +62,7 @@ namespace Jackhammer.Screens
                 MediaPlayer.Pause();
             }
             
-            if (InputManager.IsKeyDown(Keys.OemTilde))
+            if (InputManager.WasKeyPressed(Keys.OemTilde))
             {
                 Restart();
             }

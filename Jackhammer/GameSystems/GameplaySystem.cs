@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Jackhammer.Audio;
 using Jackhammer.Input;
 using Jackhammer.Screens;
 using Jackhammer.Skins;
@@ -10,6 +11,12 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Screens;
+using NAudio;
+using NAudio.Utils;
+using NAudio.Vorbis;
+using NAudio.Wave;
+using NVorbis;
+using NVorbis.Ogg;
 
 namespace Jackhammer.GameSystems
 {
@@ -17,7 +24,7 @@ namespace Jackhammer.GameSystems
     {
         public Beatmap Beatmap { get; }
         public Skin Skin { get; }
-        public int Time { get; private set; }
+        public long Time { get; private set; }
 
         public GameSettings Settings => _game.Services.GetService<GameSettings>();
 
@@ -28,17 +35,32 @@ namespace Jackhammer.GameSystems
 
         private readonly Jackhammer _game;
         private readonly Texture2D _background;
-        private readonly Song _song;
+        //private readonly Song _song;
 
         private SpriteBatch _spriteBatch;
+
+        public TimingPoint CurrentTimingPoint;
+
+        //private VorbisWaveReader _waveReader;
+        //private WaveOutEvent _wave;
+
+        private Music _music;
+
+        private string _beatmapName;
 
         public GameplaySystem(Jackhammer game, string beatmapName)
         {
             _game = game;
             Beatmap = LoadBeatmap(beatmapName);
+            CurrentTimingPoint = Beatmap.TimingPoints[0];
             _background = LoadBackground(beatmapName);
-            _song = LoadSong(beatmapName);
-            
+            //_song = LoadSong(beatmapName);
+            _music = new Music(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", beatmapName, Beatmap.Settings.General.AudioFileName));
+            _music.PlaybackRate = 1.5f;
+
+            _music.Play();
+            _beatmapName = beatmapName;
+
             Skin = _game.Services.GetService<Skin>();
             Time = 0;
         }
@@ -49,7 +71,7 @@ namespace Jackhammer.GameSystems
 
             _spriteBatch = new SpriteBatch(_game.GraphicsDevice);
 
-            MediaPlayer.Play(_song);
+            //MediaPlayer.Play(_song);
             MediaPlayer.Volume = Settings.SongVolumeF;
         }
 
@@ -57,7 +79,8 @@ namespace Jackhammer.GameSystems
         {
             base.Update(gameTime);
 
-            Time += gameTime.ElapsedGameTime.Milliseconds;
+            //Time += gameTime.ElapsedGameTime.Milliseconds;
+            Time = (long)((float)_music.Position.TotalMilliseconds * _music.PlaybackRate);
 
             if (InputManager.WasKeyPressed(Keys.F4))
                 if (ScrollingSpeed < 20.0f)
@@ -68,14 +91,40 @@ namespace Jackhammer.GameSystems
             /*if (InputManager.WasKeyPressed(Keys.F5))
                 Settings.IsReversedDirection = !IsUpsideDown;*/
 
-            HandleInput();
+            if (InputManager.WasKeyPressed(Keys.F1))
+            {
+                Reset();
+                _music.PlaybackRate -= 0.1f;
+                
+            }
 
+            if (InputManager.WasKeyPressed(Keys.F2))
+            {
+                Reset();
+                _music.PlaybackRate += 0.1f;
+            }
+
+            HandleInput();
+            
             if (Beatmap.HitObjects.Last().Position + 1000 < Time)
             {
                 // The beatmap is over
                 MediaPlayer.Volume -= gameTime.ElapsedGameTime.Milliseconds / 5000.0f;
+                //if (_wave.Volume > 0.01f)
+                //    _wave.Volume -= gameTime.ElapsedGameTime.Milliseconds / 5000.0f;
+
+                //if (_wave.Volume <= 0.01f) 
+                //    _wave.Pause();
                 //MediaPlayer.Stop();
             }
+
+            foreach (var tp in Beatmap.TimingPoints)
+            {
+                if (Math.Abs(Time - tp.Position) <= 10)
+                    CurrentTimingPoint = tp;
+            }
+
+            //Console.WriteLine($"{CurrentTimingPoint.Position}");
         }
 
         public override void Draw(GameTime gameTime)
@@ -157,7 +206,7 @@ namespace Jackhammer.GameSystems
 
                     var scoreSys = GameSystemManager.FindSystem<ScoreSystem>();
                     
-                    if (o.Position + scoreSys.HitThresholds["Miss"] < Time)
+                    if (o.Position + scoreSys.HitThresholds[scoreSys.ScoreMiss] < Time)
                     {
                         scoreSys.Calculate(o);
                     }
@@ -170,6 +219,11 @@ namespace Jackhammer.GameSystems
             _spriteBatch.DrawString(Skin.Font, Time.ToString(), new Vector2(12, 12), Color.Red);
             _spriteBatch.DrawString(Skin.Font, IsUpsideDown.ToString(), new Vector2(12, 30), Color.Red);
             _spriteBatch.DrawString(Skin.Font, ScrollingSpeed.ToString("F1"), new Vector2(12, 48), Color.Red);
+
+            _spriteBatch.DrawString(Skin.Font,
+                $"Song Position: {_music.Position:mm\\:ss}\nSong Speed: {_music.PlaybackRate:F1}", 
+                new Vector2(12, 64),
+                Color.DarkRed);
 
             var scoreSystem = GameSystemManager.FindSystem<ScoreSystem>();
 
@@ -194,10 +248,16 @@ namespace Jackhammer.GameSystems
                 o.IsPressed = false;
             }
 
-            Time = 0;
+            //_wave.Stop();
+            //_wave.Dispose();
+            //LoadSong(_beatmapName);
+            _music.Position = TimeSpan.Zero;
+
+            //_wave.Play();
+
             MediaPlayer.Stop();
             MediaPlayer.Volume = Settings.SongVolumeF;
-            MediaPlayer.Play(_song);
+            //MediaPlayer.Play(_song);
         }
 
         private void HandleInput()
@@ -245,7 +305,7 @@ namespace Jackhammer.GameSystems
         private void DrawBeatDivisors()
         {
             // TODO: Skip unnecessary loops
-            var tp = Beatmap.TimingPoints[0];
+            var tp = CurrentTimingPoint;
             for (int i = tp.Position; i <= Beatmap.HitObjects.Last().Position; i += (int)Math.Floor(tp.MsPerBeat * 4))
             {
                 float posY = (ScrollingSpeed * (Time - i) +
@@ -255,6 +315,41 @@ namespace Jackhammer.GameSystems
                     new Vector2(Skin.Settings.PlayfieldPositionX + Skin.PlayfieldLineTexture.Width * Beatmap.Settings.Difficulty.KeyAmount, posY), Color.Gray,
                     3.0f);
             }
+        }
+
+        private TimingPoint GetCurrentTimingPoint()
+        {
+            // TODO: This
+            // If there's no timing point at the time, return the first timing point
+            if (Beatmap.TimingPoints[0].Position < Time)
+                return Beatmap.TimingPoints[0];
+
+            // If there's the only one timing point on the map, return that timing point
+            if (Beatmap.TimingPoints.Count == 1)
+                return Beatmap.TimingPoints[0];
+
+            /*foreach (var tp in Beatmap.TimingPoints)
+            {
+                if (tp.Position < Time)
+                {
+                    
+                    return tp;
+                }
+            }*/
+
+            for (int i = 0; i < Beatmap.TimingPoints.Count - 1; i++)
+            {
+                var cur = Beatmap.TimingPoints[i].Position;
+                var next = Beatmap.TimingPoints[i + 1].Position;
+
+                //if ()
+                {
+                //    Console.WriteLine($"returning tp: {Beatmap.TimingPoints[i].Position}");
+                //    return Beatmap.TimingPoints[i];
+                }
+            }
+            
+            return Beatmap.TimingPoints[0];
         }
 
         /// <summary>
@@ -272,7 +367,9 @@ namespace Jackhammer.GameSystems
 
             var first = SeparatedLines[line - 1].First(o => !o.IsPressed);
 
-            return Math.Abs(Time - first.Position) <= (GameSystemManager.FindSystem<ScoreSystem>().HitThresholds["Miss"]) ? first : null;
+            var ss = GameSystemManager.FindSystem<ScoreSystem>();
+
+            return Math.Abs(Time - first.Position) <= (ss.HitThresholds[ss.ScoreMiss]) ? first : null;
         }
 
         private Beatmap LoadBeatmap(string beatmapName)
@@ -322,6 +419,16 @@ namespace Jackhammer.GameSystems
         {
             Song song = Song.FromUri("BrainPower.ogg",
                 new Uri(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", beatmapName, "BrainPower.ogg")));
+
+            /*_wave = new WaveOutEvent();
+            
+            _waveReader = new VorbisWaveReader(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", beatmapName,
+                Beatmap.Settings.General.AudioFileName));
+            _wave.Init(_waveReader);
+
+            _wave.Volume = _game.Services.GetService<GameSettings>().SongVolumeF;
+            
+            _wave.Play();*/
 
             return song;
         }

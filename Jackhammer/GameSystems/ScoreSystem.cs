@@ -8,12 +8,12 @@ namespace Jackhammer.GameSystems
 {
     public class ScoreSystem : GameSystem
     {
-        public const string ScoreMarvelous = "Marvelous";
-        public const string ScorePerfect = "Perfect";
-        public const string ScoreGreat = "Great";
-        public const string ScoreGood = "Good";
-        public const string ScoreBad = "Bad";
-        public const string ScoreMiss = "Miss";
+        public string ScoreMarvelous => "Marvelous";
+        public string ScorePerfect => "Perfect";
+        public string ScoreGreat => "Great";
+        public string ScoreGood => "Good";
+        public string ScoreBad => "Bad";
+        public string ScoreMiss => "Miss";
 
         public const int MaxScore = 1000000;
 
@@ -206,7 +206,7 @@ namespace Jackhammer.GameSystems
 
         private int GetHitValue(HitObject hitObject)
         {
-            int timeOffset = hitObject.Position - _gameplay.Time;
+            int timeOffset = hitObject.Position - (int)_gameplay.Time;
             int absTimeOffset = Math.Abs(timeOffset);
             
             int score = 0;
@@ -274,7 +274,7 @@ namespace Jackhammer.GameSystems
             }
             else throw new InvalidDataException("Score not found");
             
-            GameSystemManager.FindSystem<ScoremeterSystem>()?.AddScore(_gameplay.Time, hitObject.Position);
+            GameSystemManager.FindSystem<ScoremeterSystem>()?.AddScore((int)_gameplay.Time, hitObject.Position);
 
             ProceedCombo(hitValue);
             CalculateScore(hitValueName);
