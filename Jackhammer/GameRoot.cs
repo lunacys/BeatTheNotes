@@ -19,7 +19,7 @@ using Exception = System.Exception;
 
 namespace Jackhammer
 {
-    public class Jackhammer : Game
+    public class GameRoot : Game
     {
         private readonly GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -34,7 +34,7 @@ namespace Jackhammer
 
         private int _minFps = Int32.MaxValue, _maxFps = 0;
 
-        public Jackhammer()
+        public GameRoot()
         {
             LogHelper.Log($"======= Starting Jackhammer at {DateTime.Now} =======");
 

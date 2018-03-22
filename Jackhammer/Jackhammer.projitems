@@ -32,7 +32,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\SystemAddedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Graphs\Graph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Input\InputManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Jackhammer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameRoot.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Beatmap\TimingPoint.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Logging\ConsoleLogger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Logging\FileLogger.cs" />
@@ -58,6 +58,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)SoundTouch\SoundTouchProfile.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SoundTouch\SoundTouchSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SoundTouch\VarispeedSampleProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TimeSpanExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />

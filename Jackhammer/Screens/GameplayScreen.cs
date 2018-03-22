@@ -16,13 +16,13 @@ namespace Jackhammer.Screens
 {
     public class GameplayScreen : Screen
     {
-        private readonly Jackhammer _game;
+        private readonly GameRoot _game;
 
         public GameSystemComponent GameSystemComponent { get; }
 
         private readonly string _beatmapName;
 
-        public GameplayScreen(Jackhammer game, string beatmapName)
+        public GameplayScreen(GameRoot game, string beatmapName)
         {
             _game = game;
             _beatmapName = beatmapName;

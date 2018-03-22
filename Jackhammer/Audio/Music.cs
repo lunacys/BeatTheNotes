@@ -17,14 +17,21 @@ namespace Jackhammer.Audio
 
         public TimeSpan Position
         {
-            get => _wavePlayer.GetPositionTimeSpan();
+            get => _wavePlayer.GetPositionTimeSpan().Multiply(PlaybackRate);
             set
             {
+                _wavePlayer.Dispose();
+                _wavePlayer = new WaveOutEvent();
+                _wavePlayer.Init(_speedControl);
+                _wavePlayer.Play();
                 _reader.CurrentTime = value;
-                Dispose();
-                LoadFromFile(_filename);
-                Play();
             }
+        }
+
+        public float Volume
+        {
+            get => _wavePlayer.Volume;
+            set => _wavePlayer.Volume = value;
         }
 
         public float PlaybackRate
@@ -35,7 +42,6 @@ namespace Jackhammer.Audio
             {
                 _speedControl.PlaybackRate = value; 
             }
-/*0.5f + value * 0.1f;*/
         }
 
         private WaveOutEvent _wavePlayer;
@@ -46,60 +52,34 @@ namespace Jackhammer.Audio
         public Music(string filename)
         {
             _filename = filename;
-            _wavePlayer = new WaveOutEvent();
+
             LoadFromFile(_filename);
         }
 
         public void LoadFromFile(string filename)
         {
-            /*string ext = Path.GetExtension(filename);
+            Dispose();
 
-            if (string.IsNullOrEmpty(ext) || (ext.ToLower() != ".mp3" && ext.ToLower() != ".ogg"))
-                throw new InvalidDataException("Not supported file format");
-
-            switch (ext.ToLower())
-            {
-                case ".mp3":
-                    _mp3Reader = new Mp3FileReader(filename);
-                    _wave.Init(_mp3Reader);
-                    break;
-                case ".ogg":
-                    _oggReader = new VorbisWaveReader(filename);
-                    _wave.Init(_oggReader);
-                    break;
-            }*/
-
-            _reader?.Dispose();
-            _speedControl?.Dispose();
             _reader = null;
             _speedControl = null;
+            _wavePlayer = null;
             
             if (filename == null) return;
             _reader = new AudioFileReader(filename);
+            _speedControl = new VarispeedSampleProvider(_reader, 100, new SoundTouchProfile(true, true));
+
+            PlaybackRate = 1.0f;
+
+            _wavePlayer = new WaveOutEvent();
+
+            _wavePlayer.Volume = 1.0f;
+            _wavePlayer.Init(_speedControl);
             
-            _speedControl = new VarispeedSampleProvider(_reader, 100, new SoundTouchProfile(true, false));
         }
 
         public void Play()
         {
-            if (_wavePlayer == null)
-            {
-                _wavePlayer = new WaveOutEvent();
-                _wavePlayer.PlaybackStopped += (sender, args) => 
-                {
-                    if (args.Exception != null)
-                        LogHelper.Log($"Playback Stopped Unexpectedly: {args.Exception.Message}", LogLevel.Error);
-                };
-            }
-            if (_speedControl == null)
-            {
-                LoadFromFile(_filename);
-                if (_speedControl == null) return;
-            }
-
-            _wavePlayer.Init(_speedControl);
-
-            _wavePlayer.Play();
+            _wavePlayer?.Play();
         }
 
         public void Stop()
