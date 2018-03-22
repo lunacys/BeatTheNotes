@@ -2,17 +2,34 @@
 
 ## Description
 
-Jackhammer is a Stepmania or osu!mania-like game which is a 'reincarnation' of my university course work [Notemania](https://github.com/lunacys/Notemania).
+Jackhammer is a cross-platform rhythm Stepmania-like game.
 
-Jackhammer is fully written in C# using [MonoGame framework](https://github.com/mono/MonoGame).
+In fact, it is a 'reincarnation' of my university course work [Notemania](https://github.com/lunacys/Notemania).
 
-Jackhammer is available in Windows, Linux and OS X systems.
+Jackhammer is fully written in C# using [MonoGame Framework](https://github.com/mono/MonoGame).
+
+Jackhammer will be available in Windows, Linux, OS X and Android systems.
+
+## Platform support
+
+- [x] Windows
+- [ ] Linux
+- [ ] OS X
+- [ ] Android
 
 ## Building
 
 To be able to build the Desktop project you need only [Visual Studio 2015](https://www.visualstudio.com/) or higher.
 
 If you want to build Android project, you'll need to get [Visual Studio](https://www.visualstudio.com/) with Android Tools (Xamarin for Android).
+
+First of all, you need to clone the repo:
+
+```git clone https://github.com/lunacys/Jackhammer.git```
+
+Next, open the ```Jackhammer.sln``` file and select the required solution configuration - Debug or Release.
+
+You can now build and run the game.
 
 ### Deps
 
@@ -32,13 +49,13 @@ Currently all the game resources are in under work. They will be available as so
 
 Plans on game resorces:
 
-- Website
-- Discord Channel
-- Game Wiki
+- [ ] Website
+- [ ] Discord Channel
+- [ ] Game Wiki
 
 ## License
 
-All the source code is under [MIT](LICENSE.txt) license except for SoundTouch which is under LGPL v2.1.
+All the game source code is under [MIT](LICENSE.txt) license except for SoundTouch which is under LGPL v2.1 license. Check [LICENSE.txt](LICENSE.txt) file for more information.
 
 ## Описание
 
@@ -55,9 +72,11 @@ Jackhammer представляет собой игру наподобии Stepm
 - Возможности для кастомизации процесса игры.
 - Различные режимы для усложнения или упрощения процесса игры, делая его более интересным как для новичков, так и для профессионалов.
 - Возможности для практикования игры и улучшения своих навыков.
-- Версия под Android.
-- Версия под Linux.
+- Версия под Windows, Linux, OS X и Android.
 - Поддержка импорта карт из [osu!](https://osu.ppy.sh) (формат .osu).
+- Возможность при помощи Drag&Drop изменять все элементы интерфейса.
+- Автоматическая генерация карт.
+- Автоматическое создание музыки из семплов и карт на её основе для тренировки различных паттернов.
 
 ### Техническая сторона
 
@@ -81,6 +100,7 @@ Jackhammer представляет собой игру наподобии Stepm
 - [ ] Технические вещи
   - [x] Система логгинга (Log) в файл и консоль с синхроном и асинхроном
   - [x] Система игровых установок (GameSettings), сериализация и десериализация
+  - [x] Поддержка изменения скорости музыки и карты
   - [ ] Поддержка графиков (Graphs):
     - [ ] FpsGraph
     - [ ] AccuracyGraph
@@ -106,7 +126,10 @@ Jackhammer представляет собой игру наподобии Stepm
     - [ ] Разрешения
     - [ ] Соотношения сторон (16:9, 4:3, 16:10, 3:2)
   - [ ] Поддержка WaveForms для редактора
-  - [ ] Поддержка изменения скорости музыки и карты
+  - [ ] Возможность изменения положения элементов интерфейса и игрового процесса (Очки, Scoremeter, Игровое поле и т.д.)
+  - [ ] Автоматическая генерация карты по музыке
+  - [ ] Автоматические создание карт для тренировки различных паттернов
+  - [ ] Генерация музыки для предыдущего пункта из семплов
 - [ ] Загрузка/сохранение карт (Beatmap)
   - [x] Запись и чтение карты из файла в формате JSON
   - [ ] Загрузка списка всех карт в память при запуске игры
@@ -125,7 +148,8 @@ Jackhammer представляет собой игру наподобии Stepm
   - [ ] Игровое поле, содержащее от 4 до 7 линий в зависимости от сложности:
     - [x] 4k
     - [ ] 5k-7k
-  - [x] Управление на заданные клавиши, их настройка (по умолчанию D F J K для 4 кнопок (4k))
+  - [x] Управление на заданные клавиши (по умолчанию Z X . / для 4 кнопок (4k))
+  - [x] Настройка управления
   - [x] Поддержка ноты Click
   - [x] Scoremeter
   - [ ] Поддержка ноты Hold

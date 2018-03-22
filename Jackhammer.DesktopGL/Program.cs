@@ -14,7 +14,7 @@ namespace Jackhammer.DesktopGL
         [STAThread]
         static void Main()
         {
-            using (var game = new Jackhammer())
+            using (var game = new GameRoot())
                 game.Run();
         }
     }

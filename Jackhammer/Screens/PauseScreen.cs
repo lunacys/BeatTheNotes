@@ -10,11 +10,11 @@ namespace Jackhammer.Screens
 {
     public class PauseScreen : Screen
     {
-        private readonly Jackhammer _game;
+        private readonly GameRoot _game;
         private SpriteBatch _spriteBatch;
         private Skin Skin => _game.Services.GetService<Skin>();
 
-        public PauseScreen(Jackhammer game)
+        public PauseScreen(GameRoot game)
         {
             _game = game;
         }
