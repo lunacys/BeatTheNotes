@@ -37,10 +37,8 @@ Following frameworks are used in the project as NuGet packages:
 
 - ```MonoGame``` - Main framework
 - ```MonoGame.Extended``` - Screens, Viewport adapters
-- ```MonoGame.Extended.Input``` - Event-driven input
 - ```Newton.Json``` - JSON Searialization/Deserialization
 - ```NAudio``` - Audio, Music
-- ```NAudio.Vorbis``` - OGG format support
 - ```SoundTouch``` - Music Varispeed
 
 ## Resources

@@ -10,6 +10,8 @@ using Jackhammer.Skins;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 using Jackhammer.Input;
+using MonoGame.Extended;
+using MonoGame.Extended.Screens;
 using Exception = System.Exception;
 
 #endregion
