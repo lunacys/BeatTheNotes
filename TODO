@@ -1,0 +1,34 @@
+
+Todo:
+  ✔ Splash названия очков (Marvelous, Pefrect etc) @done(18-03-18 20:48)
+  ☐ Вынесение музыки в отдельную систему MusicSystem @started(18-03-21 09:44)
+  ☐ Зависимость игрового времени от позиции музыки
+  ☐ Поддержка загрузки mp3 и ogg файлов музыки
+  ☐ Поддержка графиков (Graphs):
+    ☐ FpsGraph
+    ☐ AccuracyGraph
+  ☐ Рефакторинг: @started(18-03-17 18:54)
+    ✔ Game Systems @started(18-03-17 18:54) @done(18-03-18 20:44) @lasted(1 day 1 hour 50 minutes 59 seconds)
+    ✔ Использование паттернов ServiceLocator и Component @done(18-03-18 20:45)
+    ✔ GameplayScreen.cs @started(18-03-18 20:45) @done(18-03-18 20:45) @lasted(19 seconds)
+    ☐ GameplaySystem.cs @started(18-03-18 20:47)
+    ☐ Jackhammer.cs
+    ☐ Перевод игрового времени в GameSystem (а может GameService или Component?)
+  ✔ Переделать систему очков - добавить BonusScore @started(18-03-18 21:58) @done(18-03-18 22:57) @lasted(59 minutes 9 seconds)
+  ☐ Полоса здоровья, система жизней
+  ☐ Поддержка ноты Hold
+  ☐ Поддержка анимации
+    ☐ Элементов игрового поля (линии)
+    ☐ Кнопок
+    ☐ Ноты Click
+    ☐ Ноты Hold
+  ☐ GUI
+    ☐ Canvas
+    ☐ Button
+    ☐ Window
+    ☐ TextBox
+    ☐ Slider
+    ☐ ComboBox
+  ☐ BeatmapFonts
+    ☐ Для игры
+    ☐ Для скинов

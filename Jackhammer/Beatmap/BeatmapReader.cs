@@ -134,10 +134,7 @@ namespace Jackhammer
                 }
 
                 Beatmap bm = new Beatmap(
-                    general,
-                    editor,
-                    metadata,
-                    difficulty,
+                    new BeatmapSettings(general, editor, metadata, difficulty), 
                     timingPoints,
                     hitObjects
                 );
@@ -152,6 +149,8 @@ namespace Jackhammer
         /// <returns>Beatmap</returns>
         public static Beatmap LoadFromFile(string mapname)
         {
+            LogHelper.Log($"BeatmapReader: Load Beatmap from file '{mapname}'");
+
             // TODO: Encapsulate "Maps"
             string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", mapname, mapname + ".jmap");
 
@@ -163,7 +162,8 @@ namespace Jackhammer
                 str = sr.ReadToEnd();
 
 
-            Console.WriteLine(str);
+            LogHelper.Log($"BeatmapReader: Parsing Beatmap '{mapname}'");
+            
             JObject obj = JObject.Parse(str);
 
             BeatmapSettings settings =
@@ -177,19 +177,22 @@ namespace Jackhammer
                 throw new FileLoadException("HitObjectsFilename is null");
             if (string.IsNullOrEmpty(settings.TimingPointsFilename))
                 throw new FileLoadException("TimingPointsFilename is null");
-            if (!File.Exists(settings.HitObjectsFilename))
+            if (!File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", mapname, settings.HitObjectsFilename)))
                 throw new FileNotFoundException("HitObjects file not found");
-            if (!File.Exists(settings.TimingPointsFilename))
+            if (!File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", mapname, settings.TimingPointsFilename)))
                 throw new FileNotFoundException("TimingPoints file not found");
 
             List<TimingPoint> timingPoints = new List<TimingPoint>();
             List<HitObject> hitObjects = new List<HitObject>();
+
+            LogHelper.Log($"BeatmapReader: Reading Beatmap Timing Points '{mapname}'");
 
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", mapname,
                 settings.TimingPointsFilename);
             // Reading TimingPoints file, which contains all the timing points used in the beatmap
             using (StreamReader sr = new StreamReader(path))
             {
+                LogHelper.Log($"BeatmapReader: Found Beatmap Timing Points file '{settings.TimingPointsFilename}'");
                 string full = sr.ReadToEnd();
                 string[] lines = full.Split('\n');
                 foreach (var line in lines)
@@ -215,13 +218,17 @@ namespace Jackhammer
                     timingPoints.Add(tp);
                 }
             }
+            LogHelper.Log($"BeatmapReader: Sucessfully Read Beatmap Timing Points. Total Timing Point count: {timingPoints.Count}");
 
+            LogHelper.Log($"BeatmapReader: Reading Beatmap Hit Objects '{mapname}'");
             path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", mapname,
                 settings.HitObjectsFilename);
             // Reading HitObjects file, which contans all the objects used in the beatmap
             // HitObjects file uses this format: "Line Position" for a Click, and "Line Position EndPosition" for a Hold
             using (StreamReader sr = new StreamReader(path))
             {
+                LogHelper.Log($"BeatmapReader: Found Beatmap Hit Objects file '{settings.HitObjectsFilename}'");
+
                 string full = sr.ReadToEnd();
                 string[] lines = full.Split('\n');
                 foreach (var line in lines)
@@ -241,9 +248,11 @@ namespace Jackhammer
                     hitObjects.Add(ho);
                 }
             }
+            LogHelper.Log($"BeatmapReader: Sucessfully Read Beatmap Hit Objects. Total Hit Objects count: {hitObjects.Count}");
 
-            Beatmap bm = new Beatmap(settings.General, settings.Editor, settings.Metadata,
-                settings.Difficulty, timingPoints, hitObjects);
+            Beatmap bm = new Beatmap(settings, timingPoints, hitObjects);
+
+            LogHelper.Log($"BeatmapReader: Sucessfully Read Beatmap '{mapname}'");
 
             return bm;
         }
