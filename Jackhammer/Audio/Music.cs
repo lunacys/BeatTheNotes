@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using Jackhammer.SoundTouch;
 using NAudio.Utils;
-using NAudio.Vorbis;
 using NAudio.Wave;
 
 namespace Jackhammer.Audio

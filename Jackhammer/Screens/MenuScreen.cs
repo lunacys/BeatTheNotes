@@ -1,6 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoGame.Extended;
-using MonoGame.Extended.Screens;
 
 namespace Jackhammer.Screens
 {

@@ -8,8 +8,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using MonoGame.Extended.Input.InputListeners;
-using MonoGame.Extended.Screens;
 using Jackhammer.Input;
 
 namespace Jackhammer.Screens

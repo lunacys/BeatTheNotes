@@ -11,7 +11,7 @@ namespace Jackhammer.GameSystems
 
         public event EventHandler<SystemAddedEventArgs> SystemAdded;
 
-        public GameSystemComponent(Game game, IEnumerable<GameSystem> systems) : base(game)
+        public GameSystemComponent(Game game, IEnumerable<GameSystem> systems) : this(game)
         {
             foreach (var gameSystem in systems)
                 Register(gameSystem);

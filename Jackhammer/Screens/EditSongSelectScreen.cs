@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.Screens;
 
 namespace Jackhammer.Screens
 {
