@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Jackhammer.Audio;
+using Jackhammer.Framework;
+using Jackhammer.Framework.Beatmaps;
+using Jackhammer.Framework.GameSystems;
+using Jackhammer.Framework.Logging;
+using Jackhammer.Framework.Settings;
+using Jackhammer.Framework.Skins;
 using Jackhammer.Input;
-using Jackhammer.Skins;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -36,7 +40,7 @@ namespace Jackhammer.GameSystems
         //private VorbisWaveReader _waveReader;
         //private WaveOutEvent _wave;
 
-        private Music _music;
+        //private Music _music;
 
         private string _beatmapName;
 
@@ -47,10 +51,10 @@ namespace Jackhammer.GameSystems
             CurrentTimingPoint = Beatmap.TimingPoints[0];
             _background = LoadBackground(beatmapName);
             //_song = LoadSong(beatmapName);
-            _music = new Music(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", beatmapName, Beatmap.Settings.General.AudioFileName));
+            //_music = new Music(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", beatmapName, Beatmap.Settings.General.AudioFileName));
             //_music.PlaybackRate = 1.5f;
 
-            _music.Play();
+            //_music.Play();
             _beatmapName = beatmapName;
 
             Skin = _game.Services.GetService<Skin>();
@@ -72,7 +76,7 @@ namespace Jackhammer.GameSystems
             base.Update(gameTime);
 
             //Time += gameTime.ElapsedGameTime.Milliseconds;
-            Time = (long)_music.Position.TotalMilliseconds;
+            Time = FindSystem<MusicSystem>().MusicPosition;
 
             if (InputManager.WasKeyPressed(Keys.F4))
                 if (ScrollingSpeed < 20.0f)
@@ -86,14 +90,14 @@ namespace Jackhammer.GameSystems
             if (InputManager.WasKeyPressed(Keys.F1))
             {
                 Reset();
-                _music.PlaybackRate -= 0.1f;
+                FindSystem<MusicSystem>().PlaybackRate -= 0.1f;
                 
             }
             
             if (InputManager.WasKeyPressed(Keys.F2))
             {
                 Reset();
-                _music.PlaybackRate += 0.1f;
+                FindSystem<MusicSystem>().PlaybackRate += 0.1f;
             }
 
             HandleInput();
@@ -102,10 +106,10 @@ namespace Jackhammer.GameSystems
             {
                 // The beatmap is over
                 //MediaPlayer.Volume -= gameTime.ElapsedGameTime.Milliseconds / 5000.0f;
-                if (_music.Volume > 0.01f)
-                    _music.Volume -= gameTime.ElapsedGameTime.Milliseconds / 5000.0f;
+                if (FindSystem<MusicSystem>().Volume > 0.01f)
+                    FindSystem<MusicSystem>().Volume -= gameTime.ElapsedGameTime.Milliseconds / 5000.0f;
 
-                if (_music.Volume <= 0.01f)
+                if (FindSystem<MusicSystem>().Volume <= 0.01f)
                     Reset();
                 //MediaPlayer.Stop();
 
@@ -216,7 +220,7 @@ namespace Jackhammer.GameSystems
             _spriteBatch.DrawString(Skin.Font, ScrollingSpeed.ToString("F1"), new Vector2(12, 48), Color.Red);
 
             _spriteBatch.DrawString(Skin.Font,
-                $"Song Position: {_music.Position:mm\\:ss}\nSong Speed: {_music.PlaybackRate:F1}", 
+                $"Song Speed: {FindSystem<MusicSystem>().PlaybackRate:F1}", 
                 new Vector2(12, 64),
                 Color.DarkRed);
 
@@ -246,13 +250,13 @@ namespace Jackhammer.GameSystems
             //_wave.Stop();
             //_wave.Dispose();
             //LoadSong(_beatmapName);
-            _music.LoadFromFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", _beatmapName, Beatmap.Settings.General.AudioFileName));
+            //_music.LoadFromFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", _beatmapName, Beatmap.Settings.General.AudioFileName));
             Time = 0;
-            _music.Play();
+            //_music.Play();
             //_wave.Play();
 
-            MediaPlayer.Stop();
-            MediaPlayer.Volume = Settings.SongVolumeF;
+            //MediaPlayer.Stop();
+            //MediaPlayer.Volume = Settings.SongVolumeF;
             //MediaPlayer.Play(_song);
         }
 
@@ -352,7 +356,7 @@ namespace Jackhammer.GameSystems
         /// Find and return the nearest object on the specified line. The nearest object is the first object on the line.
         /// </summary>
         /// <param name="line">Line starting from 1 to KeyAmount</param>
-        /// <returns>Neares object</returns>
+        /// <returns>Nearest object</returns>
         private HitObject GetNearestHitObjectOnLine(int line)
         {
             if (SeparatedLines[line - 1].Count == 0)

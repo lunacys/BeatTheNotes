@@ -1,18 +1,19 @@
 ﻿#region Using Statements
 using System;
 using System.IO;
+using Jackhammer.Framework.Logging;
+using Jackhammer.Framework.Settings;
+using Jackhammer.Framework.Skins;
 using Jackhammer.GameSystems;
 using Jackhammer.Screens;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
-using Jackhammer.Skins;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
-using MonoGame.Extended.Input.InputListeners;
-using MonoGame.Extended.Screens;
 using Jackhammer.Input;
+using MonoGame.Extended;
+using MonoGame.Extended.Screens;
 using Exception = System.Exception;
 
 #endregion
@@ -28,9 +29,6 @@ namespace Jackhammer
 
         private Skin _usedSkin;
         private GameSettings _settings;
-
-        InputListenerComponent _ilc;
-        
 
         private int _minFps = Int32.MaxValue, _maxFps = 0;
 
@@ -66,17 +64,6 @@ namespace Jackhammer
             _graphics.PreferredBackBufferWidth = _settings.WindowWidth;
             _graphics.PreferredBackBufferHeight = _settings.WindowHeight;
 
-            KeyboardListener kl = new KeyboardListener();
-            kl.KeyPressed += (sender, args) =>
-            {
-                //Console.WriteLine($"Pressed Key '{args.Key}'");
-                
-            };
-            _ilc = new InputListenerComponent(this, kl);
-
-            
-
-            Components.Add(_ilc);
 
 #if WIN || LINUX
             _graphics.IsFullScreen = _settings.IsFullscreen;
@@ -112,11 +99,8 @@ namespace Jackhammer
             }
 
             Services.AddService(_usedSkin);
-
-            //bm = BeatmapReader.LoadTextureFromFile("test");
-            //BeatmapWriter.WriteToFile(bm, "test-saved");
+            
             _screenComponent = new ScreenGameComponent(this);
-            //LogHelper.Log($"Game Root: Add Component ScreenComponent");
             Components.Add(_screenComponent);
             GameplayScreen gameplayScreen = new GameplayScreen(this, "test");
             _screenComponent.Register(gameplayScreen);

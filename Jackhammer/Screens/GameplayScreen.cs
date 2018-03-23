@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Jackhammer.Framework.GameSystems;
+using Jackhammer.Framework.Logging;
 using Jackhammer.GameSystems;
-using Jackhammer.Skins;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using MonoGame.Extended.Input.InputListeners;
-using MonoGame.Extended.Screens;
 using Jackhammer.Input;
+using MonoGame.Extended.Screens;
 
 namespace Jackhammer.Screens
 {
@@ -36,20 +36,23 @@ namespace Jackhammer.Screens
 
             base.Initialize();
 
+            
             GameSystemComponent.Register(new GameplaySystem(_game, _beatmapName));
+            GameSystemComponent.Register(new MusicSystem(_beatmapName,
+                GameSystemComponent.FindSystem<GameplaySystem>().Beatmap.Settings.General.AudioFileName));
             GameSystemComponent.Register(new ScoreSystem(_game.GraphicsDevice));
             GameSystemComponent.Register(new ScoremeterSystem(_game.GraphicsDevice));
 
             GameSystemComponent.Initialize();
 
-            LogHelper.Log("GameplayScreen: Sucessfully Initialized");
+            LogHelper.Log("GameplayScreen: Successfully Initialized");
         }
 
         public override void LoadContent()
         {
             LogHelper.Log("GameplayScreen: Loading Content");
             base.LoadContent();
-            LogHelper.Log("GameplayScreen: Sucessfully Loaded Content");
+            LogHelper.Log("GameplayScreen: Successfully Loaded Content");
         }
 
         public override void Update(GameTime gameTime)
