@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Jackhammer.Audio;
+using Jackhammer.Framework.Audio;
+using Jackhammer.Framework.GameSystems;
 
 namespace Jackhammer.GameSystems
 {

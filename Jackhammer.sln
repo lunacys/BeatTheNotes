@@ -5,11 +5,15 @@ VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Jackhammer", "Jackhammer\Jackhammer.shproj", "{A0CDBD0E-3A41-42B7-9425-A838BC2C7383}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jackhammer.DesktopGL", "Jackhammer.DesktopGL\Jackhammer.DesktopGL.csproj", "{896E067F-4C45-46BC-ADF5-D7E879FD6FBC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jackhammer.DesktopGL", "Jackhammer.DesktopGL\Jackhammer.DesktopGL.csproj", "{3202BE07-66ED-4C44-AF72-C240F27EA167}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundTouchWrapper", "SoundTouchWrapper\SoundTouchWrapper.csproj", "{926540C3-CBD2-4652-B633-DED9E9E3635D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jackhammer.Framework", "Jackhammer.Framework\Jackhammer.Framework.csproj", "{9A16E450-C2A4-441E-8D1C-29120C6A6B03}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Jackhammer\Jackhammer.projitems*{896e067f-4c45-46bc-adf5-d7e879fd6fbc}*SharedItemsImports = 4
+		Jackhammer\Jackhammer.projitems*{3202be07-66ed-4c44-af72-c240f27ea167}*SharedItemsImports = 4
 		Jackhammer\Jackhammer.projitems*{a0cdbd0e-3a41-42b7-9425-a838bc2c7383}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +21,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{896E067F-4C45-46BC-ADF5-D7E879FD6FBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{896E067F-4C45-46BC-ADF5-D7E879FD6FBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{896E067F-4C45-46BC-ADF5-D7E879FD6FBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{896E067F-4C45-46BC-ADF5-D7E879FD6FBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3202BE07-66ED-4C44-AF72-C240F27EA167}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3202BE07-66ED-4C44-AF72-C240F27EA167}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3202BE07-66ED-4C44-AF72-C240F27EA167}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3202BE07-66ED-4C44-AF72-C240F27EA167}.Release|Any CPU.Build.0 = Release|Any CPU
+		{926540C3-CBD2-4652-B633-DED9E9E3635D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{926540C3-CBD2-4652-B633-DED9E9E3635D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{926540C3-CBD2-4652-B633-DED9E9E3635D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{926540C3-CBD2-4652-B633-DED9E9E3635D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A16E450-C2A4-441E-8D1C-29120C6A6B03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A16E450-C2A4-441E-8D1C-29120C6A6B03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A16E450-C2A4-441E-8D1C-29120C6A6B03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A16E450-C2A4-441E-8D1C-29120C6A6B03}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

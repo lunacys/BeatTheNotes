@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Jackhammer.Framework.Beatmaps;
+using Jackhammer.Framework.GameSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

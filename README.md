@@ -35,6 +35,7 @@ You can now build and run the game.
 
 Following frameworks are used in the project as NuGet packages:
 
+- ```Jackhammer.Framework``` - Game framework
 - ```MonoGame``` - Main framework
 - ```MonoGame.Extended``` - Screens, Viewport adapters
 - ```Newton.Json``` - JSON Searialization/Deserialization

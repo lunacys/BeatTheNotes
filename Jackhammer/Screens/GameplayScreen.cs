@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Jackhammer.Framework.GameSystems;
+using Jackhammer.Framework.Logging;
 using Jackhammer.GameSystems;
-using Jackhammer.Skins;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
