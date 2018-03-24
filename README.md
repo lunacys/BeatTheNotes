@@ -1,14 +1,14 @@
-# Jackhammer
+# Beat The Notes
 
 ## Description
 
-Jackhammer is a cross-platform rhythm Stepmania-like game.
+Beat The Notes is a cross-platform rhythm Stepmania-like game.
 
 In fact, it is a 'reincarnation' of my university course work [Notemania](https://github.com/lunacys/Notemania).
 
-Jackhammer is fully written in C# using [MonoGame Framework](https://github.com/mono/MonoGame).
+Beat The Notes is fully written in C# using [MonoGame Framework](https://github.com/mono/MonoGame).
 
-Jackhammer will be available in Windows, Linux, OS X and Android systems.
+Beat The Notes will be available in Windows, Linux, OS X and Android systems.
 
 ## Platform support
 
@@ -25,9 +25,9 @@ If you want to build Android project, you'll need to get [Visual Studio](https:/
 
 First of all, you need to clone the repo:
 
-```git clone https://github.com/lunacys/Jackhammer.git```
+```git clone https://github.com/lunacys/BeatTheNotes.git```
 
-Next, open the ```Jackhammer.sln``` file and select the required solution configuration - Debug or Release.
+Next, open the ```BeatTheNotes.sln``` file and select the required solution configuration - Debug or Release.
 
 You can now build and run the game.
 
@@ -35,7 +35,7 @@ You can now build and run the game.
 
 Following frameworks are used in the project as NuGet packages:
 
-- ```Jackhammer.Framework``` - Game framework
+- ```BeatTheNotes.Framework``` - Game framework
 - ```MonoGame``` - Main framework
 - ```MonoGame.Extended``` - Screens, Viewport adapters
 - ```Newton.Json``` - JSON Searialization/Deserialization
@@ -58,7 +58,7 @@ All the game source code is under [MIT](LICENSE.txt) license except for SoundTou
 
 ## Описание
 
-Jackhammer представляет собой игру наподобии Stepmania или osu!mania.
+Beat The Notes представляет собой игру наподобии Stepmania или osu!mania.
 Фактически является продолжением моего проекта, сделанного для университетской практики
 [Notemania](https://github.com/lunacys/Notemania). В том же репозитории есть подробное описание механики игры.
 
