@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>e9725f50-67ed-496f-bfc9-c31e31b56b7b</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>BeatTheNotes.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)GameRoot.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\GameplaySystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\MusicSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\Score.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\ScoremeterSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\ScoreSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\Splash.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Input\InputManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Screens\EditSongSelectScreen.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Screens\GameplayScreen.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Screens\MenuScreen.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Screens\PauseScreen.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Screens\PlaySongSelectScreen.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Content\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Graphs\" />
+  </ItemGroup>
+  <ItemGroup>
+    <MonoGameContentReference Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />
+  </ItemGroup>
+</Project>
