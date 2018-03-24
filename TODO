@@ -1,6 +1,6 @@
 
 Todo:
-  ☐ Переименовать в BeatTheNotes @started(18-03-24 12:20)
+  ✔ Переименовать в BeatTheNotes @started(18-03-24 12:20) @done(18-03-24 12:48) @lasted(28 minutes 45 seconds)
   ✔ Splash названия очков (Marvelous, Pefrect etc) @done(18-03-18 20:48)
   ✔ Вынесение музыки в отдельную систему MusicSystem @started(18-03-21 09:44) @done(18-03-22 13:40) @lasted(1 day 3 hours 56 minutes 25 seconds)
   ✔ Зависимость игрового времени от позиции музыки @done(18-03-22 10:23)
