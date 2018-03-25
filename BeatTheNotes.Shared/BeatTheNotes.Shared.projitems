@@ -11,7 +11,10 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)GameRoot.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\GameplaySystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\GameTimeSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\HealthSystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\MusicSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\OnScoreGetEventHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\Score.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\ScoremeterSystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\ScoreSystem.cs" />

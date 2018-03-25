@@ -9,6 +9,8 @@ using BeatTheNotes.Framework.Settings;
 using BeatTheNotes.Framework.Skins;
 using BeatTheNotes.Input;
 using BeatTheNotes.Framework;
+using BeatTheNotes.Framework.Audio;
+using BeatTheNotes.Shared.GameSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -20,7 +22,7 @@ namespace BeatTheNotes.GameSystems
     {
         public Beatmap Beatmap { get; }
         public Skin Skin { get; }
-        public long Time { get; private set; }
+        //public long Time { get; private set; }
 
         public GameSettings Settings => _game.Services.GetService<GameSettings>();
 
@@ -30,10 +32,11 @@ namespace BeatTheNotes.GameSystems
         public List<HitObject>[] SeparatedLines { get; private set; }
 
         private readonly GameRoot _game;
-        private readonly Texture2D _background;
+        private Texture2D _background;
         //private readonly Song _song;
 
         private SpriteBatch _spriteBatch;
+        private Music _music;
 
         public TimingPoint CurrentTimingPoint;
 
@@ -49,7 +52,6 @@ namespace BeatTheNotes.GameSystems
             _game = game;
             Beatmap = LoadBeatmap(beatmapName);
             CurrentTimingPoint = Beatmap.TimingPoints[0];
-            _background = LoadBackground(beatmapName);
             //_song = LoadSong(beatmapName);
             //_music.PlaybackRate = 1.5f;
 
@@ -57,7 +59,7 @@ namespace BeatTheNotes.GameSystems
             _beatmapName = beatmapName;
 
             Skin = _game.Services.GetService<Skin>();
-            Time = 0;
+            //Time = 0;
         }
 
         public override void Initialize()
@@ -67,15 +69,19 @@ namespace BeatTheNotes.GameSystems
             _spriteBatch = new SpriteBatch(_game.GraphicsDevice);
 
             //MediaPlayer.Play(_song);
+            FindSystem<MusicSystem>().Music = _music;
             MediaPlayer.Volume = Settings.SongVolumeF;
+
+            FindSystem<HealthSystem>().HpDrainRate = Beatmap.Settings.Difficulty.HpDrainRate;
         }
 
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
 
+            var time = FindSystem<GameTimeSystem>().Time;
             //Time += gameTime.ElapsedGameTime.Milliseconds;
-            Time = FindSystem<MusicSystem>().MusicPosition;
+            //Time = (long) FindSystem<MusicSystem>().MusicPosition.TotalMilliseconds;
 
             if (InputManager.WasKeyPressed(Keys.F4))
                 if (ScrollingSpeed < 20.0f)
@@ -101,14 +107,14 @@ namespace BeatTheNotes.GameSystems
 
             HandleInput();
             
-            if (Beatmap.HitObjects.Last().Position + 1000 < Time)
+            if (Beatmap.HitObjects.Last().Position + 1000 < time)
             {
                 // The beatmap is over
                 //MediaPlayer.Volume -= gameTime.ElapsedGameTime.Milliseconds / 5000.0f;
                 if (FindSystem<MusicSystem>().Volume > 0.01f)
                     FindSystem<MusicSystem>().Volume -= gameTime.ElapsedGameTime.Milliseconds / 5000.0f;
 
-                if (FindSystem<MusicSystem>().Volume <= 0.01f)
+                if (FindSystem<MusicSystem>().Volume <= 0.05f)
                     Reset();
                 //MediaPlayer.Stop();
 
@@ -116,7 +122,7 @@ namespace BeatTheNotes.GameSystems
 
             foreach (var tp in Beatmap.TimingPoints)
             {
-                if (Math.Abs(Time - tp.Position) <= 10)
+                if (Math.Abs(time - tp.Position) <= 10)
                     CurrentTimingPoint = tp;
             }
 
@@ -126,6 +132,8 @@ namespace BeatTheNotes.GameSystems
         public override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
+
+            var time = (long)FindSystem<GameTimeSystem>().Time;
 
             _spriteBatch.Begin();
 
@@ -162,7 +170,7 @@ namespace BeatTheNotes.GameSystems
                         Skin.Settings.PlayfieldPositionX +
                         ((o.Line - 1) * (Skin.PlayfieldLineTexture.Width)),
                         // y
-                        (ScrollingSpeed * (Time - o.Position) +
+                        (ScrollingSpeed * (time - o.Position) +
                          (Settings.WindowHeight - Skin.ButtonTexture.Height)) +
                         Skin.Settings.HitPosition
                     );
@@ -189,7 +197,7 @@ namespace BeatTheNotes.GameSystems
                                 Skin.Settings.PlayfieldPositionX +
                                 ((o.Line - 1) * (Skin.PlayfieldLineTexture.Width)),
                                 // y
-                                (ScrollingSpeed * (Time - (o.Position + i)) +
+                                (ScrollingSpeed * (time - (o.Position + i)) +
                                  (Settings.WindowHeight - Skin.ButtonTexture.Height)) +
                                 Skin.Settings.HitPosition
                             );
@@ -204,7 +212,7 @@ namespace BeatTheNotes.GameSystems
 
                     var scoreSys = GameSystemManager.FindSystem<ScoreSystem>();
                     
-                    if (o.Position + scoreSys.HitThresholds[scoreSys.ScoreMiss] < Time)
+                    if (o.Position + scoreSys.HitThresholds[scoreSys.ScoreMiss] < time)
                     {
                         scoreSys.Calculate(o);
                     }
@@ -214,7 +222,7 @@ namespace BeatTheNotes.GameSystems
             DrawBeatDivisors();
 
             // Debug things
-            _spriteBatch.DrawString(Skin.Font, Time.ToString(), new Vector2(12, 12), Color.Red);
+            _spriteBatch.DrawString(Skin.Font, time.ToString(), new Vector2(12, 12), Color.Red);
             _spriteBatch.DrawString(Skin.Font, IsUpsideDown.ToString(), new Vector2(12, 30), Color.Red);
             _spriteBatch.DrawString(Skin.Font, ScrollingSpeed.ToString("F1"), new Vector2(12, 48), Color.Red);
 
@@ -232,7 +240,46 @@ namespace BeatTheNotes.GameSystems
                             $"Bad: {scoreSystem.BadCount}\n" +
                             $"Miss: {scoreSystem.MissCount}";
             _spriteBatch.DrawString(Skin.Font, scores, new Vector2(800, 10), Color.Black);
-            _spriteBatch.DrawString(Skin.Font, $"Score: {scoreSystem.Score}\nCombo: {scoreSystem.Combo}\nAcc: {scoreSystem.Accuracy * 100:F2}%", new Vector2(15, 300), Color.Black);
+            _spriteBatch.DrawString(Skin.Font,
+                $"Score: {scoreSystem.Score}\n" +
+                $"Combo: {scoreSystem.Combo}\n" +
+                $"Acc: {scoreSystem.Accuracy * 100:F2}%\n" +
+                $"HP: {FindSystem<HealthSystem>().Health}",
+                new Vector2(15, 300), Color.Black);
+
+            
+            float hpX = Skin.Settings.PlayfieldPositionX +
+                        Skin.PlayfieldLineTexture.Width * Beatmap.Settings.Difficulty.KeyAmount;
+            float hpY = _game.Services.GetService<GameSettings>().WindowHeight;
+            float hpW = 20;
+            float hpH = _game.Services.GetService<GameSettings>().WindowHeight;
+
+            //_spriteBatch.FillRectangle(hpX, hpY, hpW, hpH, Color.Gray);
+            _spriteBatch.Draw(Skin.HealthBarBg, new Vector2(hpX, 0), null, Color.White, 0.0f, Vector2.One, new Vector2(1.0f, 1.0f), SpriteEffects.None, 0.0f);
+
+            var curVal = FindSystem<HealthSystem>().Health;
+            var maxVal = FindSystem<HealthSystem>().MaxHealth;
+            var minVal = FindSystem<HealthSystem>().MinHealth;
+
+            //Console.WriteLine(curVal);
+
+            var srcRect = new Rectangle(0, 0, (int)hpW, (int)(hpH * (curVal / (maxVal - minVal))));
+
+            Color col = Color.Lerp(Color.Red, Color.White, curVal / 100.0f);
+
+            /*_spriteBatch.Draw(Skin.HealthBar, new Vector2(hpX, hpY),
+                new Rectangle((int) hpX, 0, (int) hpW, (int) (hpH * (curVal / (maxVal - minVal)))), col, (float)Math.PI,
+                new Vector2(hpW, 0), new Vector2(1, 1)), SpriteEffects.None, 0.0f);*/
+
+            _spriteBatch.Draw(Skin.HealthBar, new Vector2(hpX, hpY), srcRect, col, (float)Math.PI, new Vector2(hpW, 0), Vector2.One, SpriteEffects.None, 0.0f);
+
+            /*_spriteBatch.FillRectangle(
+                Skin.Settings.PlayfieldPositionX + Skin.PlayfieldLineTexture.Width * Beatmap.Settings.Difficulty.KeyAmount + 2, // x
+                2, // y
+                16, // w
+                _game.Services.GetService<GameSettings>().WindowHeight * (curVal / (maxVal - minVal)), // h
+                col);*/
+            // spriteBatch.FillRectangle(host.Position + Offset, new Vector2(Size.X * (CurrentValue / (MaxValue - MinValue)), Size.Y), Color * 0.33f);
 
             _spriteBatch.End();
         }
@@ -250,7 +297,7 @@ namespace BeatTheNotes.GameSystems
             //_wave.Dispose();
             //LoadSong(_beatmapName);
             //_music.LoadFromFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", _beatmapName, Beatmap.Settings.General.AudioFileName));
-            Time = 0;
+            //Time = 0;
             //_music.Play();
             //_wave.Play();
 
@@ -307,7 +354,7 @@ namespace BeatTheNotes.GameSystems
             var tp = CurrentTimingPoint;
             for (int i = tp.Position; i <= Beatmap.HitObjects.Last().Position; i += (int)Math.Floor(tp.MsPerBeat * 4))
             {
-                float posY = (ScrollingSpeed * (Time - i) +
+                float posY = (ScrollingSpeed * ((long)FindSystem<GameTimeSystem>().Time - i) +
                               (Settings.WindowHeight - Skin.ButtonTexture.Height) + Skin.NoteClickTexture.Height +
                               Skin.Settings.HitPosition);
                 _spriteBatch.DrawLine(new Vector2(Skin.Settings.PlayfieldPositionX, posY),
@@ -320,7 +367,7 @@ namespace BeatTheNotes.GameSystems
         {
             // TODO: This
             // If there's no timing point at the time, return the first timing point
-            if (Beatmap.TimingPoints[0].Position < Time)
+            if (Beatmap.TimingPoints[0].Position < FindSystem<GameTimeSystem>().Time)
                 return Beatmap.TimingPoints[0];
 
             // If there's the only one timing point on the map, return that timing point
@@ -368,7 +415,7 @@ namespace BeatTheNotes.GameSystems
 
             var ss = GameSystemManager.FindSystem<ScoreSystem>();
 
-            return Math.Abs(Time - first.Position) <= (ss.HitThresholds[ss.ScoreMiss]) ? first : null;
+            return Math.Abs(FindSystem<GameTimeSystem>().Time - first.Position) <= (ss.HitThresholds[ss.ScoreMiss]) ? first : null;
         }
 
         private Beatmap LoadBeatmap(string beatmapName)
@@ -378,7 +425,7 @@ namespace BeatTheNotes.GameSystems
             // Load Beatmap
             try
             {
-                beatmap = BeatmapReader.LoadFromFile(_game.Services.GetService<GameSettings>().BeatmapFolder, beatmapName);
+                beatmap = BeatmapReader.LoadFromFile(_game.GraphicsDevice, _game.Services.GetService<GameSettings>().BeatmapFolder, beatmapName, out _background, out _music);
             }
             catch (Exception e)
             {
@@ -393,7 +440,7 @@ namespace BeatTheNotes.GameSystems
             return beatmap;
         }
 
-        private Texture2D LoadBackground(string beatmapName)
+        /*private Texture2D LoadBackground(string beatmapName)
         {
             Texture2D bg;
             try
@@ -412,6 +459,6 @@ namespace BeatTheNotes.GameSystems
             }
 
             return bg;
-        }
+        }*/
     }
 }

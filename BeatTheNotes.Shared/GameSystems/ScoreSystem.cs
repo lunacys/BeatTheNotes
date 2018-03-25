@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using BeatTheNotes.Framework.Beatmaps;
 using BeatTheNotes.Framework.GameSystems;
+using BeatTheNotes.Shared.GameSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -45,6 +46,8 @@ namespace BeatTheNotes.GameSystems
         public float Od => _gameplay.Beatmap.Settings.Difficulty.OverallDifficutly;
 
         public Splash CurrentSplash { get; private set; }
+
+        public event EventHandler<OnScoreGetEventHandler> OnScoreGet; 
 
         private readonly SpriteBatch _spriteBatch;
 
@@ -208,8 +211,8 @@ namespace BeatTheNotes.GameSystems
 
         private int GetHitValue(HitObject hitObject)
         {
-            int timeOffset = hitObject.Position - (int)_gameplay.Time;
-            int absTimeOffset = Math.Abs(timeOffset);
+            var timeOffset = hitObject.Position - FindSystem<GameTimeSystem>().Time;
+            var absTimeOffset = Math.Abs(timeOffset);
             
             int score = 0;
             
@@ -276,7 +279,8 @@ namespace BeatTheNotes.GameSystems
             }
             else throw new InvalidDataException("Score not found");
             
-            GameSystemManager.FindSystem<ScoremeterSystem>()?.AddScore((int)_gameplay.Time, hitObject.Position);
+            OnScoreGet?.Invoke(this, new OnScoreGetEventHandler(hitValueName, HitValues[hitValueName]));
+            GameSystemManager.FindSystem<ScoremeterSystem>()?.AddScore((long)FindSystem<GameTimeSystem>().Time, hitObject.Position, hitValueName);
 
             ProceedCombo(hitValue);
             CalculateScore(hitValueName);

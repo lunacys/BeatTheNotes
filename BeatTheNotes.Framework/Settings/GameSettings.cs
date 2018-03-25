@@ -40,6 +40,8 @@ namespace BeatTheNotes.Framework.Settings
         public int SongVolume { get; set; }
         public int ScrollingSpeed { get; set; }
 
+        public int HealthBarHeight { get; set; }
+
         public string Skin { get; set; }
 
         public string BeatmapFolder { get; set; }
@@ -84,6 +86,8 @@ namespace BeatTheNotes.Framework.Settings
             Skin = "Default";
 
             BeatmapFolder = "Maps";
+
+            HealthBarHeight = 0;
 
             N1 = Keys.Z;
             N2 = Keys.X;

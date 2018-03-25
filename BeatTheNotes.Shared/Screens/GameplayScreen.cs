@@ -6,6 +6,7 @@ using BeatTheNotes.Framework.GameSystems;
 using BeatTheNotes.Framework.Logging;
 using BeatTheNotes.GameSystems;
 using BeatTheNotes.Input;
+using BeatTheNotes.Shared.GameSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -38,10 +39,11 @@ namespace BeatTheNotes.Screens
 
             
             GameSystemComponent.Register(new GameplaySystem(_game, _beatmapName));
-            GameSystemComponent.Register(new MusicSystem(_beatmapName,
-                GameSystemComponent.FindSystem<GameplaySystem>().Beatmap.Settings.General.AudioFileName));
+            GameSystemComponent.Register(new MusicSystem());
             GameSystemComponent.Register(new ScoreSystem(_game.GraphicsDevice));
             GameSystemComponent.Register(new ScoremeterSystem(_game.GraphicsDevice));
+            GameSystemComponent.Register(new GameTimeSystem());
+            GameSystemComponent.Register(new HealthSystem(0.0f));
 
             GameSystemComponent.Initialize();
 

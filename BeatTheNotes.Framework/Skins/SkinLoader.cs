@@ -53,7 +53,8 @@ namespace BeatTheNotes.Framework.Skins
                     AuthorName = "loonacuse",
                     SkinName = "Default",
                     HitPosition = 0,
-                    PlayfieldPositionX = 200
+                    PlayfieldPositionX = 200,
+                    HealthBarHeight = 0
                 };
 
                 skin.DefaultBackground = content.Load<Texture2D>(Path.Combine("Images", "DefaultBackground"));
@@ -141,6 +142,9 @@ namespace BeatTheNotes.Framework.Skins
                     skin.ScoreGoodTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "HitGood.png"));
                     skin.ScoreBadTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "HitBad.png"));
                     skin.ScoreMissTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "HitMiss.png"));
+
+                    skin.HealthBarBg = LoadTextureFromFile(device, Path.Combine(dirPath, "HealthBarBg.png"));
+                    skin.HealthBar = LoadTextureFromFile(device, Path.Combine(dirPath, "HealthBar.png"));
 
                     skin.Font = content.Load<SpriteFont>(Path.Combine("Fonts", "MainFont"));
 
