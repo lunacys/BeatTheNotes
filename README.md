@@ -35,14 +35,18 @@ You can now build and run the game.
 
 ### Deps
 
-Following frameworks are used in the project as NuGet packages:
-
 - ```BeatTheNotes.Framework``` - Game framework
+- ```BeatTheNotes.Shared``` - Shared code for all platforms
+- ```BeatTheNotes.DesktopGL``` - Windows, Linux and OS X version
+- ```BeatTheNotes.Android``` - Android version
+- ```SoundTouch``` - Music Varispeed
+
+Following dependencies are used in the projects as NuGet packages:
+
 - ```MonoGame``` - Main framework
-- ```MonoGame.Extended``` - Screens, Viewport adapters
+- ```MonoGame.Extended``` - Screens, Viewport adapters, etc
 - ```Newton.Json``` - JSON Searialization/Deserialization
 - ```NAudio``` - Audio, Music
-- ```SoundTouch``` - Music Varispeed
 
 ## Resources
 
