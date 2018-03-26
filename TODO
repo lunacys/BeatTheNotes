@@ -21,7 +21,7 @@ Todo:
     ☐ Jackhammer.cs
     ✔ Перевод игрового времени в GameSystem @started(18-03-22 10:59) @done(18-03-25 10:33) @lasted(2 days 23 hours 34 minutes 8 seconds)
   ✔ Переделать систему очков - добавить BonusScore @started(18-03-18 21:58) @done(18-03-18 22:57) @lasted(59 minutes 9 seconds)
-  ☐ Поддержка ноты Hold
+  ☐ Поддержка ноты Hold @started(18-03-26 12:15)
   ☐ Поддержка анимации
     ☐ Элементов игрового поля (линии)
     ☐ Кнопок

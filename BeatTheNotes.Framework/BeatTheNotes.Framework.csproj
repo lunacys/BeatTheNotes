@@ -85,6 +85,7 @@
     <Compile Include="Beatmaps\BeatmapWriter.cs" />
     <Compile Include="Beatmaps\GameMode.cs" />
     <Compile Include="Beatmaps\HitObject.cs" />
+    <Compile Include="Beatmaps\HitObjectOnPressEventArgs.cs" />
     <Compile Include="Beatmaps\TimingPoint.cs" />
     <Compile Include="GameSystems\GameSystem.cs" />
     <Compile Include="GameSystems\GameSystemComponent.cs" />

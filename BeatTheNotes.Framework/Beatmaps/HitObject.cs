@@ -1,4 +1,6 @@
-﻿namespace BeatTheNotes.Framework.Beatmaps
+﻿using System;
+
+namespace BeatTheNotes.Framework.Beatmaps
 {
     public class HitObject
     {
@@ -12,7 +14,22 @@
         public int Position { get; }
         public int EndPosition { get; }
 
-        public bool IsPressed { get; set; }
+        public event EventHandler<HitObjectOnPressEventArgs> OnPress;
+
+        public bool IsPressed
+        {
+            get => _isPressed;
+            set
+            {
+                _isPressed = value;
+                if (value)
+                    OnPress?.Invoke(this, new HitObjectOnPressEventArgs(this));
+            }
+        }
+
+        private bool _isPressed;
+
+        public bool IsLongNote => Position != EndPosition;
 
         public HitObject(int line, int position, int endPosition = 0)
         {

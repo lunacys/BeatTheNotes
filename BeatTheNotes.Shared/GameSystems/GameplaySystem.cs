@@ -38,8 +38,6 @@ namespace BeatTheNotes.GameSystems
         private SpriteBatch _spriteBatch;
         private Music _music;
 
-        public TimingPoint CurrentTimingPoint;
-
         //private VorbisWaveReader _waveReader;
         //private WaveOutEvent _wave;
 
@@ -51,7 +49,7 @@ namespace BeatTheNotes.GameSystems
         {
             _game = game;
             Beatmap = LoadBeatmap(beatmapName);
-            CurrentTimingPoint = Beatmap.TimingPoints[0];
+            //CurrentTimingPoint = Beatmap.TimingPoints[0];
             //_song = LoadSong(beatmapName);
             //_music.PlaybackRate = 1.5f;
 
@@ -90,10 +88,10 @@ namespace BeatTheNotes.GameSystems
             /*if (InputManager.WasKeyPressed(Keys.F5))
                 Settings.IsReversedDirection = !IsUpsideDown;*/
 
-            
+
 
             HandleInput();
-            
+
             if (Beatmap.HitObjects.Last().Position + 1000 < time)
             {
                 // The beatmap is over
@@ -107,11 +105,11 @@ namespace BeatTheNotes.GameSystems
 
             }
 
-            foreach (var tp in Beatmap.TimingPoints)
+            /*foreach (var tp in Beatmap.TimingPoints)
             {
                 if (Math.Abs(time - tp.Position) <= 10)
                     CurrentTimingPoint = tp;
-            }
+            }*/
 
             //Console.WriteLine($"{CurrentTimingPoint.Position}");
         }
@@ -189,7 +187,7 @@ namespace BeatTheNotes.GameSystems
                                 Skin.Settings.HitPosition
                             );
 
-                            
+
 
                             _spriteBatch.Draw(hitObjectTexture, position, null, o.IsPressed ? Color.Black : Color.White);
                         }
@@ -198,14 +196,14 @@ namespace BeatTheNotes.GameSystems
                     if (o.IsPressed) continue;
 
                     var scoreSys = GameSystemManager.FindSystem<ScoreSystem>();
-                    
+
                     if (o.Position + scoreSys.HitThresholds[scoreSys.ScoreMiss] < time)
                     {
-                        scoreSys.Calculate(o);
+                        scoreSys.Calculate(o, null);
                     }
                 }
             }
-            
+
             DrawBeatDivisors();
 
             // Debug things
@@ -214,7 +212,7 @@ namespace BeatTheNotes.GameSystems
             _spriteBatch.DrawString(Skin.Font, ScrollingSpeed.ToString("F1"), new Vector2(12, 48), Color.Red);
 
             _spriteBatch.DrawString(Skin.Font,
-                $"Song Speed: {FindSystem<MusicSystem>().PlaybackRate:F1}", 
+                $"Song Speed: {FindSystem<MusicSystem>().PlaybackRate:F1}",
                 new Vector2(12, 64),
                 Color.DarkRed);
 
@@ -234,7 +232,7 @@ namespace BeatTheNotes.GameSystems
                 $"HP: {FindSystem<HealthSystem>().Health}",
                 new Vector2(15, 300), Color.Black);
 
-            
+
             float hpX = Skin.Settings.PlayfieldPositionX +
                         Skin.PlayfieldLineTexture.Width * Beatmap.Settings.Difficulty.KeyAmount;
             float hpY = _game.Services.GetService<GameSettings>().WindowHeight;
@@ -255,12 +253,12 @@ namespace BeatTheNotes.GameSystems
 
             Color col = Color.Lerp(Color.Red, Color.Green, curVal / 100.0f);
 
-            _spriteBatch.Draw(Skin.HealthBar, new Vector2(hpX, hpY), srcRect, col, (float) Math.PI, new Vector2(hpW, 0),
+            _spriteBatch.Draw(Skin.HealthBar, new Vector2(hpX, hpY), srcRect, col, (float)Math.PI, new Vector2(hpW, 0),
                 Vector2.One, SpriteEffects.None, 0.0f);
 
             _spriteBatch.End();
         }
-        
+
         public override void Reset()
         {
             base.Reset();
@@ -277,48 +275,104 @@ namespace BeatTheNotes.GameSystems
         {
             ScoreSystem scoreSystem = GameSystemManager.FindSystem<ScoreSystem>();
 
+
             if (InputManager.WasKeyPressed(Settings.N1))
             {
-                Skin.HitNormal.Play();
-
                 var nearest = GetNearestHitObjectOnLine(1);
 
                 if (nearest != null)
-                    scoreSystem.Calculate(nearest);
+                {
+                    if (!nearest.IsLongNote)
+                        scoreSystem.Calculate(nearest, Settings.N1);
+                }
             }
+
             if (InputManager.WasKeyPressed(Settings.N2))
             {
-                Skin.HitNormal.Play();
-
                 var nearest = GetNearestHitObjectOnLine(2);
 
                 if (nearest != null)
-                    scoreSystem.Calculate(nearest);
+                {
+                    if (!nearest.IsLongNote)
+                        scoreSystem.Calculate(nearest, Settings.N2);
+                }
             }
+
             if (InputManager.WasKeyPressed(Settings.N3))
             {
-                Skin.HitNormal.Play();
-
                 var nearest = GetNearestHitObjectOnLine(3);
 
                 if (nearest != null)
-                    scoreSystem.Calculate(nearest);
+                    if (!nearest.IsLongNote)
+                        scoreSystem.Calculate(nearest, Settings.N3);
             }
+
             if (InputManager.WasKeyPressed(Settings.N4))
             {
-                Skin.HitNormal.Play();
-
                 var nearest = GetNearestHitObjectOnLine(4);
 
                 if (nearest != null)
-                    scoreSystem.Calculate(nearest);
+                {
+                    if (!nearest.IsLongNote)
+                        scoreSystem.Calculate(nearest, Settings.N4);
+                }
+            }
+
+
+
+            if (InputManager.WasKeyReleased(Settings.N1))
+            {
+                var nearest = GetNearestHitObjectOnLine(1, true);
+
+                if (nearest != null)
+                {
+                    if (nearest.IsLongNote)
+                        scoreSystem.Calculate(nearest, Settings.N1);
+                }
+            }
+
+            if (InputManager.WasKeyReleased(Settings.N2))
+            {
+                var nearest = GetNearestHitObjectOnLine(2, true);
+
+                if (nearest != null)
+                {
+                    if (nearest.IsLongNote)
+                        scoreSystem.Calculate(nearest, Settings.N2);
+                }
+            }
+
+            if (InputManager.WasKeyReleased(Settings.N3))
+            {
+                var nearest = GetNearestHitObjectOnLine(3, true);
+
+                if (nearest != null)
+                    if (nearest.IsLongNote)
+                        scoreSystem.Calculate(nearest, Settings.N3);
+            }
+
+            if (InputManager.WasKeyReleased(Settings.N4))
+            {
+                var nearest = GetNearestHitObjectOnLine(4, true);
+
+                if (nearest != null)
+                {
+                    if (nearest.IsLongNote)
+                        scoreSystem.Calculate(nearest, Settings.N4);
+                }
+            }
+
+            if (InputManager.WasKeyPressed(Settings.N1) || InputManager.WasKeyPressed(Settings.N2) ||
+                InputManager.WasKeyPressed(Settings.N3) || InputManager.WasKeyPressed(Settings.N4))
+            {
+                Skin.HitNormal.Play();
             }
         }
 
         private void DrawBeatDivisors()
         {
             // TODO: Skip unnecessary loops
-            var tp = CurrentTimingPoint;
+            var tp = GetCurrentTimingPoint();
             for (int i = tp.Position; i <= Beatmap.HitObjects.Last().Position; i += (int)Math.Floor(tp.MsPerBeat * 4))
             {
                 float posY = (ScrollingSpeed * ((long)FindSystem<GameTimeSystem>().Time - i) +
@@ -357,11 +411,11 @@ namespace BeatTheNotes.GameSystems
 
                 //if ()
                 {
-                //    Console.WriteLine($"returning tp: {Beatmap.TimingPoints[i].Position}");
-                //    return Beatmap.TimingPoints[i];
+                    //    Console.WriteLine($"returning tp: {Beatmap.TimingPoints[i].Position}");
+                    //    return Beatmap.TimingPoints[i];
                 }
             }
-            
+
             return Beatmap.TimingPoints[0];
         }
 
@@ -370,7 +424,7 @@ namespace BeatTheNotes.GameSystems
         /// </summary>
         /// <param name="line">Line starting from 1 to KeyAmount</param>
         /// <returns>Nearest object</returns>
-        private HitObject GetNearestHitObjectOnLine(int line)
+        private HitObject GetNearestHitObjectOnLine(int line, bool isLongNote = false)
         {
             if (SeparatedLines[line - 1].Count == 0)
                 return null;
@@ -382,7 +436,10 @@ namespace BeatTheNotes.GameSystems
 
             var ss = GameSystemManager.FindSystem<ScoreSystem>();
 
-            return Math.Abs(FindSystem<GameTimeSystem>().Time - first.Position) <= (ss.HitThresholds[ss.ScoreMiss]) ? first : null;
+            if (!isLongNote)
+                return Math.Abs(FindSystem<GameTimeSystem>().Time - first.Position) <= (ss.HitThresholds[ss.ScoreMiss]) ? first : null;
+
+            return Math.Abs(FindSystem<GameTimeSystem>().Time - first.EndPosition) <= (ss.HitThresholds[ss.ScoreMiss]) ? first : null;
         }
 
         private Beatmap LoadBeatmap(string beatmapName)

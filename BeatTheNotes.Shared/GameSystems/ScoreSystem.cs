@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using BeatTheNotes.Framework.Beatmaps;
 using BeatTheNotes.Framework.GameSystems;
+using BeatTheNotes.Input;
 using BeatTheNotes.Shared.GameSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace BeatTheNotes.GameSystems
 {
@@ -47,7 +49,7 @@ namespace BeatTheNotes.GameSystems
 
         public Splash CurrentSplash { get; private set; }
 
-        public event EventHandler<OnScoreGetEventHandler> OnScoreGet; 
+        public event EventHandler<OnScoreGetEventHandler> OnScoreGet;
 
         private readonly SpriteBatch _spriteBatch;
 
@@ -126,7 +128,7 @@ namespace BeatTheNotes.GameSystems
 
         public override void Update(GameTime gameTime)
         {
-            CurrentSplash?.Update(gameTime); 
+            CurrentSplash?.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
@@ -149,10 +151,20 @@ namespace BeatTheNotes.GameSystems
             _spriteBatch.End();
         }
 
-        public void Calculate(HitObject hitObject)
+        public void Calculate(HitObject hitObject, Keys? key)
         {
             int hitVal = GetHitValue(hitObject);
-            DoScore(hitObject, hitVal);
+
+            if (!hitObject.IsLongNote)
+            {
+                DoScore(hitObject, hitVal);
+            }
+            else
+            {
+                if (key == null) return;
+
+                DoScore(hitObject, hitVal);
+            }
         }
 
         public override void Reset()
@@ -211,16 +223,16 @@ namespace BeatTheNotes.GameSystems
 
         private int GetHitValue(HitObject hitObject)
         {
-            var timeOffset = hitObject.Position - FindSystem<GameTimeSystem>().Time;
+            var timeOffset = (hitObject.IsLongNote ? hitObject.EndPosition : hitObject.Position) - FindSystem<GameTimeSystem>().Time;
             var absTimeOffset = Math.Abs(timeOffset);
-            
+
             int score = 0;
-            
+
             if (absTimeOffset <= HitThresholds[ScoreMarvelous])
                 score = HitValues[ScoreMarvelous];
-            else if (absTimeOffset <= HitThresholds[ScorePerfect]) 
+            else if (absTimeOffset <= HitThresholds[ScorePerfect])
                 score = HitValues[ScorePerfect];
-            else if (absTimeOffset <= HitThresholds[ScoreGreat]) 
+            else if (absTimeOffset <= HitThresholds[ScoreGreat])
                 score = HitValues[ScoreGreat];
             else if (absTimeOffset <= HitThresholds[ScoreGood])
                 score = HitValues[ScoreGood];
@@ -278,9 +290,10 @@ namespace BeatTheNotes.GameSystems
                 hitValueName = ScoreMiss;
             }
             else throw new InvalidDataException("Score not found");
-            
+
             OnScoreGet?.Invoke(this, new OnScoreGetEventHandler(hitValueName, HitValues[hitValueName]));
-            GameSystemManager.FindSystem<ScoremeterSystem>()?.AddScore((long)FindSystem<GameTimeSystem>().Time, hitObject.Position, hitValueName);
+            GameSystemManager.FindSystem<ScoremeterSystem>()?.AddScore((long)FindSystem<GameTimeSystem>().Time,
+                hitObject.IsLongNote ? hitObject.EndPosition : hitObject.Position, hitValueName);
 
             ProceedCombo(hitValue);
             CalculateScore(hitValueName);
