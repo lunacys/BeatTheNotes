@@ -80,8 +80,6 @@ namespace BeatTheNotes.GameSystems
             base.Update(gameTime);
 
             var time = FindSystem<GameTimeSystem>().Time;
-            //Time += gameTime.ElapsedGameTime.Milliseconds;
-            //Time = (long) FindSystem<MusicSystem>().MusicPosition.TotalMilliseconds;
 
             if (InputManager.WasKeyPressed(Keys.F4))
                 if (ScrollingSpeed < 20.0f)
@@ -92,18 +90,7 @@ namespace BeatTheNotes.GameSystems
             /*if (InputManager.WasKeyPressed(Keys.F5))
                 Settings.IsReversedDirection = !IsUpsideDown;*/
 
-            if (InputManager.WasKeyPressed(Keys.F1))
-            {
-                Reset();
-                FindSystem<MusicSystem>().PlaybackRate -= 0.1f;
-                
-            }
             
-            if (InputManager.WasKeyPressed(Keys.F2))
-            {
-                Reset();
-                FindSystem<MusicSystem>().PlaybackRate += 0.1f;
-            }
 
             HandleInput();
             
@@ -255,7 +242,8 @@ namespace BeatTheNotes.GameSystems
             float hpH = _game.Services.GetService<GameSettings>().WindowHeight;
 
             //_spriteBatch.FillRectangle(hpX, hpY, hpW, hpH, Color.Gray);
-            _spriteBatch.Draw(Skin.HealthBarBg, new Vector2(hpX, 0), null, Color.White, 0.0f, Vector2.One, new Vector2(1.0f, 1.0f), SpriteEffects.None, 0.0f);
+            _spriteBatch.Draw(Skin.HealthBarBg, new Vector2(hpX, hpY - Skin.HealthBarBg.Height), null, Color.White,
+                0.0f, Vector2.One, new Vector2(1.0f, 1.0f), SpriteEffects.None, 0.0f);
 
             var curVal = FindSystem<HealthSystem>().Health;
             var maxVal = FindSystem<HealthSystem>().MaxHealth;
@@ -263,23 +251,12 @@ namespace BeatTheNotes.GameSystems
 
             //Console.WriteLine(curVal);
 
-            var srcRect = new Rectangle(0, 0, (int)hpW, (int)(hpH * (curVal / (maxVal - minVal))));
+            var srcRect = new Rectangle(0, 0, (int)hpW, (int)(Skin.HealthBar.Height * (curVal / (maxVal - minVal))));
 
-            Color col = Color.Lerp(Color.Red, Color.White, curVal / 100.0f);
+            Color col = Color.Lerp(Color.Red, Color.Green, curVal / 100.0f);
 
-            /*_spriteBatch.Draw(Skin.HealthBar, new Vector2(hpX, hpY),
-                new Rectangle((int) hpX, 0, (int) hpW, (int) (hpH * (curVal / (maxVal - minVal)))), col, (float)Math.PI,
-                new Vector2(hpW, 0), new Vector2(1, 1)), SpriteEffects.None, 0.0f);*/
-
-            _spriteBatch.Draw(Skin.HealthBar, new Vector2(hpX, hpY), srcRect, col, (float)Math.PI, new Vector2(hpW, 0), Vector2.One, SpriteEffects.None, 0.0f);
-
-            /*_spriteBatch.FillRectangle(
-                Skin.Settings.PlayfieldPositionX + Skin.PlayfieldLineTexture.Width * Beatmap.Settings.Difficulty.KeyAmount + 2, // x
-                2, // y
-                16, // w
-                _game.Services.GetService<GameSettings>().WindowHeight * (curVal / (maxVal - minVal)), // h
-                col);*/
-            // spriteBatch.FillRectangle(host.Position + Offset, new Vector2(Size.X * (CurrentValue / (MaxValue - MinValue)), Size.Y), Color * 0.33f);
+            _spriteBatch.Draw(Skin.HealthBar, new Vector2(hpX, hpY), srcRect, col, (float) Math.PI, new Vector2(hpW, 0),
+                Vector2.One, SpriteEffects.None, 0.0f);
 
             _spriteBatch.End();
         }
@@ -293,17 +270,7 @@ namespace BeatTheNotes.GameSystems
                 o.IsPressed = false;
             }
 
-            //_wave.Stop();
-            //_wave.Dispose();
-            //LoadSong(_beatmapName);
-            //_music.LoadFromFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", _beatmapName, Beatmap.Settings.General.AudioFileName));
-            //Time = 0;
-            //_music.Play();
-            //_wave.Play();
-
-            //MediaPlayer.Stop();
-            //MediaPlayer.Volume = Settings.SongVolumeF;
-            //MediaPlayer.Play(_song);
+            FindSystem<MusicSystem>().Volume = _game.Services.GetService<GameSettings>().SongVolumeF;
         }
 
         private void HandleInput()
@@ -439,26 +406,5 @@ namespace BeatTheNotes.GameSystems
 
             return beatmap;
         }
-
-        /*private Texture2D LoadBackground(string beatmapName)
-        {
-            Texture2D bg;
-            try
-            {
-                FileStream fs =
-                    new FileStream(
-                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", beatmapName,
-                            Beatmap.Settings.General.BackgroundFileName), FileMode.Open);
-                bg = Texture2D.FromStream(_game.GraphicsDevice, fs);
-                fs.Dispose();
-            }
-            catch (Exception e)
-            {
-                LogHelper.Log($"GameplayScreen: Error while opening Background file. Using empty background instead: {e}");
-                bg = Skin.DefaultBackground;
-            }
-
-            return bg;
-        }*/
     }
 }

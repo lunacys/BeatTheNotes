@@ -9,7 +9,5 @@
 
         public int HitPosition { get; set; }
         public int PlayfieldPositionX { get; set; }
-
-        public int HealthBarHeight { get; set; }
     }
 }

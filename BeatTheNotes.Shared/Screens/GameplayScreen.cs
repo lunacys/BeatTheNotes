@@ -72,11 +72,23 @@ namespace BeatTheNotes.Screens
                 Restart();
             }
 
+            if (InputManager.WasKeyPressed(Keys.F1))
+            {
+                Restart();
+                GameSystemComponent.FindSystem<MusicSystem>().PlaybackRate -= 0.1f;
+            }
+
+            if (InputManager.WasKeyPressed(Keys.F2))
+            {
+                Restart();
+                GameSystemComponent.FindSystem<MusicSystem>().PlaybackRate += 0.1f;
+            }
+
             /*if (InputManager.IsKeyDown(Keys.Space))
                 Restart(23000);*/
 
             // Updating..
-            
+
             GameSystemComponent.Update(gameTime);
             base.Update(gameTime);
         }

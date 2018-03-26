@@ -86,7 +86,6 @@ namespace BeatTheNotes.GameSystems
             foreach (var t in _scores)
             {
                 Vector2 pos = new Vector2((Position.X + Size.X / 2 + t.Position) * SizeMultiplier - 1, Position.Y - 15);
-                Vector2 off = new Vector2(Position.X + Size.X / 2, Position.Y);
                 
                 Color color = _hitColors[t.HitName];
 
