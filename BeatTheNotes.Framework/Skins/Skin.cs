@@ -38,5 +38,8 @@ namespace BeatTheNotes.Framework.Skins
         public Texture2D ScoreGoodTexture { get; set; }
         public Texture2D ScoreBadTexture { get; set; }
         public Texture2D ScoreMissTexture { get; set; }
+
+        public Texture2D HealthBarBg { get; set; }
+        public Texture2D HealthBar { get; set; }
     }
 }

@@ -1,26 +1,18 @@
 ﻿using System;
 using SoundTouch;
-using NAudio.Utils;
 using NAudio.Wave;
 
 namespace BeatTheNotes.Framework.Audio
 {
     public sealed class Music : IDisposable
     {
-        //private WaveOutEvent _wave;
-        //private VorbisWaveReader _oggReader;
-        //private Mp3FileReader _mp3Reader;
-
         public TimeSpan Position
         {
-            get => _wavePlayer.GetPositionTimeSpan().Multiply(PlaybackRate);
+            get => _reader.CurrentTime;//_wavePlayer.GetPositionTimeSpan().Multiply(PlaybackRate);
             set
             {
-                _wavePlayer.Dispose();
-                _wavePlayer = new WaveOutEvent();
-                _wavePlayer.Init(_speedControl);
-                _wavePlayer.Play();
                 _reader.CurrentTime = value;
+                _speedControl.Reposition();
             }
         }
 
@@ -34,22 +26,16 @@ namespace BeatTheNotes.Framework.Audio
         {
             // TODO: Reset song
             get => _speedControl.PlaybackRate;
-            set
-            {
-                _speedControl.PlaybackRate = value; 
-            }
+            set => _speedControl.PlaybackRate = value;
         }
 
         private WaveOutEvent _wavePlayer;
         private VarispeedSampleProvider _speedControl;
         private AudioFileReader _reader;
-        private readonly string _filename;
 
         public Music(string filename)
         {
-            _filename = filename;
-
-            LoadFromFile(_filename);
+            LoadFromFile(filename);
         }
 
         public void LoadFromFile(string filename)
@@ -64,13 +50,12 @@ namespace BeatTheNotes.Framework.Audio
             _reader = new AudioFileReader(filename);
             _speedControl = new VarispeedSampleProvider(_reader, 100, new SoundTouchProfile(true, true));
 
-            PlaybackRate = 1.0f;
-
             _wavePlayer = new WaveOutEvent();
+
+            PlaybackRate = 1.0f;
 
             _wavePlayer.Volume = 1.0f;
             _wavePlayer.Init(_speedControl);
-            
         }
 
         public void Play()
@@ -81,6 +66,12 @@ namespace BeatTheNotes.Framework.Audio
         public void Stop()
         {
             _wavePlayer?.Stop();
+        }
+
+        public void Reset()
+        {
+            _reader.CurrentTime = TimeSpan.Zero;
+            _speedControl.Reposition();
         }
 
         public void Pause()

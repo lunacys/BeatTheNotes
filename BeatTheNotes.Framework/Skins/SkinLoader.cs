@@ -70,6 +70,9 @@ namespace BeatTheNotes.Framework.Skins
                 skin.ScoreBadTexture = content.Load<Texture2D>(Path.Combine("Images", "HitBad"));
                 skin.ScoreMissTexture = content.Load<Texture2D>(Path.Combine("Images", "HitMiss"));
 
+                skin.HealthBarBg = content.Load<Texture2D>(Path.Combine("Images", "HealthBarBg"));
+                skin.HealthBar = content.Load<Texture2D>(Path.Combine("Images", "HealthBar"));
+
                 skin.HitNormal = content.Load<SoundEffect>(Path.Combine("Sfx", "HitNormal"));
                 skin.ComboBreak = content.Load<SoundEffect>(Path.Combine("Sfx", "ComboBreak"));
             }
@@ -96,7 +99,7 @@ namespace BeatTheNotes.Framework.Skins
                 if (!Directory.Exists(dirPath))
                     throw new DirectoryNotFoundException("Skin Not Found");
                 if (!File.Exists(skinSettings))
-                    throw new FileNotFoundException("Skin init file not found");
+                    throw new FileNotFoundException("Skin settings file not found");
 
                 string str;
 
@@ -141,6 +144,9 @@ namespace BeatTheNotes.Framework.Skins
                     skin.ScoreGoodTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "HitGood.png"));
                     skin.ScoreBadTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "HitBad.png"));
                     skin.ScoreMissTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "HitMiss.png"));
+
+                    skin.HealthBarBg = LoadTextureFromFile(device, Path.Combine(dirPath, "HealthBarBg.png"));
+                    skin.HealthBar = LoadTextureFromFile(device, Path.Combine(dirPath, "HealthBar.png"));
 
                     skin.Font = content.Load<SpriteFont>(Path.Combine("Fonts", "MainFont"));
 

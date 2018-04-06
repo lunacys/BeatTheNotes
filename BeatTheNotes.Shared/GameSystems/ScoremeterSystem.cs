@@ -14,6 +14,7 @@ namespace BeatTheNotes.GameSystems
         private float _od;
 
         private SpriteBatch _spriteBatch;
+        private Dictionary<string, Color> _hitColors;
 
         public float SizeMultiplier
         {
@@ -26,6 +27,8 @@ namespace BeatTheNotes.GameSystems
         public ScoremeterSystem(GraphicsDevice graphicsDevice)
         {
             _spriteBatch = new SpriteBatch(graphicsDevice);
+
+            
         }
 
         public override void Initialize()
@@ -40,11 +43,23 @@ namespace BeatTheNotes.GameSystems
 
             SizeMultiplier = 1.0f;
 
-            Size = new Vector2((188 - (3 * _od)) * 2, 8);
+            var scoreSys = FindSystem<ScoreSystem>();
+
+            Size = new Vector2((float)scoreSys.HitThresholds[scoreSys.ScoreMiss] * 2.0f, 8);
             Position = new Vector2(
                 gs.Skin.Settings.PlayfieldPositionX +
                 gs.Skin.PlayfieldLineTexture.Width * gs.Beatmap.Settings.Difficulty.KeyAmount / 2.0f -
                 Size.X * SizeMultiplier / 2.0f, 400);
+
+            _hitColors = new Dictionary<string, Color>
+            {
+                { scoreSys.ScoreMarvelous, new Color(255, 255, 255) },
+                { scoreSys.ScorePerfect, new Color(233, 201, 27) },
+                { scoreSys.ScoreGreat, new Color(0, 231, 33) },
+                { scoreSys.ScoreGood, new Color(0, 185, 231) },
+                { scoreSys.ScoreBad, new Color(229, 0, 151) },
+                { scoreSys.ScoreMiss, new Color(199, 0, 0) }
+            };
         }
 
         public override void Update(GameTime gameTime)
@@ -57,9 +72,9 @@ namespace BeatTheNotes.GameSystems
             _scores = _scores.Where(score => !score.IsExpired).ToList();
         }
 
-        public void AddScore(int currentTime, int hitObjectPosition)
+        public void AddScore(long currentTime, long hitObjectPosition, string hit)
         {
-            _scores.Add(new Score(currentTime - hitObjectPosition, 3000));
+            _scores.Add(new Score(currentTime - hitObjectPosition, 3000, hit));
         }
 
         public override void Draw(GameTime gameTime)
@@ -70,13 +85,11 @@ namespace BeatTheNotes.GameSystems
 
             foreach (var t in _scores)
             {
-                // TODO: Add colors for every score
                 Vector2 pos = new Vector2((Position.X + Size.X / 2 + t.Position) * SizeMultiplier - 1, Position.Y - 15);
-                Vector2 off = new Vector2(Position.X + Size.X / 2, Position.Y);
-                _spriteBatch.FillRectangle(pos, new Vector2(2, 40),
-                    ((pos.X > off.X - ((151 - (3 * _od))) && pos.X < off.X + ((151 - (3 * _od)))
-                        ? Color.Orange * (t.MsBeforeExpire / 1000.0f)
-                        : Color.Red * (t.MsBeforeExpire / 1000.0f))));
+                
+                Color color = _hitColors[t.HitName];
+
+                _spriteBatch.FillRectangle(pos, new Vector2(2, 40), color * 0.5f * (t.MsBeforeExpire / 1000.0f));
             }
 
             _spriteBatch.End();
@@ -84,23 +97,25 @@ namespace BeatTheNotes.GameSystems
 
         private void DrawBaseRect()
         {
+            var scoreSys = FindSystem<ScoreSystem>();
+
             // miss
-            _spriteBatch.FillRectangle(Position, Size, new Color(199, 0, 0));
+            _spriteBatch.FillRectangle(Position, Size, _hitColors[scoreSys.ScoreMiss]);
             // bad
             var offset = new Vector2((Size.X / 2 - (151 - (3 * _od))), 0);
-            _spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), new Color(229, 0, 151));
+            _spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), _hitColors[scoreSys.ScoreBad]);
             // good
             offset = new Vector2((Size.X / 2 - (127 - (3 * _od))), 0);
-            _spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), new Color(0, 185, 231));
+            _spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), _hitColors[scoreSys.ScoreGood]);
             // great
             offset = new Vector2(Size.X / 2 - ((97 - (3 * _od))), 0);
-            _spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), new Color(0, 231, 33));
+            _spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), _hitColors[scoreSys.ScoreGreat]);
             // perfect
             offset = new Vector2(Size.X / 2 - ((64 - (3 * _od))), 0);
-            _spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), new Color(233, 201, 27));
+            _spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), _hitColors[scoreSys.ScorePerfect]);
             // marvelous
             offset = new Vector2(Size.X / 2 - 16, 0);
-            _spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), new Color(255, 255, 255));
+            _spriteBatch.FillRectangle(Position + offset, new Vector2(Size.X - offset.X * 2, Size.Y), _hitColors[scoreSys.ScoreMarvelous]);
 
             _spriteBatch.FillRectangle(Position + new Vector2(Size.X / 2.0f - 1, -18), new Vector2(2, 48), new Color(200, 200, 200));
         }

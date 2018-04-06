@@ -11,7 +11,11 @@ namespace BeatTheNotes.GameSystems
     {
         public Music Music { get; set; }
 
-        public long MusicPosition => (long)Music.Position.TotalMilliseconds;
+        public TimeSpan MusicPosition
+        {
+            get => Music.Position;
+            set => Music.Position = value;
+        }
 
         public float PlaybackRate
         {
@@ -24,38 +28,29 @@ namespace BeatTheNotes.GameSystems
             get => Music.Volume;
             set => Music.Volume = value;
         }
+        
 
-        private string _beatmapName;
-        private string _songName;
-
-        public MusicSystem(string beatmapName, string songName)
-        {
-            _beatmapName = beatmapName;
-            _songName = songName;
-            
-        }
+        public MusicSystem()
+        { }
 
         public override void Initialize()
         {
             base.Initialize();
-
-            Music = new Music(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", _beatmapName, _songName));
-            Music.Play();
+            
+            Music?.Play();
         }
 
         public override void Reset()
         {
             base.Reset();
 
-            Music.Stop();
-            Music.LoadFromFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Maps", _beatmapName, _songName));
-            Music.Play();
+            Music?.Reset();
         }
 
         public override void Dispose()
         {
             base.Dispose();
-            Music.Dispose();
+            Music?.Dispose();
             GC.SuppressFinalize(this);
         }
     }

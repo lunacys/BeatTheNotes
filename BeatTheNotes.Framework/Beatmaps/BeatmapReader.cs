@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using BeatTheNotes.Framework.Audio;
 using BeatTheNotes.Framework.Logging;
+using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -148,7 +150,7 @@ namespace BeatTheNotes.Framework.Beatmaps
         /// Load Beatmap from a JSON file with file path and filename specified
         /// </summary>
         /// <returns>Beatmap</returns>
-        public static Beatmap LoadFromFile(string beatmapFolder, string mapname)
+        public static Beatmap LoadFromFile(GraphicsDevice gd, string beatmapFolder, string mapname, out Texture2D background, out Music music)
         {
             LogHelper.Log($"BeatmapReader: Load Beatmap from file '{mapname}'");
 
@@ -255,6 +257,13 @@ namespace BeatTheNotes.Framework.Beatmaps
             Beatmap bm = new Beatmap(settings, timingPoints, hitObjects);
 
             LogHelper.Log($"BeatmapReader: Successfully Read Beatmap '{mapname}'");
+
+            using (FileStream fs = new FileStream(Path.Combine(beatmapFolder, mapname, bm.Settings.General.BackgroundFileName), FileMode.Open))
+            {
+                background = Texture2D.FromStream(gd, fs);
+            }
+            
+            music = new Music(Path.Combine(beatmapFolder, mapname, bm.Settings.General.AudioFileName));
 
             return bm;
         }
