@@ -33,6 +33,11 @@ namespace BeatTheNotes.Framework.GameSystems
             return system;
         }
 
+        public IList<GameSystem> GetAllGameSystems()
+        {
+            return _gameSystems;
+        }
+
         public T Register<T>(T system) where T : GameSystem
         {
             LogHelper.Log($"GameSystemManager: Registering System {typeof(T)}");

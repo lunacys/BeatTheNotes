@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace BeatTheNotes.GameSystems
 {
-    public class ScoreSystem : GameSystem
+    public class ScoreSystem : GameSystem, IGameSystemProcessHitObject
     {
         public string ScoreMarvelous => "Marvelous";
         public string ScorePerfect => "Perfect";
@@ -151,7 +151,7 @@ namespace BeatTheNotes.GameSystems
             _spriteBatch.End();
         }
 
-        public void Calculate(HitObject hitObject, Keys? key)
+        public void Calculate(HitObject hitObject)
         {
             int hitVal = GetHitValue(hitObject);
 
@@ -161,8 +161,6 @@ namespace BeatTheNotes.GameSystems
             }
             else
             {
-                if (key == null) return;
-
                 DoScore(hitObject, hitVal);
             }
         }
@@ -250,7 +248,7 @@ namespace BeatTheNotes.GameSystems
 
             string hitValueName;
 
-            hitObject.IsPressed = true;
+            //hitObject.IsPressed = true;
 
             if (hitValue == HitValues[ScoreMarvelous])
             {
@@ -305,6 +303,11 @@ namespace BeatTheNotes.GameSystems
             if (Combo >= 30)
                 _gameplay.Skin.ComboBreak.Play();
             Combo = 0;
+        }
+
+        public void OnHitObjectHit(object sender, HitObjectOnPressEventArgs args)
+        {
+            Calculate(args.HitObject);
         }
     }
 }

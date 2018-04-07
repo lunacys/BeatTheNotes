@@ -81,6 +81,8 @@ namespace BeatTheNotes.GameSystems
             MediaPlayer.Volume = Settings.SongVolumeF;
 
             FindSystem<HealthSystem>().HpDrainRate = Beatmap.Settings.Difficulty.HpDrainRate;
+
+            InitializeAllHitObjects();
         }
 
         public override void Update(GameTime gameTime)
@@ -218,7 +220,7 @@ namespace BeatTheNotes.GameSystems
 
                     if (o.Position + scoreSys.HitThresholds[scoreSys.ScoreMiss] < time)
                     {
-                        scoreSys.Calculate(o, null);
+                        o.IsPressed = true;
                     }
                 }
             }
@@ -288,11 +290,6 @@ namespace BeatTheNotes.GameSystems
             }
 
             FindSystem<MusicSystem>().Volume = _game.Services.GetService<GameSettings>().SongVolumeF;
-        }
-
-        private void HandleInput(InputHandler inputHandler)
-        {
-            
         }
 
         private void DrawBeatDivisors()
@@ -388,6 +385,15 @@ namespace BeatTheNotes.GameSystems
                 SeparatedLines[i] = beatmap.HitObjects.FindAll(o => o.Line == i + 1);
 
             return beatmap;
+        }
+
+        private void InitializeAllHitObjects()
+        {
+            foreach (var separatedLine in SeparatedLines)
+            foreach (var hitObject in separatedLine)
+            foreach (var system in GameSystemManager.GetAllGameSystems())
+                if (system is IGameSystemProcessHitObject)
+                    hitObject.OnPress += (system as IGameSystemProcessHitObject).OnHitObjectHit;
         }
     }
 }

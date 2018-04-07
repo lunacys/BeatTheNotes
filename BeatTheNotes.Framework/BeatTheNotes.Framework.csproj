@@ -91,6 +91,7 @@
     <Compile Include="GameSystems\GameSystem.cs" />
     <Compile Include="GameSystems\GameSystemComponent.cs" />
     <Compile Include="GameSystems\IGameSystemManager.cs" />
+    <Compile Include="GameSystems\IGameSystemProcessHitObject.cs" />
     <Compile Include="GameSystems\SystemAddedEventArgs.cs" />
     <Compile Include="Graphs\Graph.cs" />
     <Compile Include="Input\IInputCommand.cs" />
