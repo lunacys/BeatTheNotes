@@ -1,5 +1,4 @@
-﻿using System;
-using BeatTheNotes.Framework.Beatmaps;
+﻿using BeatTheNotes.Framework.Beatmaps;
 using BeatTheNotes.Framework.Input;
 using BeatTheNotes.GameSystems;
 
@@ -9,7 +8,7 @@ namespace BeatTheNotes.Shared.GameSystems
     {
         public int Line { get; }
 
-        private GameplaySystem _gameplay;
+        private readonly GameplaySystem _gameplay;
 
         public KeyLineCommand(GameplaySystem gameplay, int line)
         {
@@ -22,12 +21,12 @@ namespace BeatTheNotes.Shared.GameSystems
             var nearest = _gameplay.GetNearestHitObjectOnLine(Line);
 
             if (nearest != null)
-                DoHit(nearest);//_gameplay.FindSystem<ScoreSystem>().Calculate(nearest);
+                DoHit(nearest);
         }
 
-        public void DoHit(HitObject hitObject)
+        private void DoHit(HitObject hitObject)
         {
-            hitObject.IsPressed = true;
+            hitObject.DoHit();
         }
     }
 }

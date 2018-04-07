@@ -16,16 +16,7 @@ namespace BeatTheNotes.Framework.Beatmaps
 
         public event EventHandler<HitObjectOnPressEventArgs> OnPress;
 
-        public bool IsPressed
-        {
-            get => _isPressed;
-            set
-            {
-                _isPressed = value;
-                if (value)
-                    OnPress?.Invoke(this, new HitObjectOnPressEventArgs(this));
-            }
-        }
+        public bool IsPressed => _isPressed;
 
         private bool _isPressed;
 
@@ -40,7 +31,18 @@ namespace BeatTheNotes.Framework.Beatmaps
             else
                 EndPosition = endPosition;
 
-            IsPressed = false;
+            _isPressed = false;
+        }
+
+        public void Reset()
+        {
+            _isPressed = false;
+        }
+
+        public void DoHit()
+        {
+            _isPressed = true;
+            OnPress?.Invoke(this, new HitObjectOnPressEventArgs(this));
         }
 
         public override string ToString()
