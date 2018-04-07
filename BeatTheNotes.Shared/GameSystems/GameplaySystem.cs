@@ -291,6 +291,9 @@ namespace BeatTheNotes.GameSystems
         {
             // TODO: Skip unnecessary loops
             var tp = GetCurrentTimingPoint();
+
+            Console.WriteLine($"current TP pos: {tp.Position}");
+
             for (int i = tp.Position; i <= Beatmap.HitObjects.Last().Position; i += (int)Math.Floor(tp.MsPerBeat * 4))
             {
                 float posY = (ScrollingSpeed * ((long)FindSystem<GameTimeSystem>().Time - i) +
@@ -306,35 +309,33 @@ namespace BeatTheNotes.GameSystems
         {
             // TODO: This
             // If there's no timing point at the time, return the first timing point
-            if (Beatmap.TimingPoints[0].Position < FindSystem<GameTimeSystem>().Time)
+            if (Beatmap.TimingPoints[0].Position > FindSystem<GameTimeSystem>().Time)
                 return Beatmap.TimingPoints[0];
 
             // If there's the only one timing point on the map, return that timing point
             if (Beatmap.TimingPoints.Count == 1)
                 return Beatmap.TimingPoints[0];
+            
+            return FindTimingPointByTime(FindSystem<GameTimeSystem>().Time);
+        }
 
-            /*foreach (var tp in Beatmap.TimingPoints)
+        private TimingPoint FindTimingPointByTime(double time)
+        {
+            // TODO: This
+            var timingPoint = Beatmap.TimingPoints[0];
+            var cur = Beatmap.TimingPoints[0];
+            var next = Beatmap.TimingPoints[1];
+            foreach (var tp in Beatmap.TimingPoints)
             {
-                if (tp.Position < Time)
+                if (cur.Position < time && next.Position > time)
                 {
-                    
-                    return tp;
+                    timingPoint = cur;
                 }
-            }*/
 
-            for (int i = 0; i < Beatmap.TimingPoints.Count - 1; i++)
-            {
-                var cur = Beatmap.TimingPoints[i].Position;
-                var next = Beatmap.TimingPoints[i + 1].Position;
-
-                //if ()
-                {
-                    //    Console.WriteLine($"returning tp: {Beatmap.TimingPoints[i].Position}");
-                    //    return Beatmap.TimingPoints[i];
-                }
+                cur = next;
             }
 
-            return Beatmap.TimingPoints[0];
+            return timingPoint;
         }
 
         /// <summary>
