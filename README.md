@@ -21,7 +21,7 @@ Beat The Notes will be available in **Windows**, **Linux**, **OS X** and **Andro
 
 To be able to build the Desktop project you need only [Visual Studio 2015](https://www.visualstudio.com/) or higher.
 
-**Please note, that the game uses .NET Framework 4.7.1 as a target framework, you may need to install it. However, I'm planning to change it to lower versions.**
+**Please note, that the game uses .NET Framework 4.6.1, and the SoundTouch library uses the .NET Standard 2.0. You may have to install both.**
 
 If you want to build Android project, you'll need to get [Visual Studio](https://www.visualstudio.com/) with Android Tools (Xamarin for Android).
 
