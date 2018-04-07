@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\GameplaySystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\GameTimeSystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\HealthSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\KeyLineCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\MusicSystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\OnScoreGetEventHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\Score.cs" />

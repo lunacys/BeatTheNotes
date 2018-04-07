@@ -9,10 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BeatTheNotes.Framework</RootNamespace>
     <AssemblyName>BeatTheNotes.Framework</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -92,6 +93,10 @@
     <Compile Include="GameSystems\IGameSystemManager.cs" />
     <Compile Include="GameSystems\SystemAddedEventArgs.cs" />
     <Compile Include="Graphs\Graph.cs" />
+    <Compile Include="Input\IInputCommand.cs" />
+    <Compile Include="Input\InputCommandAlreadyRegisteredEventArgs.cs" />
+    <Compile Include="Input\InputHandler.cs" />
+    <Compile Include="Input\MouseButton.cs" />
     <Compile Include="Logging\ConsoleLogger.cs" />
     <Compile Include="Logging\FileLogger.cs" />
     <Compile Include="Logging\Logger.cs" />

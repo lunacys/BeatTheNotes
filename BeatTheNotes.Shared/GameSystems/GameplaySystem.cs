@@ -10,6 +10,7 @@ using BeatTheNotes.Framework.Skins;
 using BeatTheNotes.Input;
 using BeatTheNotes.Framework;
 using BeatTheNotes.Framework.Audio;
+using BeatTheNotes.Framework.Input;
 using BeatTheNotes.Shared.GameSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -38,6 +39,8 @@ namespace BeatTheNotes.GameSystems
         private SpriteBatch _spriteBatch;
         private Music _music;
 
+        private InputHandler _input;
+
         //private VorbisWaveReader _waveReader;
         //private WaveOutEvent _wave;
 
@@ -57,6 +60,13 @@ namespace BeatTheNotes.GameSystems
             _beatmapName = beatmapName;
 
             Skin = _game.Services.GetService<Skin>();
+
+            _input = new InputHandler();
+
+            _input.RegisterKeyCommand(Settings.N1, new KeyLineCommand(this, 1));
+            _input.RegisterKeyCommand(Settings.N2, new KeyLineCommand(this, 2));
+            _input.RegisterKeyCommand(Settings.N3, new KeyLineCommand(this, 3));
+            _input.RegisterKeyCommand(Settings.N4, new KeyLineCommand(this, 4));
             //Time = 0;
         }
 
@@ -76,7 +86,7 @@ namespace BeatTheNotes.GameSystems
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-
+            
             var time = FindSystem<GameTimeSystem>().Time;
 
             if (InputManager.WasKeyPressed(Keys.F4))
@@ -88,14 +98,25 @@ namespace BeatTheNotes.GameSystems
             /*if (InputManager.WasKeyPressed(Keys.F5))
                 Settings.IsReversedDirection = !IsUpsideDown;*/
 
+            
+            // Handle Input for gameplay keys
+            _input.Update();
+            var command = _input.HandleInput();
+            command?.Execute();
 
+            // If one of keys was pressed, play a hit sound
+            // TODO: Link to TimingPoint hit sound
+            if (InputManager.WasKeyPressed(Settings.N1) || InputManager.WasKeyPressed(Settings.N2) ||
+                InputManager.WasKeyPressed(Settings.N3) || InputManager.WasKeyPressed(Settings.N4))
+            {
+                Skin.HitNormal.Play();
+            }
 
-            HandleInput();
-
+            // If last object of the beatmap has been reached..
             if (Beatmap.HitObjects.Last().Position + 1000 < time)
             {
-                // The beatmap is over
-                //MediaPlayer.Volume -= gameTime.ElapsedGameTime.Milliseconds / 5000.0f;
+                // ..The beatmap is over, so smoothely low the music volume and reset if volume is too low
+
                 if (FindSystem<MusicSystem>().Volume > 0.01f)
                     FindSystem<MusicSystem>().Volume -= gameTime.ElapsedGameTime.Milliseconds / 5000.0f;
 
@@ -110,8 +131,6 @@ namespace BeatTheNotes.GameSystems
                 if (Math.Abs(time - tp.Position) <= 10)
                     CurrentTimingPoint = tp;
             }*/
-
-            //Console.WriteLine($"{CurrentTimingPoint.Position}");
         }
 
         public override void Draw(GameTime gameTime)
@@ -271,102 +290,9 @@ namespace BeatTheNotes.GameSystems
             FindSystem<MusicSystem>().Volume = _game.Services.GetService<GameSettings>().SongVolumeF;
         }
 
-        private void HandleInput()
+        private void HandleInput(InputHandler inputHandler)
         {
-            ScoreSystem scoreSystem = GameSystemManager.FindSystem<ScoreSystem>();
-
-
-            if (InputManager.WasKeyPressed(Settings.N1))
-            {
-                var nearest = GetNearestHitObjectOnLine(1);
-
-                if (nearest != null)
-                {
-                    if (!nearest.IsLongNote)
-                        scoreSystem.Calculate(nearest, Settings.N1);
-                }
-            }
-
-            if (InputManager.WasKeyPressed(Settings.N2))
-            {
-                var nearest = GetNearestHitObjectOnLine(2);
-
-                if (nearest != null)
-                {
-                    if (!nearest.IsLongNote)
-                        scoreSystem.Calculate(nearest, Settings.N2);
-                }
-            }
-
-            if (InputManager.WasKeyPressed(Settings.N3))
-            {
-                var nearest = GetNearestHitObjectOnLine(3);
-
-                if (nearest != null)
-                    if (!nearest.IsLongNote)
-                        scoreSystem.Calculate(nearest, Settings.N3);
-            }
-
-            if (InputManager.WasKeyPressed(Settings.N4))
-            {
-                var nearest = GetNearestHitObjectOnLine(4);
-
-                if (nearest != null)
-                {
-                    if (!nearest.IsLongNote)
-                        scoreSystem.Calculate(nearest, Settings.N4);
-                }
-            }
-
-
-
-            if (InputManager.WasKeyReleased(Settings.N1))
-            {
-                var nearest = GetNearestHitObjectOnLine(1, true);
-
-                if (nearest != null)
-                {
-                    if (nearest.IsLongNote)
-                        scoreSystem.Calculate(nearest, Settings.N1);
-                }
-            }
-
-            if (InputManager.WasKeyReleased(Settings.N2))
-            {
-                var nearest = GetNearestHitObjectOnLine(2, true);
-
-                if (nearest != null)
-                {
-                    if (nearest.IsLongNote)
-                        scoreSystem.Calculate(nearest, Settings.N2);
-                }
-            }
-
-            if (InputManager.WasKeyReleased(Settings.N3))
-            {
-                var nearest = GetNearestHitObjectOnLine(3, true);
-
-                if (nearest != null)
-                    if (nearest.IsLongNote)
-                        scoreSystem.Calculate(nearest, Settings.N3);
-            }
-
-            if (InputManager.WasKeyReleased(Settings.N4))
-            {
-                var nearest = GetNearestHitObjectOnLine(4, true);
-
-                if (nearest != null)
-                {
-                    if (nearest.IsLongNote)
-                        scoreSystem.Calculate(nearest, Settings.N4);
-                }
-            }
-
-            if (InputManager.WasKeyPressed(Settings.N1) || InputManager.WasKeyPressed(Settings.N2) ||
-                InputManager.WasKeyPressed(Settings.N3) || InputManager.WasKeyPressed(Settings.N4))
-            {
-                Skin.HitNormal.Play();
-            }
+            
         }
 
         private void DrawBeatDivisors()
@@ -384,7 +310,7 @@ namespace BeatTheNotes.GameSystems
             }
         }
 
-        private TimingPoint GetCurrentTimingPoint()
+        public TimingPoint GetCurrentTimingPoint()
         {
             // TODO: This
             // If there's no timing point at the time, return the first timing point
@@ -424,7 +350,7 @@ namespace BeatTheNotes.GameSystems
         /// </summary>
         /// <param name="line">Line starting from 1 to KeyAmount</param>
         /// <returns>Nearest object</returns>
-        private HitObject GetNearestHitObjectOnLine(int line, bool isLongNote = false)
+        public HitObject GetNearestHitObjectOnLine(int line, bool isLongNote = false)
         {
             if (SeparatedLines[line - 1].Count == 0)
                 return null;
