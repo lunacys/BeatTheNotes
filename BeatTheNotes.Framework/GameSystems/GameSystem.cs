@@ -1,4 +1,5 @@
 ﻿using System;
+using BeatTheNotes.Framework.Beatmaps;
 using Microsoft.Xna.Framework;
 
 namespace BeatTheNotes.Framework.GameSystems

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BeatTheNotes.Framework.GameSystems;
+using BeatTheNotes.Framework.Input;
 using BeatTheNotes.Framework.Logging;
+using BeatTheNotes.Framework.Settings;
 using BeatTheNotes.GameSystems;
 using BeatTheNotes.Input;
 using BeatTheNotes.Shared.GameSystems;
@@ -23,11 +25,16 @@ namespace BeatTheNotes.Screens
 
         private readonly string _beatmapName;
 
+        private readonly InputHandler _input;
+
+        private GameSettings _settings => _game.Services.GetService<GameSettings>();
+
         public GameplayScreen(GameRoot game, string beatmapName)
         {
             _game = game;
             _beatmapName = beatmapName;
 
+            _input = new InputHandler();
             GameSystemComponent = new GameSystemComponent(game);
         }
 
@@ -37,7 +44,6 @@ namespace BeatTheNotes.Screens
 
             base.Initialize();
 
-            
             GameSystemComponent.Register(new GameplaySystem(_game, _beatmapName));
             GameSystemComponent.Register(new MusicSystem());
             GameSystemComponent.Register(new ScoreSystem(_game.GraphicsDevice));
@@ -59,26 +65,26 @@ namespace BeatTheNotes.Screens
 
         public override void Update(GameTime gameTime)
         {
-            InputManager.Update(_game);
+            _input.Update(_game);
 
-            if (InputManager.WasKeyPressed(Keys.Escape))
+            if (_input.WasKeyPressed(Keys.Escape))
             {
                 Show<PauseScreen>(true);
                 MediaPlayer.Pause();
             }
-            
-            if (InputManager.WasKeyPressed(Keys.OemTilde))
+
+            if (_input.WasKeyPressed(_settings.GameKeys["BeatmapRestart"]))
             {
                 Restart();
             }
 
-            if (InputManager.WasKeyPressed(Keys.F1))
+            if (_input.WasKeyPressed(_settings.GameKeys["BeatmapMusicBPMDown"]))
             {
                 Restart();
                 GameSystemComponent.FindSystem<MusicSystem>().PlaybackRate -= 0.1f;
             }
 
-            if (InputManager.WasKeyPressed(Keys.F2))
+            if (_input.WasKeyPressed(_settings.GameKeys["BeatmapMusicBPMUp"]))
             {
                 Restart();
                 GameSystemComponent.FindSystem<MusicSystem>().PlaybackRate += 0.1f;

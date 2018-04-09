@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using BeatTheNotes.Framework.Beatmaps;
 using BeatTheNotes.Framework.GameSystems;
-using BeatTheNotes.Input;
 using BeatTheNotes.Shared.GameSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace BeatTheNotes.GameSystems
 {
-    public class ScoreSystem : GameSystem
+    public class ScoreSystem : GameSystem, IGameSystemProcessHitObject
     {
         public string ScoreMarvelous => "Marvelous";
         public string ScorePerfect => "Perfect";
@@ -20,6 +18,7 @@ namespace BeatTheNotes.GameSystems
         public string ScoreBad => "Bad";
         public string ScoreMiss => "Miss";
 
+        // Max score is one million
         public const int MaxScore = 1000000;
 
         private double _score;
@@ -135,12 +134,16 @@ namespace BeatTheNotes.GameSystems
         {
             _spriteBatch.Begin();
 
+            // If there is a splash set, draw it
             if (CurrentSplash != null)
             {
                 var pos = new Vector2(
+                    // x
                     _gameplay.Skin.Settings.PlayfieldPositionX +
                     (_gameplay.Skin.PlayfieldLineTexture.Width * _gameplay.Beatmap.Settings.Difficulty.KeyAmount) / 2,
+                    // y
                     300);
+
                 var color = Color.White * (CurrentSplash.MsBeforeExpire / 1000.0f);
                 var origin = new Vector2(CurrentSplash.Texture.Width / 2.0f, CurrentSplash.Texture.Height / 2.0f);
                 var size = new Vector2(0.9f * ((CurrentSplash.MsBeforeExpire / 1000.0f)), 0.9f * ((CurrentSplash.MsBeforeExpire / 1000.0f)));
@@ -151,20 +154,11 @@ namespace BeatTheNotes.GameSystems
             _spriteBatch.End();
         }
 
-        public void Calculate(HitObject hitObject, Keys? key)
+        private void Calculate(HitObject hitObject)
         {
             int hitVal = GetHitValue(hitObject);
 
-            if (!hitObject.IsLongNote)
-            {
-                DoScore(hitObject, hitVal);
-            }
-            else
-            {
-                if (key == null) return;
-
-                DoScore(hitObject, hitVal);
-            }
+            DoScore(hitObject, hitVal);
         }
 
         public override void Reset()
@@ -182,14 +176,18 @@ namespace BeatTheNotes.GameSystems
         {
             var hitValue = HitValues[hitValueName];
 
+            // Total amount of notes
             var totalNotes = _gameplay.Beatmap.HitObjects.Count;
 
+            // Base score is the half of the total score
             var baseScore = (MaxScore * 0.5 / totalNotes) * (hitValue / 320.0);
             var bonus = CurrentBonus + HitBonuses[hitValueName] - HitPunishments[hitValueName];
 
+            // Proceed punishment
             CurrentBonus -= HitPunishments[hitValueName];
             bonus = MathHelper.Clamp(bonus, 1, 100);
 
+            // Bonus score is the other half of the total score
             var bonusScore = (MaxScore * 0.5f / totalNotes) * (HitBonusValues[hitValueName] * Math.Sqrt(bonus) / 320.0);
             var totalScore = baseScore + bonusScore;
 
@@ -202,7 +200,7 @@ namespace BeatTheNotes.GameSystems
             {
                 Combo = 0;
             }
-            else
+            else 
             {
                 Combo++;
                 if (Combo > MaxCombo)
@@ -223,7 +221,8 @@ namespace BeatTheNotes.GameSystems
 
         private int GetHitValue(HitObject hitObject)
         {
-            var timeOffset = (hitObject.IsLongNote ? hitObject.EndPosition : hitObject.Position) - FindSystem<GameTimeSystem>().Time;
+            var timeOffset = (hitObject.IsLongNote ? hitObject.EndPosition : hitObject.Position) -
+                             FindSystem<GameTimeSystem>().Time;
             var absTimeOffset = Math.Abs(timeOffset);
 
             int score = 0;
@@ -249,8 +248,6 @@ namespace BeatTheNotes.GameSystems
             if (hitValue < 0) return;
 
             string hitValueName;
-
-            hitObject.IsPressed = true;
 
             if (hitValue == HitValues[ScoreMarvelous])
             {
@@ -305,6 +302,11 @@ namespace BeatTheNotes.GameSystems
             if (Combo >= 30)
                 _gameplay.Skin.ComboBreak.Play();
             Combo = 0;
+        }
+
+        public void OnHitObjectHit(object sender, HitObjectOnPressEventArgs args)
+        {
+            Calculate(args.HitObject);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 
 namespace BeatTheNotes.Framework.Settings
@@ -12,7 +13,7 @@ namespace BeatTheNotes.Framework.Settings
         public bool IsUsedVSync { get; set; }
         public int TargetFramesPerSecond { get; set; }
 
-        
+
         public bool IsReversedDirection { get; set; }
 
         [JsonIgnore]
@@ -26,14 +27,14 @@ namespace BeatTheNotes.Framework.Settings
         public float SongVolumeF
         {
             get => SongVolume / 100.0f;
-            set => SongVolume = (int) (value * 100.0f);
+            set => SongVolume = (int)(value * 100.0f);
         }
 
         [JsonIgnore]
         public float ScrollingSpeedF
         {
             get => ScrollingSpeed / 10.0f;
-            set => ScrollingSpeed = (int) (value * 10.0f);
+            set => ScrollingSpeed = (int)(value * 10.0f);
         }
 
         public int HitsoundVolume { get; set; }
@@ -47,19 +48,21 @@ namespace BeatTheNotes.Framework.Settings
         /// <summary>
         /// Key for the first line
         /// </summary>
-        public Keys N1 { get; set; }
+        //public Keys N1 { get; set; }
         /// <summary>
         /// Key for the second line
         /// </summary>
-        public Keys N2 { get; set; }
+        //public Keys N2 { get; set; }
         /// <summary>
         /// Key for the third line
         /// </summary>
-        public Keys N3 { get; set; }
+        //public Keys N3 { get; set; }
         /// <summary>
         /// Key for the fourth line
         /// </summary>
-        public Keys N4 { get; set; }
+        //public Keys N4 { get; set; }
+
+        public Dictionary<string, Keys> GameKeys = new Dictionary<string, Keys>();
 
         public GameSettings()
         {
@@ -85,10 +88,27 @@ namespace BeatTheNotes.Framework.Settings
 
             BeatmapFolder = "Maps";
 
-            N1 = Keys.Z;
-            N2 = Keys.X;
-            N3 = Keys.OemPeriod;
-            N4 = Keys.OemQuestion;
+            //N1 = Keys.Z;
+            //N2 = Keys.X;
+            //N3 = Keys.OemPeriod;
+            //N4 = Keys.OemQuestion;
+
+            GameKeys["KL1"] = Keys.Z;
+            GameKeys["KL2"] = Keys.X;
+            GameKeys["KL3"] = Keys.OemPeriod;
+            GameKeys["KL4"] = Keys.OemQuestion;
+
+            GameKeys["MusicVolumeUp"] = Keys.Up;
+            GameKeys["MusicVolumeDown"] = Keys.Down;
+            GameKeys["SFXVolumeUp"] = Keys.Right;
+            GameKeys["SFXVolumeDown"] = Keys.Down;
+
+            GameKeys["BeatmapMusicBPMUp"] = Keys.F2;
+            GameKeys["BeatmapMusicBPMDown"] = Keys.F1;
+            GameKeys["BeatmapScrollingSpeedUp"] = Keys.F4;
+            GameKeys["BeatmapScrollingSpeedDown"] = Keys.F3;
+
+            GameKeys["BeatmapRestart"] = Keys.OemTilde;
         }
     }
 }

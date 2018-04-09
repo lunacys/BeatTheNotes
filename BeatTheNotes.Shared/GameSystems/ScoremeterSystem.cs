@@ -60,6 +60,8 @@ namespace BeatTheNotes.GameSystems
                 { scoreSys.ScoreBad, new Color(229, 0, 151) },
                 { scoreSys.ScoreMiss, new Color(199, 0, 0) }
             };
+
+
         }
 
         public override void Update(GameTime gameTime)

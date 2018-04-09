@@ -53,7 +53,7 @@ namespace BeatTheNotes
             Services.AddService(_settings);
 
             MediaPlayer.Volume = _settings.SongVolume;
-            
+
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             fps = new FramesPerSecondCounter();
@@ -77,7 +77,7 @@ namespace BeatTheNotes
             LogHelper.Log("Game Root: Initialize..");
 
             base.Initialize();
-            
+
             LogHelper.Log("Game Root: End Initialize..");
         }
 
@@ -86,7 +86,7 @@ namespace BeatTheNotes
             LogHelper.Log("Game Root: Load Content..");
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            
+
             try
             {
                 _usedSkin = SkinLoader.Load(Content, GraphicsDevice, _settings.Skin);
@@ -99,14 +99,14 @@ namespace BeatTheNotes
             }
 
             Services.AddService(_usedSkin);
-            
+
             _screenComponent = new ScreenGameComponent(this);
             Components.Add(_screenComponent);
             GameplayScreen gameplayScreen = new GameplayScreen(this, "test");
             _screenComponent.Register(gameplayScreen);
             PauseScreen ps = new PauseScreen(this);
             _screenComponent.Register(ps);
-            
+
             base.LoadContent();
 
             LogHelper.Log("Game Root: End Load Content");
@@ -130,7 +130,7 @@ namespace BeatTheNotes
             //    Exit();
 #endif
 
-            if (InputManager.WasKeyPressed(Keys.Left))
+            /*if (InputManager.WasKeyPressed(Keys.Left))
             {
                 _settings.SongVolumeF -= 0.1f;
                 _settings.SongVolumeF = MathHelper.Clamp(_settings.SongVolumeF, 0.0f, 1.0f);
@@ -158,8 +158,8 @@ namespace BeatTheNotes
                 _settings.HitsoundVolumeF = MathHelper.Clamp(_settings.HitsoundVolumeF, 0.0f, 1.0f);
 
                 SoundEffect.MasterVolume = _settings.HitsoundVolumeF;
-            }
-            
+            }*/
+
             fps.Update(gameTime);
             if (fps.FramesPerSecond < _minFps)
                 _minFps = fps.FramesPerSecond;
@@ -181,7 +181,7 @@ namespace BeatTheNotes
                 new Vector2(_settings.WindowWidth - 80, _settings.WindowHeight - 18 * 3), Color.Red);
             _spriteBatch.End();
 
-            
+
         }
     }
 }

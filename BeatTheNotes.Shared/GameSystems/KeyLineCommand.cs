@@ -1,14 +1,15 @@
 ﻿using System;
+using BeatTheNotes.Framework.Beatmaps;
 using BeatTheNotes.Framework.Input;
 using BeatTheNotes.GameSystems;
 
 namespace BeatTheNotes.Shared.GameSystems
 {
-    public class KeyLineCommand :IInputCommand
+    public class KeyLineCommand : IInputCommand
     {
         public int Line { get; }
 
-        private GameplaySystem _gameplay;
+        private readonly GameplaySystem _gameplay;
 
         public KeyLineCommand(GameplaySystem gameplay, int line)
         {
@@ -18,10 +19,18 @@ namespace BeatTheNotes.Shared.GameSystems
 
         public void Execute()
         {
+            // TODO: Create SoundEffectsSystem
+            _gameplay.Skin.HitNormal.Play();
+
             var nearest = _gameplay.GetNearestHitObjectOnLine(Line);
 
             if (nearest != null)
-                _gameplay.FindSystem<ScoreSystem>().Calculate(nearest, null);
+                DoHit(nearest);
+        }
+
+        private void DoHit(HitObject hitObject)
+        {
+            hitObject.DoHit();
         }
     }
 }

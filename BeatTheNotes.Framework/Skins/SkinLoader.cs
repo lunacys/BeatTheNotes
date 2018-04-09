@@ -16,12 +16,12 @@ namespace BeatTheNotes.Framework.Skins
                 throw new FileNotFoundException($"File '{filename}' Not Found");
 
             Texture2D t;
-            
+
             using (var fs = new FileStream(filename, FileMode.Open))
             {
                 t = Texture2D.FromStream(device, fs);
             }
-            
+
             LogHelper.Log($"SkinLoader: Sucessfully loaded asset '{filename}'");
 
             return t;
@@ -61,6 +61,7 @@ namespace BeatTheNotes.Framework.Skins
                 skin.NoteHoldTexture = content.Load<Texture2D>(Path.Combine("Images", "NoteHold"));
                 skin.PlayfieldLineTexture = content.Load<Texture2D>(Path.Combine("Images", "PlayfieldLine"));
                 skin.ButtonTexture = content.Load<Texture2D>(Path.Combine("Images", "Button"));
+
                 skin.Font = content.Load<SpriteFont>(Path.Combine("Fonts", "MainFont"));
 
                 skin.ScoreMarvelousTexture = content.Load<Texture2D>(Path.Combine("Images", "HitMarvelous"));
@@ -136,6 +137,8 @@ namespace BeatTheNotes.Framework.Skins
                     }
                     skin.DefaultBackground = LoadTextureFromFile(device, Path.Combine(dirPath, "DefaultBackground.png"));
                     skin.PlayfieldLineTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "PlayfieldLine.png"));
+                    skin.PlayfieldLinePressedTexture =
+                        LoadTextureFromFile(device, Path.Combine(dirPath, "PlayfieldLinePressed.png"));
                     skin.ButtonTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "Button.png"));
 
                     skin.ScoreMarvelousTexture = LoadTextureFromFile(device, Path.Combine(dirPath, "HitMarvelous.png"));
