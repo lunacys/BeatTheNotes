@@ -19,9 +19,9 @@ Beat The Notes will be available in **Windows**, **Linux**, **OS X** and **Andro
 
 ## Building
 
-To be able to build the Desktop project you need only [Visual Studio 2015](https://www.visualstudio.com/) or higher.
+To be able to build the Desktop project you need [Visual Studio 2015](https://www.visualstudio.com/) or higher and [MonoGame Framework](http://www.monogame.net/) 3.6 or higher.
 
-**Please note, that the game uses .NET Framework 4.6.1, and the SoundTouch library uses the .NET Standard 2.0. You may have to install both.**
+**Please note, that the game uses .NET Framework 4.6.1, and the SoundTouch library uses the .NET Standard 2.0. You may need to install both of them.**
 
 If you want to build Android project, you'll need to get [Visual Studio](https://www.visualstudio.com/) with Android Tools (Xamarin for Android).
 
@@ -33,7 +33,17 @@ git clone https://github.com/lunacys/BeatTheNotes.git
 
 Next, open the ```BeatTheNotes.sln``` file and select the required solution configuration - ```Debug``` or ```Release```.
 
-You can now build and run the game.
+Before you can go building the game, you should clone ```BeatTheNotes.Dist``` repo which contains ```SoundTouch.dll``` x64 & x86:
+
+```
+git clone https://github.com/lunacys/BeatTheNotes.Dist.git
+```
+
+Next copy ```x86``` and ```x64``` folders to ```{root directory}/BeatTheNotes.DesktopGL```.
+
+Now you can build and run the game.
+
+Please note that this repo doesn't contain any maps to play, you can get some from the ```BeatTheNotes.Dist``` repo. You need the ```Maps``` folder. Just place it into your run directory where executable file is placed, for example, ```{root directory}/BeatTheNotes.DesktopGL/bin/AnyCPU/Debug```.
 
 ### Deps
 
@@ -56,7 +66,7 @@ Currently all the game resources are in work. They will be available as soon as 
 
 Plans on game resorces:
 
-- [ ] Website - under development now
+- [ ] [Website](https://beatthenotes.com) - under development now
 - [ ] Discord Channel
 - [ ] Bot for Discord
 - [ ] Game Wiki
