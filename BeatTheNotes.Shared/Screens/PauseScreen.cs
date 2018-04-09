@@ -28,14 +28,15 @@ namespace BeatTheNotes.Screens
 
         public override void Update(GameTime gameTime)
         {
-            InputManager.Update(_game);
+            // TODO: This
+            //InputManager.Update(_game);
 
-            if (InputManager.WasKeyPressed(Keys.Escape))
+            //if (InputManager.WasKeyPressed(Keys.Escape))
             {
                 Show<GameplayScreen>(true);
                 MediaPlayer.Resume();
             }
-            
+
             base.Update(gameTime);
         }
 

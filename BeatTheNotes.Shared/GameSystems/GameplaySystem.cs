@@ -36,7 +36,7 @@ namespace BeatTheNotes.GameSystems
         private SpriteBatch _spriteBatch;
         private Music _music;
 
-        private InputHandler _input;
+        private readonly InputHandler _input;
 
 
         public GameplaySystem(GameRoot game, string beatmapName)
@@ -48,10 +48,10 @@ namespace BeatTheNotes.GameSystems
 
             _input = new InputHandler();
 
-            _input.RegisterKeyCommand(Settings.N1, new KeyLineCommand(this, 1));
-            _input.RegisterKeyCommand(Settings.N2, new KeyLineCommand(this, 2));
-            _input.RegisterKeyCommand(Settings.N3, new KeyLineCommand(this, 3));
-            _input.RegisterKeyCommand(Settings.N4, new KeyLineCommand(this, 4));
+            _input.RegisterKeyCommand(Settings.GameKeys["KL1"], new KeyLineCommand(this, 1));
+            _input.RegisterKeyCommand(Settings.GameKeys["KL2"], new KeyLineCommand(this, 2));
+            _input.RegisterKeyCommand(Settings.GameKeys["KL3"], new KeyLineCommand(this, 3));
+            _input.RegisterKeyCommand(Settings.GameKeys["KL4"], new KeyLineCommand(this, 4));
         }
 
         public override void Initialize()
@@ -59,7 +59,7 @@ namespace BeatTheNotes.GameSystems
             base.Initialize();
 
             _spriteBatch = new SpriteBatch(_game.GraphicsDevice);
-            
+
             FindSystem<MusicSystem>().Music = _music;
             MediaPlayer.Volume = Settings.SongVolumeF;
 
@@ -71,36 +71,39 @@ namespace BeatTheNotes.GameSystems
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            
+
             var time = FindSystem<GameTimeSystem>().Time;
 
-            if (InputManager.WasKeyPressed(Keys.F4))
+            _input.Update(_game);
+
+            if (_input.WasKeyPressed(Settings.GameKeys["BeatmapScrollingSpeedUp"]))
                 if (ScrollingSpeed < 20.0f)
                     Settings.ScrollingSpeedF += 0.1f;
-            if (InputManager.WasKeyPressed(Keys.F3))
+            if (_input.WasKeyPressed(Settings.GameKeys["BeatmapScrollingSpeedDown"]))
                 if (ScrollingSpeed > 0.2f)
                     Settings.ScrollingSpeedF -= 0.1f;
-            /*if (InputManager.WasKeyPressed(Keys.F5))
+            /*if (_input.WasKeyPressed(Keys.F5))
                 Settings.IsReversedDirection = !IsUpsideDown;*/
 
-            
+
             // Handle Input for gameplay keys
-            _input.Update();
-            var command = _input.HandleInput();
-            command?.Execute();
+            var command = _input.HandleInput(_input.WasKeyPressed);
+            foreach (var input in command)
+                input.Execute();
+
 
             // If one of keys was pressed, play a hit sound
             // TODO: Link to TimingPoint hit sound
-            if (InputManager.WasKeyPressed(Settings.N1) || InputManager.WasKeyPressed(Settings.N2) ||
-                InputManager.WasKeyPressed(Settings.N3) || InputManager.WasKeyPressed(Settings.N4))
+            /*if (_input.WasKeyPressed(Settings.N1) || _input.WasKeyPressed(Settings.N2) ||
+                _input.WasKeyPressed(Settings.N3) || _input.WasKeyPressed(Settings.N4))
             {
                 Skin.HitNormal.Play();
-            }
+            }*/
 
             // If last object of the beatmap has been reached..
             if (Beatmap.HitObjects.Last().Position + 1000 < time)
             {
-                // ..The beatmap is over, so smoothely low the music volume and reset if volume is too low
+                // ..The beatmap is over, so smoothly low the music volume and reset if volume is too low
                 if (FindSystem<MusicSystem>().Volume > 0.01f)
                     FindSystem<MusicSystem>().Volume -= gameTime.ElapsedGameTime.Milliseconds / 5000.0f;
 
@@ -112,7 +115,7 @@ namespace BeatTheNotes.GameSystems
         public override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
-            
+
             _spriteBatch.Begin();
             // Draw background before all the screen components
             _spriteBatch.Draw(_background, new Rectangle(0, 0, Settings.WindowWidth, Settings.WindowHeight), Color.White);
@@ -121,7 +124,7 @@ namespace BeatTheNotes.GameSystems
             DrawPlayfield();
             DrawBeatDivisors();
             DrawHitObjects();
-            
+
             // Draw UI
             DrawUi();
 
@@ -154,11 +157,11 @@ namespace BeatTheNotes.GameSystems
 
             // Draw buttons
             _spriteBatch.Draw(Skin.ButtonTexture,
-                IsUpsideDown
-                    ? new Vector2(Skin.Settings.PlayfieldPositionX, 0)
-                    : new Vector2(Skin.Settings.PlayfieldPositionX,
-                        Settings.WindowHeight - Skin.ButtonTexture.Height),
-                Color.White);
+            IsUpsideDown
+                ? new Vector2(Skin.Settings.PlayfieldPositionX, 0)
+                : new Vector2(Skin.Settings.PlayfieldPositionX,
+                    Settings.WindowHeight - Skin.ButtonTexture.Height),
+            Color.White);
 
 
             // Init health bar settings
@@ -292,7 +295,7 @@ namespace BeatTheNotes.GameSystems
             // TODO: Skip unnecessary loops
             var tp = GetCurrentTimingPoint();
 
-            Console.WriteLine($"current TP pos: {tp.Position}");
+            //Console.WriteLine($"current TP pos: {tp.Position}");
 
             for (int i = tp.Position; i <= Beatmap.HitObjects.Last().Position; i += (int)Math.Floor(tp.MsPerBeat * 4))
             {
@@ -315,7 +318,7 @@ namespace BeatTheNotes.GameSystems
             // If there's the only one timing point on the map, return that timing point
             if (Beatmap.TimingPoints.Count == 1)
                 return Beatmap.TimingPoints[0];
-            
+
             return FindTimingPointByTime(FindSystem<GameTimeSystem>().Time);
         }
 
@@ -401,10 +404,10 @@ namespace BeatTheNotes.GameSystems
         private void InitializeAllHitObjects()
         {
             foreach (var separatedLine in SeparatedLines)
-            foreach (var hitObject in separatedLine)
-            foreach (var system in GameSystemManager.GetAllGameSystems())
-                if (system is IGameSystemProcessHitObject)
-                    hitObject.OnPress += (system as IGameSystemProcessHitObject).OnHitObjectHit;
+                foreach (var hitObject in separatedLine)
+                    foreach (var system in GameSystemManager.GetAllGameSystems())
+                        if (system is IGameSystemProcessHitObject)
+                            hitObject.OnPress += (system as IGameSystemProcessHitObject).OnHitObjectHit;
         }
     }
 }

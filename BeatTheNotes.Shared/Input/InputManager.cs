@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace BeatTheNotes.Input
@@ -10,7 +11,8 @@ namespace BeatTheNotes.Input
         Middle
     }
 
-    public static class InputManager
+    //[Obsolete("Use InputHandler from the game framework instead")]
+    /*public static class InputManager
     {
         public static Vector2 MousePosition { get; private set; }
         public static Vector2 MouseVelocity { get; private set; }
@@ -112,5 +114,5 @@ namespace BeatTheNotes.Input
             }
             return false;
         }
-    }
+    }*/
 }

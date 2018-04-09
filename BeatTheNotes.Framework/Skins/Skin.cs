@@ -15,7 +15,7 @@ namespace BeatTheNotes.Framework.Skins
             get => NoteClickTextures[0];
             set => NoteClickTextures.Add(value);
         }
-        
+
         public Texture2D NoteHoldTexture
         {
             get => NoteHoldTextures[0];
@@ -23,6 +23,8 @@ namespace BeatTheNotes.Framework.Skins
         }
 
         public Texture2D PlayfieldLineTexture { get; set; }
+        public Texture2D PlayfieldLinePressedTexture { get; set; }
+
         public Texture2D ButtonTexture { get; set; }
         public SpriteFont Font { get; set; }
 

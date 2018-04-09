@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BeatTheNotes.Framework.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -16,13 +17,17 @@ namespace BeatTheNotes.Framework.Input
         private MouseState _mouseState, _oldMouseState;
         private Vector2 _oldMousePosition;
 
+        private readonly IInputCommand _nullCommand;
+
         // input commands for the keys from 0 to 9 (0 is 1k mode, 1 is 2k and so on)
         private readonly Dictionary<Keys, IInputCommand> _inputCommands;
-        
+
 
         public InputHandler()
         {
             _inputCommands = new Dictionary<Keys, IInputCommand>();
+
+            _nullCommand = new InputNullCommand();
         }
 
         public void RegisterKeyCommand(Keys key, IInputCommand command)
@@ -33,26 +38,32 @@ namespace BeatTheNotes.Framework.Input
             _inputCommands[key] = command;
         }
 
-        public IInputCommand HandleInput()
+        /// <summary>
+        /// Handle all the input provided by IInputCommand interface. Only works with keyboard.
+        /// This method returns a IEnumerable collection in order to process simultaneous pressed keys.
+        /// </summary>
+        /// <param name="keyboardHandler">Functor, if null, set WasKeyPressed method as the handler</param>
+        /// <returns>Command interface Enumerable</returns>
+        public IEnumerable<IInputCommand> HandleInput(Func<Keys, bool> keyboardHandler)
         {
-            foreach (var inputCommand in _inputCommands)
-            {
-                if (WasKeyPressed(inputCommand.Key))
-                    return inputCommand.Value;
-            }
+            if (keyboardHandler == null)
+                keyboardHandler = WasKeyPressed;
 
-            return null;
+            foreach (var inputCommand in _inputCommands)
+                if (keyboardHandler(inputCommand.Key))
+                    yield return inputCommand.Value;
+
+            yield return _nullCommand;
         }
 
-        public void Update()
+        public void Update(Game game)
         {
             _oldKeyboardState = _keyboardState;
             _oldMouseState = _mouseState;
             _oldMousePosition = _oldMouseState.Position.ToVector2();
 
-
             _keyboardState = Keyboard.GetState();
-            _mouseState = Mouse.GetState();
+            _mouseState = Mouse.GetState(game.Window);
             MousePosition = _mouseState.Position.ToVector2();
 
             MouseVelocity = MousePosition - _oldMousePosition;

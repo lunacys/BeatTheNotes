@@ -1,10 +1,11 @@
-﻿using BeatTheNotes.Framework.Beatmaps;
+﻿using System;
+using BeatTheNotes.Framework.Beatmaps;
 using BeatTheNotes.Framework.Input;
 using BeatTheNotes.GameSystems;
 
 namespace BeatTheNotes.Shared.GameSystems
 {
-    public class KeyLineCommand :IInputCommand
+    public class KeyLineCommand : IInputCommand
     {
         public int Line { get; }
 
@@ -18,6 +19,9 @@ namespace BeatTheNotes.Shared.GameSystems
 
         public void Execute()
         {
+            // TODO: Create SoundEffectsSystem
+            _gameplay.Skin.HitNormal.Play();
+
             var nearest = _gameplay.GetNearestHitObjectOnLine(Line);
 
             if (nearest != null)

@@ -95,8 +95,9 @@
     <Compile Include="GameSystems\SystemAddedEventArgs.cs" />
     <Compile Include="Graphs\Graph.cs" />
     <Compile Include="Input\IInputCommand.cs" />
-    <Compile Include="Input\InputCommandAlreadyRegisteredEventArgs.cs" />
+    <Compile Include="Input\InputCommandAlreadyRegisteredException.cs" />
     <Compile Include="Input\InputHandler.cs" />
+    <Compile Include="Input\InputNullCommand.cs" />
     <Compile Include="Input\MouseButton.cs" />
     <Compile Include="Logging\ConsoleLogger.cs" />
     <Compile Include="Logging\FileLogger.cs" />
