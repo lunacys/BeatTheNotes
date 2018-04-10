@@ -2,11 +2,11 @@
 
 namespace BeatTheNotes.Framework.Beatmaps
 {
-    public class HitObjectOnPressEventArgs : EventArgs
+    public class HitObjectOnHitEventArgs : EventArgs
     {
         public HitObject HitObject { get; }
 
-        public HitObjectOnPressEventArgs(HitObject hitObject)
+        public HitObjectOnHitEventArgs(HitObject hitObject)
         {
             HitObject = hitObject;
         }

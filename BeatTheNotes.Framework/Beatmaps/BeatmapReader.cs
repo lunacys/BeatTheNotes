@@ -117,7 +117,7 @@ namespace BeatTheNotes.Framework.Beatmaps
 
                                 if (tokens.Length == 3)
                                 {
-                                    ho = new HitObject(
+                                    ho = new NoteHold(
                                         int.Parse(tokens[0]),
                                         int.Parse(tokens[1]),
                                         int.Parse(tokens[2])
@@ -125,7 +125,7 @@ namespace BeatTheNotes.Framework.Beatmaps
                                 }
                                 else
                                 {
-                                    ho = new HitObject(
+                                    ho = new NoteClick(
                                         int.Parse(tokens[0]),
                                         int.Parse(tokens[1]));
                                 }
@@ -228,7 +228,7 @@ namespace BeatTheNotes.Framework.Beatmaps
             path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, beatmapFolder, mapname,
                 settings.HitObjectsFilename);
             // Reading HitObjects file, which contains all the objects used in the beatmap
-            // HitObjects file uses this format: "Line Position" for a Click, and "Line Position EndPosition" for a Hold
+            // HitObjects file uses this format: "Column Position" for a Click, and "Column Position EndPosition" for a Hold
             using (StreamReader sr = new StreamReader(path))
             {
                 LogHelper.Log($"BeatmapReader: Found Beatmap Hit Objects file '{settings.HitObjectsFilename}'");
@@ -244,10 +244,16 @@ namespace BeatTheNotes.Framework.Beatmaps
                     string[] tokens = Array.ConvertAll(line.Split(' '), p => p.Trim());
 
                     // If length is 3, the object is a 'Hold', else it's 'Click'
-                    var ho = ((tokens.Length == 3)
+                    /*var ho = ((tokens.Length == 3)
                         ? (new HitObject(int.Parse(tokens[0]), int.Parse(tokens[1]), int.Parse(tokens[2])))
                         : (new HitObject(int.Parse(tokens[0]), int.Parse(tokens[1])))
-                    );
+                    );*/
+                    HitObject ho;
+                    if (tokens.Length == 2)
+                        ho = new NoteClick(int.Parse(tokens[0]), int.Parse(tokens[1]));
+                    else if (tokens.Length == 3)
+                        ho = new NoteHold(int.Parse(tokens[0]), int.Parse(tokens[1]), int.Parse(tokens[2]));
+                    else throw new Exception("Unknown note type");
 
                     hitObjects.Add(ho);
                 }

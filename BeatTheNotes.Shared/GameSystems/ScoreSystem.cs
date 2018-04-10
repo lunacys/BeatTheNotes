@@ -304,7 +304,7 @@ namespace BeatTheNotes.GameSystems
             Combo = 0;
         }
 
-        public void OnHitObjectHit(object sender, HitObjectOnPressEventArgs args)
+        public void OnHitObjectHit(object sender, HitObjectOnHitEventArgs args)
         {
             Calculate(args.HitObject);
         }

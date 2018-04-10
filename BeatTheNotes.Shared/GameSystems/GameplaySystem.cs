@@ -138,7 +138,7 @@ namespace BeatTheNotes.GameSystems
             base.Reset();
 
             foreach (var o in Beatmap.HitObjects)
-                o.Reset();
+                (o as Note)?.Reset();
 
             FindSystem<MusicSystem>().Volume = _game.Services.GetService<GameSettings>().SongVolumeF;
         }
@@ -237,7 +237,7 @@ namespace BeatTheNotes.GameSystems
                     Vector2 position = new Vector2(
                         // x
                         Skin.Settings.PlayfieldPositionX +
-                        ((o.Line - 1) * (Skin.PlayfieldLineTexture.Width)),
+                        ((o.Column - 1) * (Skin.PlayfieldLineTexture.Width)),
                         // y
                         (ScrollingSpeed * (time - o.Position) +
                          (Settings.WindowHeight - Skin.ButtonTexture.Height)) +
@@ -249,7 +249,7 @@ namespace BeatTheNotes.GameSystems
                     if (Skin.Settings.NoteType.ToLower() == "arrow")
                     {
                         // For 'arrow' skin type use texture collection
-                        hitObjectTexture = Skin.NoteClickTextures[o.Line - 1];
+                        hitObjectTexture = Skin.NoteClickTextures[o.Column - 1];
                     }
 
                     // if it is a 'Click' note, just draw its texture
@@ -264,7 +264,7 @@ namespace BeatTheNotes.GameSystems
                             position = new Vector2(
                                 // x
                                 Skin.Settings.PlayfieldPositionX +
-                                ((o.Line - 1) * (Skin.PlayfieldLineTexture.Width)),
+                                ((o.Column - 1) * (Skin.PlayfieldLineTexture.Width)),
                                 // y
                                 (ScrollingSpeed * (time - (o.Position + i)) +
                                  (Settings.WindowHeight - Skin.ButtonTexture.Height)) +
@@ -343,7 +343,7 @@ namespace BeatTheNotes.GameSystems
         /// <summary>
         /// Find and return the nearest object on the specified line. The nearest object is the first object on the line.
         /// </summary>
-        /// <param name="line">Line starting from 1 to KeyAmount</param>
+        /// <param name="line">Column starting from 1 to KeyAmount</param>
         /// <param name="isLongNote">If using Hold Note</param>
         /// <returns>Nearest object on specified line within the threshold if found one, otherwise return null</returns>
         public HitObject GetNearestHitObjectOnLine(int line, bool isLongNote = false)
@@ -392,7 +392,7 @@ namespace BeatTheNotes.GameSystems
             // Create separated lines collection and fill them
             SeparatedLines = new List<HitObject>[beatmap.Settings.Difficulty.KeyAmount];
             for (int i = 0; i < SeparatedLines.Length; i++)
-                SeparatedLines[i] = beatmap.HitObjects.FindAll(o => o.Line == i + 1);
+                SeparatedLines[i] = beatmap.HitObjects.FindAll(o => o.Column == i + 1);
 
             return beatmap;
         }
@@ -406,7 +406,8 @@ namespace BeatTheNotes.GameSystems
                 foreach (var hitObject in separatedLine)
                     foreach (var system in GameSystemManager.GetAllGameSystems())
                         if (system is IGameSystemProcessHitObject)
-                            hitObject.OnPress += (system as IGameSystemProcessHitObject).OnHitObjectHit;
+                            if (hitObject is Note)
+                                (hitObject as Note).OnPress += (system as IGameSystemProcessHitObject).OnHitObjectHit;
         }
     }
 }

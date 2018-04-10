@@ -45,9 +45,17 @@ namespace BeatTheNotes.Framework.Beatmaps
             {
                 foreach (var hitObject in bm.HitObjects)
                 {
-                    sw.WriteLine(hitObject.EndPosition == hitObject.Position
-                        ? $"{hitObject.Line} {hitObject.Position}"
-                        : $"{hitObject.Line} {hitObject.Position} {hitObject.EndPosition}");
+                    if (hitObject is NoteClick)
+                    {
+                        var noteClick = hitObject as NoteClick;
+                        sw.WriteLine($"{noteClick.Column} {noteClick.Position}");
+                    }
+                    else if (hitObject is NoteHold)
+                    {
+                        var noteHold = hitObject as NoteHold;
+                        sw.WriteLine($"{noteHold.Column} {noteHold.Position} {noteHold.EndPosition}");
+                    }
+                    else throw new Exception("Unknown note type");
                 }
             }
         }
