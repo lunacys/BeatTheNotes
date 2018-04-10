@@ -6,7 +6,6 @@ using BeatTheNotes.Framework.GameSystems;
 using BeatTheNotes.Framework.Logging;
 using BeatTheNotes.Framework.Settings;
 using BeatTheNotes.Framework.Skins;
-using BeatTheNotes.Input;
 using BeatTheNotes.Framework;
 using BeatTheNotes.Framework.Audio;
 using BeatTheNotes.Framework.Input;

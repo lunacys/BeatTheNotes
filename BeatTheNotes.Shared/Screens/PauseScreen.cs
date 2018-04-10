@@ -1,5 +1,4 @@
 ﻿using BeatTheNotes.Framework.Skins;
-using BeatTheNotes.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;

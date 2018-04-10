@@ -7,7 +7,6 @@ using BeatTheNotes.Framework.Input;
 using BeatTheNotes.Framework.Logging;
 using BeatTheNotes.Framework.Settings;
 using BeatTheNotes.GameSystems;
-using BeatTheNotes.Input;
 using BeatTheNotes.Shared.GameSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

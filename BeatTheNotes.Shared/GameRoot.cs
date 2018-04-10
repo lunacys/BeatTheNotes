@@ -4,7 +4,6 @@ using System.IO;
 using BeatTheNotes.Framework.Logging;
 using BeatTheNotes.Framework.Settings;
 using BeatTheNotes.Framework.Skins;
-using BeatTheNotes.Input;
 using BeatTheNotes.Screens;
 using BeatTheNotes.GameSystems;
 using Microsoft.Xna.Framework;
