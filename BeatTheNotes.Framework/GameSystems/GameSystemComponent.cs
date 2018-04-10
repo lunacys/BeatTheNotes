@@ -41,7 +41,7 @@ namespace BeatTheNotes.Framework.GameSystems
         public T Register<T>(T system) where T : GameSystem
         {
             LogHelper.Log($"GameSystemManager: Registering System {typeof(T)}");
-            SystemAdded?.Invoke(this, new SystemAddedEventArgs(this));
+            SystemAdded?.Invoke(this, new SystemAddedEventArgs(this, system));
 
             system.GameSystemManager = this;
             system.IsWorking = true;

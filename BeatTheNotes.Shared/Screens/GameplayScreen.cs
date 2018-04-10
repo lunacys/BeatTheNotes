@@ -33,7 +33,7 @@ namespace BeatTheNotes.Screens
             _game = game;
             _beatmapName = beatmapName;
 
-            _input = new InputHandler();
+            _input = new InputHandler(game);
             GameSystemComponent = new GameSystemComponent(game);
         }
 
@@ -64,7 +64,7 @@ namespace BeatTheNotes.Screens
 
         public override void Update(GameTime gameTime)
         {
-            _input.Update(_game);
+            _input.Update(gameTime);
 
             if (_input.WasKeyPressed(Keys.Escape))
             {

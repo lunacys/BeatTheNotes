@@ -45,7 +45,7 @@ namespace BeatTheNotes.GameSystems
 
             Skin = _game.Services.GetService<Skin>();
 
-            _input = new InputHandler();
+            _input = new InputHandler(game);
 
             _input.RegisterKeyCommand(Settings.GameKeys["KL1"], new KeyLineCommand(this, 1));
             _input.RegisterKeyCommand(Settings.GameKeys["KL2"], new KeyLineCommand(this, 2));
@@ -73,7 +73,7 @@ namespace BeatTheNotes.GameSystems
 
             var time = FindSystem<GameTimeSystem>().Time;
 
-            _input.Update(_game);
+            _input.Update(gameTime);
 
             if (_input.WasKeyPressed(Settings.GameKeys["BeatmapScrollingSpeedUp"]))
                 if (ScrollingSpeed < 20.0f)
