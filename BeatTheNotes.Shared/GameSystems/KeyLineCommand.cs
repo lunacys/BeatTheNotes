@@ -1,6 +1,7 @@
 ﻿using System;
 using BeatTheNotes.Framework.Beatmaps;
 using BeatTheNotes.Framework.Input;
+using BeatTheNotes.Framework.Objects;
 using BeatTheNotes.GameSystems;
 
 namespace BeatTheNotes.Shared.GameSystems

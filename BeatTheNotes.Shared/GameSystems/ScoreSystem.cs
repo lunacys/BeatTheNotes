@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using BeatTheNotes.Framework.Beatmaps;
 using BeatTheNotes.Framework.GameSystems;
+using BeatTheNotes.Framework.Objects;
 using BeatTheNotes.Shared.GameSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -200,7 +201,7 @@ namespace BeatTheNotes.GameSystems
             {
                 Combo = 0;
             }
-            else 
+            else
             {
                 Combo++;
                 if (Combo > MaxCombo)
@@ -221,7 +222,7 @@ namespace BeatTheNotes.GameSystems
 
         private int GetHitValue(HitObject hitObject)
         {
-            var timeOffset = (hitObject.IsLongNote ? hitObject.EndPosition : hitObject.Position) -
+            var timeOffset = ((hitObject as NoteHold)?.EndPosition ?? hitObject.Position) -
                              FindSystem<GameTimeSystem>().Time;
             var absTimeOffset = Math.Abs(timeOffset);
 
@@ -290,7 +291,7 @@ namespace BeatTheNotes.GameSystems
 
             OnScoreGet?.Invoke(this, new OnScoreGetEventHandler(hitValueName, HitValues[hitValueName]));
             GameSystemManager.FindSystem<ScoremeterSystem>()?.AddScore((long)FindSystem<GameTimeSystem>().Time,
-                hitObject.IsLongNote ? hitObject.EndPosition : hitObject.Position, hitValueName);
+                (hitObject as NoteHold)?.EndPosition ?? hitObject.Position, hitValueName);
 
             ProceedCombo(hitValue);
             CalculateScore(hitValueName);
@@ -304,7 +305,7 @@ namespace BeatTheNotes.GameSystems
             Combo = 0;
         }
 
-        public void OnHitObjectHit(object sender, HitObjectOnPressEventArgs args)
+        public void OnHitObjectHit(object sender, HitObjectOnHitEventArgs args)
         {
             Calculate(args.HitObject);
         }
