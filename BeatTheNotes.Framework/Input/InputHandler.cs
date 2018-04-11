@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using BeatTheNotes.Framework.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -17,14 +16,14 @@ namespace BeatTheNotes.Framework.Input
         private MouseState _mouseState, _oldMouseState;
         private Vector2 _oldMousePosition;
 
-        private readonly GameWindow Window;
+        private readonly GameWindow _window;
 
         private readonly IInputCommand _nullCommand;
 
         // input commands for the keys from 0 to 9 (0 is 1k mode, 1 is 2k and so on)
         private readonly Dictionary<Keys, IInputCommand> _inputCommands;
 
-        public event EventHandler<InputHandlerOnCommandAdd> OnCommandAdded; 
+        public event EventHandler<InputHandlerOnCommandAdd> OnCommandAdded;
 
         public InputHandler(Game game) : base(game)
         {
@@ -32,7 +31,7 @@ namespace BeatTheNotes.Framework.Input
 
             _nullCommand = new InputNullCommand();
 
-            Window = game.Window;
+            _window = game.Window;
         }
 
         public IInputCommand this[Keys key]
@@ -76,7 +75,7 @@ namespace BeatTheNotes.Framework.Input
             _oldMousePosition = _oldMouseState.Position.ToVector2();
 
             _keyboardState = Keyboard.GetState();
-            _mouseState = Mouse.GetState(Window);
+            _mouseState = Mouse.GetState(_window);
             MousePosition = _mouseState.Position.ToVector2();
 
             MouseVelocity = MousePosition - _oldMousePosition;

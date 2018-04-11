@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using BeatTheNotes.Framework.Audio;
 using BeatTheNotes.Framework.GameSystems;
 
@@ -28,7 +25,7 @@ namespace BeatTheNotes.GameSystems
             get => Music.Volume;
             set => Music.Volume = value;
         }
-        
+
 
         public MusicSystem()
         { }
@@ -36,7 +33,7 @@ namespace BeatTheNotes.GameSystems
         public override void Initialize()
         {
             base.Initialize();
-            
+
             Music?.Play();
         }
 

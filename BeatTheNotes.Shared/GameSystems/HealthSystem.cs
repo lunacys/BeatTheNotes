@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using BeatTheNotes.Framework.GameSystems;
+﻿using BeatTheNotes.Framework.GameSystems;
 using BeatTheNotes.GameSystems;
 using Microsoft.Xna.Framework;
 
@@ -31,7 +28,7 @@ namespace BeatTheNotes.Shared.GameSystems
             var scoreSys = FindSystem<ScoreSystem>();
             scoreSys.OnScoreGet += OnScoreGet;
         }
-        
+
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);

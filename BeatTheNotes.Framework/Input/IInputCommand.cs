@@ -1,6 +1,4 @@
-﻿using BeatTheNotes.Framework.Beatmaps;
-
-namespace BeatTheNotes.Framework.Input
+﻿namespace BeatTheNotes.Framework.Input
 {
     public interface IInputCommand
     {

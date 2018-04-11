@@ -11,6 +11,7 @@ namespace BeatTheNotes.Framework.Beatmaps
         /// Write a beatmap to a file using JSON format
         /// </summary>
         /// <param name="bm">Beatmap that needs to be saved</param>
+        /// <param name="beatmapFolder"></param>
         /// <param name="mapname">Map name</param>
         public static void WriteToFile(Beatmap bm, string beatmapFolder, string mapname)
         {

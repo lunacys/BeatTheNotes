@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using BeatTheNotes.Framework.Beatmaps;
 using BeatTheNotes.Framework.GameSystems;
-using BeatTheNotes.Framework.Logging;
 using BeatTheNotes.Framework.Settings;
 using BeatTheNotes.Framework.Skins;
 using BeatTheNotes.Framework;
@@ -13,7 +12,6 @@ using BeatTheNotes.Framework.Objects;
 using BeatTheNotes.Shared.GameSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 
 namespace BeatTheNotes.GameSystems
@@ -164,7 +162,7 @@ namespace BeatTheNotes.GameSystems
             Color.White);
 
 
-            // Init health bar settings
+            // Initialize health bar settings
             float hpX = Skin.Settings.PlayfieldPositionX +
                         Skin.PlayfieldLineTexture.Width * Beatmap.Settings.Difficulty.KeyAmount;
             float hpY = _game.Services.GetService<GameSettings>().WindowHeight;
@@ -216,7 +214,7 @@ namespace BeatTheNotes.GameSystems
             _spriteBatch.DrawString(Skin.Font,
                 $"Score: {scoreSystem.Score}\n" +
                 $"Combo: {scoreSystem.Combo}\n" +
-                $"Acc: {scoreSystem.Accuracy * 100:F2}%\n" +
+                $"Accuracy: {scoreSystem.Accuracy * 100:F2}%\n" +
                 $"HP: {FindSystem<HealthSystem>().Health}",
                 new Vector2(15, 300), Color.Black);
         }
@@ -258,7 +256,7 @@ namespace BeatTheNotes.GameSystems
                     {
                         _spriteBatch.Draw(hitObjectTexture, position, o.IsExpired ? Color.Black : Color.White);
                     }
-                    else if (o is NoteHold) // if it is a 'Hold' note, draw its texure one time per 5 pixels
+                    else if (o is NoteHold) // if it is a 'Hold' note, draw its texture one time per 5 pixels
                     {
                         var noteHold = o as NoteHold;
                         for (int i = 0; i <= noteHold.EndPosition - noteHold.Position; i += 5)
@@ -296,8 +294,6 @@ namespace BeatTheNotes.GameSystems
             // TODO: Skip unnecessary loops
             var tp = GetCurrentTimingPoint();
 
-            //Console.WriteLine($"current TP pos: {tp.Position}");
-
             for (int i = tp.Position; i <= Beatmap.HitObjects.Last().Position; i += (int)Math.Floor(tp.MsPerBeat * 4))
             {
                 float posY = (ScrollingSpeed * ((long)FindSystem<GameTimeSystem>().Time - i) +
@@ -320,24 +316,13 @@ namespace BeatTheNotes.GameSystems
             if (Beatmap.TimingPoints.Count == 1)
                 return Beatmap.TimingPoints[0];
 
-            return FindTimingPointByTime(FindSystem<GameTimeSystem>().Time);
+            return FindTimingPointByTime();
         }
 
-        private TimingPoint FindTimingPointByTime(double time)
+        private TimingPoint FindTimingPointByTime()
         {
             // TODO: This
             var timingPoint = Beatmap.TimingPoints[0];
-            var cur = Beatmap.TimingPoints[0];
-            var next = Beatmap.TimingPoints[1];
-            foreach (var tp in Beatmap.TimingPoints)
-            {
-                if (cur.Position < time && next.Position > time)
-                {
-                    timingPoint = cur;
-                }
-
-                cur = next;
-            }
 
             return timingPoint;
         }

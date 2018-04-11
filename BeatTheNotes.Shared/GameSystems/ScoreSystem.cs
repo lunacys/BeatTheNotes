@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using BeatTheNotes.Framework.Beatmaps;
 using BeatTheNotes.Framework.GameSystems;
 using BeatTheNotes.Framework.Objects;
 using BeatTheNotes.Shared.GameSystems;

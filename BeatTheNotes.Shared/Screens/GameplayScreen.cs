@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using BeatTheNotes.Framework.GameSystems;
+﻿using BeatTheNotes.Framework.GameSystems;
 using BeatTheNotes.Framework.Input;
 using BeatTheNotes.Framework.Logging;
 using BeatTheNotes.Framework.Settings;
 using BeatTheNotes.GameSystems;
 using BeatTheNotes.Shared.GameSystems;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Screens;
@@ -26,7 +21,7 @@ namespace BeatTheNotes.Screens
 
         private readonly InputHandler _input;
 
-        private GameSettings _settings => _game.Services.GetService<GameSettings>();
+        private GameSettings Settings => _game.Services.GetService<GameSettings>();
 
         public GameplayScreen(GameRoot game, string beatmapName)
         {
@@ -72,18 +67,18 @@ namespace BeatTheNotes.Screens
                 MediaPlayer.Pause();
             }
 
-            if (_input.WasKeyPressed(_settings.GameKeys["BeatmapRestart"]))
+            if (_input.WasKeyPressed(Settings.GameKeys["BeatmapRestart"]))
             {
                 Restart();
             }
 
-            if (_input.WasKeyPressed(_settings.GameKeys["BeatmapMusicBPMDown"]))
+            if (_input.WasKeyPressed(Settings.GameKeys["BeatmapMusicBPMDown"]))
             {
                 Restart();
                 GameSystemComponent.FindSystem<MusicSystem>().PlaybackRate -= 0.1f;
             }
 
-            if (_input.WasKeyPressed(_settings.GameKeys["BeatmapMusicBPMUp"]))
+            if (_input.WasKeyPressed(Settings.GameKeys["BeatmapMusicBPMUp"]))
             {
                 Restart();
                 GameSystemComponent.FindSystem<MusicSystem>().PlaybackRate += 0.1f;
