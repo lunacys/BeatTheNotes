@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using BeatTheNotes.Framework.Objects;
 using Newtonsoft.Json;
 
 namespace BeatTheNotes.Framework.Beatmaps

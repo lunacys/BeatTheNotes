@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BeatTheNotes.Framework.Objects;
 
 namespace BeatTheNotes.Framework.Beatmaps
 {

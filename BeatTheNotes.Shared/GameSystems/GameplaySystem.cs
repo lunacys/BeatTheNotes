@@ -9,6 +9,7 @@ using BeatTheNotes.Framework.Skins;
 using BeatTheNotes.Framework;
 using BeatTheNotes.Framework.Audio;
 using BeatTheNotes.Framework.Input;
+using BeatTheNotes.Framework.Objects;
 using BeatTheNotes.Shared.GameSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -138,7 +139,7 @@ namespace BeatTheNotes.GameSystems
             base.Reset();
 
             foreach (var o in Beatmap.HitObjects)
-                (o as Note)?.Reset();
+                o.Reset();
 
             FindSystem<MusicSystem>().Volume = _game.Services.GetService<GameSettings>().SongVolumeF;
         }
@@ -253,31 +254,32 @@ namespace BeatTheNotes.GameSystems
                     }
 
                     // if it is a 'Click' note, just draw its texture
-                    if (o.Position == o.EndPosition)
+                    if (o is NoteClick)
                     {
-                        _spriteBatch.Draw(hitObjectTexture, position, o.IsPressed ? Color.Black : Color.White);
+                        _spriteBatch.Draw(hitObjectTexture, position, o.IsExpired ? Color.Black : Color.White);
                     }
-                    else // if it is a 'Hold' note, draw its texure one time per 5 pixels
+                    else if (o is NoteHold) // if it is a 'Hold' note, draw its texure one time per 5 pixels
                     {
-                        for (int i = 0; i <= o.EndPosition - o.Position; i += 5)
+                        var noteHold = o as NoteHold;
+                        for (int i = 0; i <= noteHold.EndPosition - noteHold.Position; i += 5)
                         {
                             position = new Vector2(
                                 // x
                                 Skin.Settings.PlayfieldPositionX +
-                                ((o.Column - 1) * (Skin.PlayfieldLineTexture.Width)),
+                                ((noteHold.Column - 1) * (Skin.PlayfieldLineTexture.Width)),
                                 // y
-                                (ScrollingSpeed * (time - (o.Position + i)) +
+                                (ScrollingSpeed * (time - (noteHold.Position + i)) +
                                  (Settings.WindowHeight - Skin.ButtonTexture.Height)) +
                                 Skin.Settings.HitPosition
                             );
 
-                            _spriteBatch.Draw(hitObjectTexture, position, null, o.IsPressed ? Color.Black : Color.White);
+                            _spriteBatch.Draw(hitObjectTexture, position, null, noteHold.IsExpired ? Color.Black : Color.White);
                         }
                     }
 
                     // Proceed miss
                     // It handles in draw method because of optimization
-                    if (o.IsPressed) continue;
+                    if (o.IsExpired) continue;
 
                     var scoreSys = GameSystemManager.FindSystem<ScoreSystem>();
 
@@ -344,28 +346,23 @@ namespace BeatTheNotes.GameSystems
         /// Find and return the nearest object on the specified line. The nearest object is the first object on the line.
         /// </summary>
         /// <param name="line">Column starting from 1 to KeyAmount</param>
-        /// <param name="isLongNote">If using Hold Note</param>
         /// <returns>Nearest object on specified line within the threshold if found one, otherwise return null</returns>
-        public HitObject GetNearestHitObjectOnLine(int line, bool isLongNote = false)
+        public HitObject GetNearestHitObjectOnLine(int line)
         {
             // If there are no objects on the line, return null
             if (SeparatedLines[line - 1].Count == 0)
                 return null;
 
             // If there are only already pressed objects on the line, return null
-            if (SeparatedLines[line - 1].Count(o => !o.IsPressed) == 0)
+            if (SeparatedLines[line - 1].Count(o => !o.IsExpired) == 0)
                 return null;
 
             // Find first unpressed object on the line
-            var first = SeparatedLines[line - 1].First(o => !o.IsPressed);
+            var first = SeparatedLines[line - 1].First(o => !o.IsExpired);
 
             var ss = GameSystemManager.FindSystem<ScoreSystem>();
 
-            if (!isLongNote)
-                return Math.Abs(FindSystem<GameTimeSystem>().Time - first.Position) <= (ss.HitThresholds[ss.ScoreMiss]) ? first : null;
-
-            // If we're using "Click" notes, we checking the end position of the object
-            return Math.Abs(FindSystem<GameTimeSystem>().Time - first.EndPosition) <= (ss.HitThresholds[ss.ScoreMiss]) ? first : null;
+            return Math.Abs(FindSystem<GameTimeSystem>().Time - first.Position) <= (ss.HitThresholds[ss.ScoreMiss]) ? first : null;
         }
 
         /// <summary>
@@ -406,8 +403,7 @@ namespace BeatTheNotes.GameSystems
                 foreach (var hitObject in separatedLine)
                     foreach (var system in GameSystemManager.GetAllGameSystems())
                         if (system is IGameSystemProcessHitObject)
-                            if (hitObject is Note)
-                                (hitObject as Note).OnPress += (system as IGameSystemProcessHitObject).OnHitObjectHit;
+                            hitObject.OnHit += (system as IGameSystemProcessHitObject).OnHitObjectHit;
         }
     }
 }

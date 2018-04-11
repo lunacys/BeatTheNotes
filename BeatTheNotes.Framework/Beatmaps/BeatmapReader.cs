@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using BeatTheNotes.Framework.Audio;
 using BeatTheNotes.Framework.Logging;
+using BeatTheNotes.Framework.Objects;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -137,7 +138,7 @@ namespace BeatTheNotes.Framework.Beatmaps
                 }
 
                 Beatmap bm = new Beatmap(
-                    new BeatmapSettings(general, editor, metadata, difficulty), 
+                    new BeatmapSettings(general, editor, metadata, difficulty),
                     timingPoints,
                     hitObjects
                 );
@@ -167,7 +168,7 @@ namespace BeatTheNotes.Framework.Beatmaps
 
 
             LogHelper.Log($"BeatmapReader: Parsing Beatmap '{mapname}'");
-            
+
             JObject obj = JObject.Parse(str);
 
             BeatmapSettings settings =
@@ -268,7 +269,7 @@ namespace BeatTheNotes.Framework.Beatmaps
             {
                 background = Texture2D.FromStream(gd, fs);
             }
-            
+
             music = new Music(Path.Combine(beatmapFolder, mapname, bm.Settings.General.AudioFileName));
 
             return bm;

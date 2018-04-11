@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BeatTheNotes.Framework.Beatmaps
+namespace BeatTheNotes.Framework.Objects
 {
     public class HitObjectOnHitEventArgs : EventArgs
     {

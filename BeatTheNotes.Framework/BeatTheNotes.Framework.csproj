@@ -85,11 +85,10 @@
     <Compile Include="Beatmaps\BeatmapSettingsMetadata.cs" />
     <Compile Include="Beatmaps\BeatmapWriter.cs" />
     <Compile Include="Beatmaps\GameMode.cs" />
-    <Compile Include="Beatmaps\HitObject.cs" />
-    <Compile Include="Beatmaps\HitObjectOnHitEventArgs.cs" />
-    <Compile Include="Beatmaps\Note.cs" />
-    <Compile Include="Beatmaps\NoteClick.cs" />
-    <Compile Include="Beatmaps\NoteHold.cs" />
+    <Compile Include="Objects\HitObject.cs" />
+    <Compile Include="Objects\HitObjectOnHitEventArgs.cs" />
+    <Compile Include="Objects\NoteClick.cs" />
+    <Compile Include="Objects\NoteHold.cs" />
     <Compile Include="Beatmaps\TimingPoint.cs" />
     <Compile Include="GameSystems\GameSystem.cs" />
     <Compile Include="GameSystems\GameSystemComponent.cs" />
