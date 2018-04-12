@@ -24,7 +24,7 @@ bld/
 
 
 # Ignore Android project
-[Bb]eat[Tt]he[Nn]otes.[Aa]ndroid/
+[Bb]eat[Tt]he[Nn]otes[Aa]ndroid/
 
 # Visual Studio 2015 cache/options directory
 .vs/
