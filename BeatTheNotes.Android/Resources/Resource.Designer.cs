@@ -9,9 +9,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: global::Android.Runtime.ResourceDesignerAttribute("Jackhammer.Android.Resource", IsApplication=true)]
+[assembly: global::Android.Runtime.ResourceDesignerAttribute("BeatTheNotes.Android.Resource", IsApplication=true)]
 
-namespace Jackhammer.Android
+namespace BeatTheNotes.Android
 {
 	
 	
