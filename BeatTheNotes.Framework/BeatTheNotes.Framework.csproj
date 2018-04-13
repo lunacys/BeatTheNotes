@@ -87,6 +87,8 @@
     <Compile Include="Beatmaps\GameMode.cs" />
     <Compile Include="Objects\HitObject.cs" />
     <Compile Include="Objects\HitObjectOnHitEventArgs.cs" />
+    <Compile Include="Objects\HitObjectSpawner.cs" />
+    <Compile Include="Objects\Mine.cs" />
     <Compile Include="Objects\NoteClick.cs" />
     <Compile Include="Objects\NoteHold.cs" />
     <Compile Include="Beatmaps\TimingPoint.cs" />
