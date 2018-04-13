@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace BeatTheNotes.GameSystems
 {
     /// <summary>
-    /// Score System where maximum score possible is one million
+    /// ScoremeterScore System where maximum score possible is one million
     /// </summary>
     public class ScoreV1System : GameSystem, IGameSystemProcessHitObject
     {
@@ -49,7 +49,7 @@ namespace BeatTheNotes.GameSystems
 
         public float Od => _gameplay.Beatmap.Settings.Difficulty.OverallDifficutly;
 
-        public Splash CurrentSplash { get; private set; }
+        public ScoreSplash CurrentScoreSplash { get; private set; }
 
         public event EventHandler<OnScoreGetEventHandler> OnScoreGet;
 
@@ -130,7 +130,7 @@ namespace BeatTheNotes.GameSystems
 
         public override void Update(GameTime gameTime)
         {
-            CurrentSplash?.Update(gameTime);
+            CurrentScoreSplash?.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
@@ -138,7 +138,7 @@ namespace BeatTheNotes.GameSystems
             _spriteBatch.Begin();
 
             // If there is a splash set, draw it
-            if (CurrentSplash != null)
+            if (CurrentScoreSplash != null)
             {
                 var pos = new Vector2(
                     // x
@@ -147,11 +147,11 @@ namespace BeatTheNotes.GameSystems
                     // y
                     300);
 
-                var color = Color.White * (CurrentSplash.MsBeforeExpire / 1000.0f);
-                var origin = new Vector2(CurrentSplash.Texture.Width / 2.0f, CurrentSplash.Texture.Height / 2.0f);
-                var size = new Vector2(0.9f * ((CurrentSplash.MsBeforeExpire / 1000.0f)), 0.9f * ((CurrentSplash.MsBeforeExpire / 1000.0f)));
+                var color = Color.White * (CurrentScoreSplash.MsBeforeExpire / 1000.0f);
+                var origin = new Vector2(CurrentScoreSplash.Texture.Width / 2.0f, CurrentScoreSplash.Texture.Height / 2.0f);
+                var size = new Vector2(0.9f * ((CurrentScoreSplash.MsBeforeExpire / 1000.0f)), 0.9f * ((CurrentScoreSplash.MsBeforeExpire / 1000.0f)));
 
-                _spriteBatch.Draw(CurrentSplash.Texture, pos, null, color, 0.0f, origin, size, SpriteEffects.None, 0.0f);
+                _spriteBatch.Draw(CurrentScoreSplash.Texture, pos, null, color, 0.0f, origin, size, SpriteEffects.None, 0.0f);
             }
 
             _spriteBatch.End();
@@ -173,7 +173,7 @@ namespace BeatTheNotes.GameSystems
 
             Accuracy = 1.0f;
 
-            CurrentSplash = null;
+            CurrentScoreSplash = null;
         }
 
         private void CalculateScore(string hitValueName)
@@ -257,42 +257,42 @@ namespace BeatTheNotes.GameSystems
 
             if (hitValue == HitValues[ScoreMarvelous])
             {
-                CurrentSplash = new Splash(_gameplay.Skin.ScoreMarvelousTexture);
+                CurrentScoreSplash = new ScoreSplash(_gameplay.Skin.ScoreMarvelousTexture);
                 MarvelousCount++;
                 hitValueName = ScoreMarvelous;
             }
             else if (hitValue == HitValues[ScorePerfect])
             {
-                CurrentSplash = new Splash(_gameplay.Skin.ScorePerfectTexture);
+                CurrentScoreSplash = new ScoreSplash(_gameplay.Skin.ScorePerfectTexture);
                 PerfectCount++;
                 hitValueName = ScorePerfect;
             }
             else if (hitValue == HitValues[ScoreGreat])
             {
-                CurrentSplash = new Splash(_gameplay.Skin.ScoreGreatTexture);
+                CurrentScoreSplash = new ScoreSplash(_gameplay.Skin.ScoreGreatTexture);
                 GreatCount++;
                 hitValueName = ScoreGreat;
             }
             else if (hitValue == HitValues[ScoreGood])
             {
-                CurrentSplash = new Splash(_gameplay.Skin.ScoreGoodTexture);
+                CurrentScoreSplash = new ScoreSplash(_gameplay.Skin.ScoreGoodTexture);
                 GoodCount++;
                 hitValueName = ScoreGood;
             }
             else if (hitValue == HitValues[ScoreBad])
             {
-                CurrentSplash = new Splash(_gameplay.Skin.ScoreBadTexture);
+                CurrentScoreSplash = new ScoreSplash(_gameplay.Skin.ScoreBadTexture);
                 BadCount++;
                 hitValueName = ScoreBad;
             }
             else if (hitValue == HitValues[ScoreMiss])
             {
-                CurrentSplash = new Splash(_gameplay.Skin.ScoreMissTexture);
+                CurrentScoreSplash = new ScoreSplash(_gameplay.Skin.ScoreMissTexture);
                 MissCount++;
                 DoBreakCombo();
                 hitValueName = ScoreMiss;
             }
-            else throw new InvalidDataException("Score not found");
+            else throw new InvalidDataException("ScoremeterScore not found");
 
             OnScoreGet?.Invoke(this, new OnScoreGetEventHandler(hitValueName, HitValues[hitValueName]));
             GameSystemManager.FindSystem<ScoremeterSystem>()?.AddScore((long)FindSystem<GameTimeSystem>().Time,

@@ -215,7 +215,7 @@ namespace BeatTheNotes.GameSystems
                             $"Miss: {scoreSystem.MissCount}";
             _spriteBatch.DrawString(Skin.Font, scores, new Vector2(800, 10), Color.Black);
             _spriteBatch.DrawString(Skin.Font,
-                $"Score: {scoreSystem.Score}\n" +
+                $"ScoremeterScore: {scoreSystem.Score}\n" +
                 $"Combo: {scoreSystem.Combo}\n" +
                 $"Accuracy: {scoreSystem.Accuracy * 100:F2}%\n" +
                 $"HP: {FindSystem<HealthSystem>().Health}",

@@ -22,7 +22,7 @@ namespace BeatTheNotes.GameSystems
             set;
         }
 
-        private List<Score> _scores;
+        private List<ScoremeterScore> _scores;
 
         public ScoremeterSystem(GraphicsDevice graphicsDevice)
         {
@@ -36,7 +36,7 @@ namespace BeatTheNotes.GameSystems
             GameplaySystem gs = GameSystemManager.FindSystem<GameplaySystem>();
 
             
-            _scores = new List<Score>();
+            _scores = new List<ScoremeterScore>();
             _od = gs.Beatmap.Settings.Difficulty.OverallDifficutly;
 
             SizeMultiplier = 1.0f;
@@ -74,7 +74,7 @@ namespace BeatTheNotes.GameSystems
 
         public void AddScore(long currentTime, long hitObjectPosition, string hit)
         {
-            _scores.Add(new Score(currentTime - hitObjectPosition, 3000, hit));
+            _scores.Add(new ScoremeterScore(currentTime - hitObjectPosition, 3000, hit));
         }
 
         public override void Draw(GameTime gameTime)
