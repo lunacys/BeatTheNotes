@@ -25,7 +25,7 @@ namespace BeatTheNotes.Shared.GameSystems
         {
             base.Initialize();
 
-            var scoreSys = FindSystem<ScoreSystem>();
+            var scoreSys = FindSystem<ScoreV1System>();
             scoreSys.OnScoreGet += OnScoreGet;
         }
 
@@ -51,7 +51,7 @@ namespace BeatTheNotes.Shared.GameSystems
 
         private void OnScoreGet(object sender, OnScoreGetEventHandler eh)
         {
-            var scoreSys = FindSystem<ScoreSystem>();
+            var scoreSys = FindSystem<ScoreV1System>();
 
             if (eh.HitValueName == scoreSys.ScoreMarvelous)
                 Health += 2 * HpDrainRate;

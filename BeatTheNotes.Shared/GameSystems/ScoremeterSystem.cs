@@ -27,8 +27,6 @@ namespace BeatTheNotes.GameSystems
         public ScoremeterSystem(GraphicsDevice graphicsDevice)
         {
             _spriteBatch = new SpriteBatch(graphicsDevice);
-
-            
         }
 
         public override void Initialize()
@@ -43,7 +41,7 @@ namespace BeatTheNotes.GameSystems
 
             SizeMultiplier = 1.0f;
 
-            var scoreSys = FindSystem<ScoreSystem>();
+            var scoreSys = FindSystem<ScoreV1System>();
 
             Size = new Vector2((float)scoreSys.HitThresholds[scoreSys.ScoreMiss] * 2.0f, 8);
             Position = new Vector2(
@@ -99,7 +97,7 @@ namespace BeatTheNotes.GameSystems
 
         private void DrawBaseRect()
         {
-            var scoreSys = FindSystem<ScoreSystem>();
+            var scoreSys = FindSystem<ScoreV1System>();
 
             // miss
             _spriteBatch.FillRectangle(Position, Size, _hitColors[scoreSys.ScoreMiss]);

@@ -86,6 +86,7 @@
     <Compile Include="Beatmaps\BeatmapWriter.cs" />
     <Compile Include="Beatmaps\GameMode.cs" />
     <Compile Include="Objects\HitObject.cs" />
+    <Compile Include="Objects\HitObjectContainer.cs" />
     <Compile Include="Objects\HitObjectOnHitEventArgs.cs" />
     <Compile Include="Objects\Mine.cs" />
     <Compile Include="Objects\NoteClick.cs" />

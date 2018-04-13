@@ -40,7 +40,7 @@ namespace BeatTheNotes.Screens
 
             GameSystemComponent.Register(new GameplaySystem(_game, _beatmapName));
             GameSystemComponent.Register(new MusicSystem());
-            GameSystemComponent.Register(new ScoreSystem(_game.GraphicsDevice));
+            GameSystemComponent.Register(new ScoreV1System(_game.GraphicsDevice));
             GameSystemComponent.Register(new ScoremeterSystem(_game.GraphicsDevice));
             GameSystemComponent.Register(new GameTimeSystem());
             GameSystemComponent.Register(new HealthSystem(0.0f));

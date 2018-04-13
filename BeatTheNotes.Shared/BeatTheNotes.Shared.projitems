@@ -18,7 +18,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\OnScoreGetEventHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\Score.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\ScoremeterSystem.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\ScoreSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\ScoreV1System.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameSystems\ScoreV2System.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameSystems\Splash.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Screens\EditSongSelectScreen.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Screens\GameplayScreen.cs" />

@@ -9,7 +9,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BeatTheNotes.GameSystems
 {
-    public class ScoreSystem : GameSystem, IGameSystemProcessHitObject
+    /// <summary>
+    /// Score System where maximum score possible is one million
+    /// </summary>
+    public class ScoreV1System : GameSystem, IGameSystemProcessHitObject
     {
         public string ScoreMarvelous => "Marvelous";
         public string ScorePerfect => "Perfect";
@@ -54,7 +57,7 @@ namespace BeatTheNotes.GameSystems
 
         private GameplaySystem _gameplay;
 
-        public ScoreSystem(GraphicsDevice graphicsDevice)
+        public ScoreV1System(GraphicsDevice graphicsDevice)
         {
             Accuracy = 1.0f;
 
@@ -157,6 +160,7 @@ namespace BeatTheNotes.GameSystems
         private void Calculate(HitObject hitObject)
         {
             int hitVal = GetHitValue(hitObject);
+            if (hitVal < 0) return;
 
             DoScore(hitObject, hitVal);
         }
@@ -239,6 +243,8 @@ namespace BeatTheNotes.GameSystems
                 score = HitValues[ScoreBad];
             else if (timeOffset <= HitThresholds[ScoreMiss])
                 score = HitValues[ScoreMiss];
+            else
+                return -1;
 
             return score;
         }

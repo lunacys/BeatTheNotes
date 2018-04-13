@@ -21,12 +21,13 @@ namespace BeatTheNotes.GameSystems
         public Beatmap Beatmap { get; }
         public Skin Skin { get; }
 
-        public GameSettings Settings => _game.Services.GetService<GameSettings>();
+        private GameSettings Settings => _game.Services.GetService<GameSettings>();
 
-        public float ScrollingSpeed => Settings.ScrollingSpeedF;
-        public bool IsUpsideDown => Settings.IsReversedDirection;
+        private float ScrollingSpeed => Settings.ScrollingSpeedF;
+        private bool IsUpsideDown => Settings.IsReversedDirection;
 
-        public List<HitObject>[] SeparatedLines { get; private set; }
+        //public List<HitObject>[] SeparatedLines { get; private set; }
+        private HitObjectContainer _hitObjectContainer;
 
         private readonly GameRoot _game;
         private Texture2D _background;
@@ -45,11 +46,13 @@ namespace BeatTheNotes.GameSystems
             Skin = _game.Services.GetService<Skin>();
 
             _input = new InputHandler(game);
+            _hitObjectContainer = new HitObjectContainer(Beatmap);
+            
 
-            _input.RegisterKeyCommand(Settings.GameKeys["KL1"], new KeyLineCommand(this, 1));
-            _input.RegisterKeyCommand(Settings.GameKeys["KL2"], new KeyLineCommand(this, 2));
-            _input.RegisterKeyCommand(Settings.GameKeys["KL3"], new KeyLineCommand(this, 3));
-            _input.RegisterKeyCommand(Settings.GameKeys["KL4"], new KeyLineCommand(this, 4));
+            _input.RegisterKeyCommand(Settings.GameKeys["KL1"], new KeyLineCommand(this, _hitObjectContainer, 1));
+            _input.RegisterKeyCommand(Settings.GameKeys["KL2"], new KeyLineCommand(this, _hitObjectContainer, 2));
+            _input.RegisterKeyCommand(Settings.GameKeys["KL3"], new KeyLineCommand(this, _hitObjectContainer, 3));
+            _input.RegisterKeyCommand(Settings.GameKeys["KL4"], new KeyLineCommand(this, _hitObjectContainer, 4));
         }
 
         public override void Initialize()
@@ -202,7 +205,7 @@ namespace BeatTheNotes.GameSystems
                 new Vector2(12, 64),
                 Color.DarkRed);
 
-            var scoreSystem = GameSystemManager.FindSystem<ScoreSystem>();
+            var scoreSystem = GameSystemManager.FindSystem<ScoreV1System>();
 
             string scores = $"Marvelous: {scoreSystem.MarvelousCount}\n" +
                             $"Perfect: {scoreSystem.PerfectCount}\n" +
@@ -223,9 +226,9 @@ namespace BeatTheNotes.GameSystems
         {
             var time = (long)FindSystem<GameTimeSystem>().Time;
 
-            foreach (var lines in SeparatedLines)
+            //foreach (var lines in SeparatedLines)
             {
-                foreach (var o in lines)
+                foreach (var o in _hitObjectContainer)
                 {
                     // TODO: Make more precise work on the numbers
                     // TODO: Make _isUpsideDown (upside down) work
@@ -279,7 +282,7 @@ namespace BeatTheNotes.GameSystems
                     // It handles in draw method because of optimization
                     if (o.IsExpired) continue;
 
-                    var scoreSys = GameSystemManager.FindSystem<ScoreSystem>();
+                    var scoreSys = GameSystemManager.FindSystem<ScoreV1System>();
 
                     if (o.Position + scoreSys.HitThresholds[scoreSys.ScoreMiss] < time)
                     {
@@ -326,30 +329,7 @@ namespace BeatTheNotes.GameSystems
 
             return timingPoint;
         }
-
-        /// <summary>
-        /// Find and return the nearest object on the specified line. The nearest object is the first object on the line.
-        /// </summary>
-        /// <param name="line">Column starting from 1 to KeyAmount</param>
-        /// <returns>Nearest object on specified line within the threshold if found one, otherwise return null</returns>
-        public HitObject GetNearestHitObjectOnLine(int line)
-        {
-            // If there are no objects on the line, return null
-            if (SeparatedLines[line - 1].Count == 0)
-                return null;
-
-            // If there are only already pressed objects on the line, return null
-            if (SeparatedLines[line - 1].Count(o => !o.IsExpired) == 0)
-                return null;
-
-            // Find first unpressed object on the line
-            var first = SeparatedLines[line - 1].First(o => !o.IsExpired);
-
-            var ss = GameSystemManager.FindSystem<ScoreSystem>();
-
-            return Math.Abs(FindSystem<GameTimeSystem>().Time - first.Position) <= (ss.HitThresholds[ss.ScoreMiss]) ? first : null;
-        }
-
+        
         /// <summary>
         /// Load beatmap from a file with background texture and music file into memory
         /// </summary>
@@ -371,11 +351,6 @@ namespace BeatTheNotes.GameSystems
                 throw new Exception(e.Message);
             }
 
-            // Create separated lines collection and fill them
-            SeparatedLines = new List<HitObject>[beatmap.Settings.Difficulty.KeyAmount];
-            for (int i = 0; i < SeparatedLines.Length; i++)
-                SeparatedLines[i] = beatmap.HitObjects.FindAll(o => o.Column == i + 1);
-
             return beatmap;
         }
 
@@ -384,11 +359,10 @@ namespace BeatTheNotes.GameSystems
         /// </summary>
         private void InitializeAllHitObjects()
         {
-            foreach (var separatedLine in SeparatedLines)
-                foreach (var hitObject in separatedLine)
-                    foreach (var system in GameSystemManager.GetAllGameSystems())
-                        if (system is IGameSystemProcessHitObject)
-                            hitObject.OnHit += (system as IGameSystemProcessHitObject).OnHitObjectHit;
+            foreach (var hitObject in _hitObjectContainer)
+                foreach (var system in GameSystemManager.GetAllGameSystems())
+                    if (system is IGameSystemProcessHitObject)
+                        hitObject.OnHit += (system as IGameSystemProcessHitObject).OnHitObjectHit;
         }
     }
 }
