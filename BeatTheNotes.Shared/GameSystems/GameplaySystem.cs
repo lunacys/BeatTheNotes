@@ -24,7 +24,6 @@ namespace BeatTheNotes.GameSystems
         private GameSettings Settings => _game.Services.GetService<GameSettings>();
 
         private float ScrollingSpeed => Settings.ScrollingSpeedF;
-        private bool IsUpsideDown => Settings.IsReversedDirection;
 
         //public List<HitObject>[] SeparatedLines { get; private set; }
         private HitObjectContainer _hitObjectContainer;
@@ -158,9 +157,7 @@ namespace BeatTheNotes.GameSystems
 
             // Draw buttons
             _spriteBatch.Draw(Skin.ButtonTexture,
-            IsUpsideDown
-                ? new Vector2(Skin.Settings.PlayfieldPositionX, 0)
-                : new Vector2(Skin.Settings.PlayfieldPositionX,
+                    new Vector2(Skin.Settings.PlayfieldPositionX,
                     Settings.WindowHeight - Skin.ButtonTexture.Height),
             Color.White);
 
@@ -197,7 +194,6 @@ namespace BeatTheNotes.GameSystems
 
             // Debug things
             _spriteBatch.DrawString(Skin.Font, time.ToString(), new Vector2(12, 12), Color.Red);
-            _spriteBatch.DrawString(Skin.Font, IsUpsideDown.ToString(), new Vector2(12, 30), Color.Red);
             _spriteBatch.DrawString(Skin.Font, ScrollingSpeed.ToString("F1"), new Vector2(12, 48), Color.Red);
 
             _spriteBatch.DrawString(Skin.Font,
