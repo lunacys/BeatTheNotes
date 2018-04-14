@@ -76,6 +76,7 @@
     <Compile Include="Audio\TimeSpanExtensions.cs" />
     <Compile Include="Audio\VarispeedSampleProvider.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />
+    <Compile Include="Beatmaps\BeatmapProcessor.cs" />
     <Compile Include="Beatmaps\BeatmapProcessorSettings.cs" />
     <Compile Include="Beatmaps\BeatmapReader.cs" />
     <Compile Include="Beatmaps\BeatmapSettings.cs" />
@@ -85,13 +86,14 @@
     <Compile Include="Beatmaps\BeatmapSettingsMetadata.cs" />
     <Compile Include="Beatmaps\BeatmapWriter.cs" />
     <Compile Include="Beatmaps\GameMode.cs" />
+    <Compile Include="TimingPoints\TimingPointContainer.cs" />
     <Compile Include="Objects\HitObject.cs" />
     <Compile Include="Objects\HitObjectContainer.cs" />
     <Compile Include="Objects\HitObjectOnHitEventArgs.cs" />
     <Compile Include="Objects\Mine.cs" />
     <Compile Include="Objects\NoteClick.cs" />
     <Compile Include="Objects\NoteHold.cs" />
-    <Compile Include="Beatmaps\TimingPoint.cs" />
+    <Compile Include="TimingPoints\TimingPoint.cs" />
     <Compile Include="GameSystems\GameSystem.cs" />
     <Compile Include="GameSystems\GameSystemComponent.cs" />
     <Compile Include="GameSystems\IGameSystemManager.cs" />

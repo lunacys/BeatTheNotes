@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace BeatTheNotes.Framework.Beatmaps
+namespace BeatTheNotes.Framework.TimingPoints
 {
     public class TimingPoint
     {

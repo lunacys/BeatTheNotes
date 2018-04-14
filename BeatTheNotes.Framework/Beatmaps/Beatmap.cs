@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using BeatTheNotes.Framework.Audio;
 using BeatTheNotes.Framework.Objects;
+using BeatTheNotes.Framework.TimingPoints;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace BeatTheNotes.Framework.Beatmaps
 {
@@ -7,16 +10,22 @@ namespace BeatTheNotes.Framework.Beatmaps
     {
         public BeatmapSettings Settings { get; }
 
-        public List<TimingPoint> TimingPoints { get; }
+        public Texture2D BackgroundTexture { get; }
+        public Music Music { get; }
 
-        public List<HitObject> HitObjects { get; }
+        public TimingPointContainer TimingPoints { get; }
+        public HitObjectContainer HitObjects { get; }
 
         public Beatmap(
             BeatmapSettings settings,
-            List<TimingPoint> timingPoints,
-            List<HitObject> hitObjects)
+            Texture2D backgroundTexture,
+            Music music,
+            TimingPointContainer timingPoints,
+            HitObjectContainer hitObjects)
         {
             Settings = settings;
+            BackgroundTexture = backgroundTexture;
+            Music = music;
             TimingPoints = timingPoints;
             HitObjects = hitObjects;
         }

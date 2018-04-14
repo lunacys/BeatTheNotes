@@ -27,9 +27,9 @@
             BeatmapSetId = beatmapSetId;
         }
 
-        /*public override string ToString()
+        public override string ToString()
         {
             return $"Title:{Title}\nArtist:{Artist}\nCreator:{Creator}\nVersion:{Version}\nTags:{Tags}\nBeatmapID:{BeatmapId}\nBeatmapSetID:{BeatmapSetId}";
-        }*/
+        }
     }
 }

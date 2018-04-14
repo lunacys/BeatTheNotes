@@ -101,7 +101,7 @@ namespace BeatTheNotes
 
             _screenComponent = new ScreenGameComponent(this);
             Components.Add(_screenComponent);
-            GameplayScreen gameplayScreen = new GameplayScreen(this, "test");
+            GameplayScreen gameplayScreen = new GameplayScreen(this, "NOMA - Brain Power");
             _screenComponent.Register(gameplayScreen);
             PauseScreen ps = new PauseScreen(this);
             _screenComponent.Register(ps);

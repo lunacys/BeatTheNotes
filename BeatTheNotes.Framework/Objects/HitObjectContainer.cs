@@ -11,17 +11,28 @@ namespace BeatTheNotes.Framework.Objects
         private List<HitObject> _rawHitObjects;
         private List<HitObject>[] _hitObjects;
 
-        public int LineCount { get; }
-        public int HitObjectCount => _rawHitObjects.Count;
+        public int ColumnCount { get; }
+        public int Count => _rawHitObjects.Count;
 
-        public HitObjectContainer(Beatmap beatmap)
+        public HitObject this[int index] => _rawHitObjects[index];
+
+        public HitObjectContainer(int columnCount)
         {
-            LineCount = beatmap.Settings.Difficulty.KeyAmount;
+            ColumnCount = columnCount;
+            _hitObjects = new List<HitObject>[ColumnCount];
+            for (var i = 0; i < _hitObjects.Length; i++)
+            {
+                _hitObjects[i] = new List<HitObject>();
+            }
 
-            _rawHitObjects = beatmap.HitObjects;
-            _hitObjects = new List<HitObject>[LineCount];
+            _rawHitObjects = new List<HitObject>();
+        }
 
-            Insert(_rawHitObjects);
+        public void Add(HitObject hitObject)
+        {
+            Console.WriteLine($"Adding hitobject: {hitObject.Position}");
+            _hitObjects[hitObject.Column - 1].Add(hitObject);
+            _rawHitObjects.Add(hitObject);
         }
 
         public void Insert(List<HitObject> hitObjects)

@@ -1,203 +1,63 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using BeatTheNotes.Framework.Audio;
 using BeatTheNotes.Framework.Logging;
 using BeatTheNotes.Framework.Objects;
+using BeatTheNotes.Framework.TimingPoints;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace BeatTheNotes.Framework.Beatmaps
 {
-    public static class BeatmapReader
+    public class BeatmapReader
     {
-        [Obsolete("Use JSON format instead")]
-        public static Beatmap LoadFromFileOld(string filename)
+        public BeatmapProcessorSettings ProcessorSettings { get; }
+
+        public BeatmapReader(BeatmapProcessorSettings processorSettings)
         {
-            if (!File.Exists(filename))
-                throw new FileNotFoundException("Could not find the map file");
-
-            using (StreamReader stream = new StreamReader(filename))
-            {
-                BeatmapSettingsGeneral general = new BeatmapSettingsGeneral("null", 0, "null");
-                BeatmapSettingsEditor editor = new BeatmapSettingsEditor(4);
-                BeatmapSettingsMetadata metadata = new BeatmapSettingsMetadata("null", "null", "null", "null", "null", -1, -1);
-                BeatmapSettingsDifficulty difficulty = new BeatmapSettingsDifficulty(1, 1, 4);
-
-                List<TimingPoint> timingPoints = new List<TimingPoint>();
-                List<HitObject> hitObjects = new List<HitObject>();
-
-                string GetVal(string key)
-                {
-                    string s = stream.ReadLine();
-                    if (s != null && s.LastIndexOf(key, StringComparison.Ordinal) == 0)
-                    {
-                        return s.Substring(key.Length);
-                    }
-                    throw new FileLoadException($"Could not find an option '{key}'");
-                }
-
-                while (!stream.EndOfStream)
-                {
-                    string s = stream.ReadLine();
-                    if (s == "[General]")
-                    {
-                        general = new BeatmapSettingsGeneral(GetVal("AudioFilename:"),
-                            int.Parse(GetVal("PreviewTime:")),
-                            GetVal("BackgroundFilename:"));
-                    }
-                    s = stream.ReadLine();
-                    if (s == "[Editor]")
-                    {
-                        editor = new BeatmapSettingsEditor(int.Parse(GetVal("BeatDivisor:")));
-                    }
-                    s = stream.ReadLine();
-                    if (s == "[Metadata]")
-                    {
-                        metadata = new BeatmapSettingsMetadata(
-                            GetVal("Title:"),
-                            GetVal("Artist:"),
-                            GetVal("Creator:"),
-                            GetVal("Version:"),
-                            GetVal("Tags:"),
-                            int.Parse(GetVal("BeatmapID:")),
-                            int.Parse(GetVal("BeatmapSetID:"))
-                            );
-                    }
-                    s = stream.ReadLine();
-                    if (s == "[Difficulty]")
-                    {
-                        difficulty = new BeatmapSettingsDifficulty(
-                            float.Parse(GetVal("HPDrainRate:")),
-                            float.Parse(GetVal("OverallDifficulty:")),
-                            int.Parse(GetVal("KeyAmount:"))
-                            );
-                    }
-                    s = stream.ReadLine();
-                    if (s == "[TimingPoints]")
-                    {
-                        Console.WriteLine("in timing points");
-                        s = stream.ReadLine();
-
-                        while (s != "[HitObjects]")
-                        {
-                            if (s != null)
-                            {
-                                Console.WriteLine("in timing points");
-                                string[] tokens = s.Split(' ');
-                                TimingPoint tp = new TimingPoint(
-                                    int.Parse(tokens[0]),
-                                    double.Parse(tokens[1]),
-                                    int.Parse(tokens[2]),
-                                    int.Parse(tokens[3]),
-                                    bool.Parse(tokens[4]));
-                                timingPoints.Add(tp);
-                            }
-
-                            s = stream.ReadLine();
-                        }
-                    }
-
-                    if (s == "[HitObjects]")
-                    {
-                        while (!stream.EndOfStream)
-                        {
-                            s = stream.ReadLine();
-
-                            if (s != null)
-                            {
-                                string[] tokens = s.Split(' ');
-
-                                HitObject ho;
-
-                                foreach (var token in tokens)
-                                {
-                                    Console.WriteLine(token);
-                                }
-
-                                if (tokens.Length == 3)
-                                {
-                                    ho = new NoteHold(
-                                        int.Parse(tokens[0]),
-                                        int.Parse(tokens[1]),
-                                        int.Parse(tokens[2])
-                                    );
-                                }
-                                else
-                                {
-                                    ho = new NoteClick(
-                                        int.Parse(tokens[0]),
-                                        int.Parse(tokens[1]));
-                                }
-
-                                hitObjects.Add(ho);
-                            }
-                        }
-                    }
-                }
-
-                Beatmap bm = new Beatmap(
-                    new BeatmapSettings(general, editor, metadata, difficulty),
-                    timingPoints,
-                    hitObjects
-                );
-
-                return bm;
-            }
+            ProcessorSettings = processorSettings;
         }
 
-        /// <summary>
-        /// Load Beatmap from a JSON file with file path and filename specified
-        /// </summary>
-        /// <returns>Beatmap</returns>
-        public static Beatmap LoadFromFile(GraphicsDevice gd, string beatmapFolder, string mapname, out Texture2D background, out Music music)
+        public BeatmapSettings ReadBeatmapSettings(string beatmapName, string versionName)
         {
-            LogHelper.Log($"BeatmapReader: Load Beatmap from file '{mapname}'");
-
-            // TODO: Encapsulate "Maps"
-            string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, beatmapFolder,
-                mapname, mapname + BeatmapProcessorSettings.BeatmapFileExtension);
+            // the format is: /BeatmapFolder/TestArtist - TestName/TestArtist - TestName [Version].btn
+            string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ProcessorSettings.BeatmapsFolder,
+                beatmapName, beatmapName + " [" + versionName + "]" + ProcessorSettings.BeatmapFileExtension);
 
             if (!File.Exists(file))
                 throw new FileNotFoundException("Beatmap file not found");
 
             string str;
+
             using (StreamReader sr = new StreamReader(file))
                 str = sr.ReadToEnd();
-
-
-            LogHelper.Log($"BeatmapReader: Parsing Beatmap '{mapname}'");
+            
+            LogHelper.Log($"BeatmapReader: Parsing Beatmap '{beatmapName}'");
 
             JObject obj = JObject.Parse(str);
 
             BeatmapSettings settings =
                 JsonConvert.DeserializeObject<BeatmapSettings>(obj["Settings"].ToString());
 
-            // TODO: Replace it when added game mode support
-            if (settings.GameModeName != "Standard")
-                throw new FileLoadException("Non-supported game mode");
+            return settings;
+        }
 
-            if (string.IsNullOrEmpty(settings.HitObjectsFilename))
-                throw new FileLoadException("HitObjectsFilename is null");
-            if (string.IsNullOrEmpty(settings.TimingPointsFilename))
-                throw new FileLoadException("TimingPointsFilename is null");
-            if (!File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, beatmapFolder, mapname, settings.HitObjectsFilename)))
-                throw new FileNotFoundException("HitObjects file not found");
-            if (!File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, beatmapFolder, mapname, settings.TimingPointsFilename)))
-                throw new FileNotFoundException("TimingPoints file not found");
+        public TimingPointContainer ReadTimingPoints(string beatmapName, BeatmapSettings beatmapSettings)
+        {
+            TimingPointContainer timingPointContainer = new TimingPointContainer();
 
-            List<TimingPoint> timingPoints = new List<TimingPoint>();
-            List<HitObject> hitObjects = new List<HitObject>();
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ProcessorSettings.BeatmapsFolder, beatmapName,
+                ProcessorSettings.TimingPointsFolder, beatmapSettings.TimingPointsFilename + "_" + beatmapSettings.Metadata.Version);
 
-            LogHelper.Log($"BeatmapReader: Reading Beatmap Timing Points '{mapname}'");
+            Console.WriteLine(path);
 
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, beatmapFolder, mapname,
-                settings.TimingPointsFilename);
+            LogHelper.Log($"BeatmapReader: Reading Beatmap Timing Points '{beatmapName}'");
+
             // Reading TimingPoints file, which contains all the timing points used in the beatmap
             using (StreamReader sr = new StreamReader(path))
             {
-                LogHelper.Log($"BeatmapReader: Found Beatmap Timing Points file '{settings.TimingPointsFilename}'");
+                LogHelper.Log($"BeatmapReader: Found Beatmap Timing Points file '{beatmapSettings.TimingPointsFilename}'");
                 string full = sr.ReadToEnd();
                 string[] lines = full.Split('\n');
                 foreach (var line in lines)
@@ -220,19 +80,32 @@ namespace BeatTheNotes.Framework.Beatmaps
                         int.Parse(tokens[3]),
                         bool.Parse(tokens[4]));
 
-                    timingPoints.Add(tp);
+                    timingPointContainer.Add(tp);
                 }
             }
-            LogHelper.Log($"BeatmapReader: Successfully Read Beatmap Timing Points. Total Timing Point count: {timingPoints.Count}");
+            LogHelper.Log($"BeatmapReader: Successfully Read Beatmap Timing Points. Total Timing Point count: {timingPointContainer.Count}");
 
-            LogHelper.Log($"BeatmapReader: Reading Beatmap Hit Objects '{mapname}'");
-            path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, beatmapFolder, mapname,
-                settings.HitObjectsFilename);
+            return timingPointContainer;
+        }
+
+        public HitObjectContainer ReadHitObjects(string beatmapName, BeatmapSettings beatmapSettings)
+        {
+            HitObjectContainer hitObjectContainer = new HitObjectContainer(beatmapSettings.Difficulty.KeyAmount);
+
+            LogHelper.Log($"BeatmapReader: Reading Beatmap Hit Objects '{beatmapName}'");
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ProcessorSettings.BeatmapsFolder, beatmapName,
+                ProcessorSettings.HitObjectsFolder, beatmapSettings.HitObjectsFilename + "_" + beatmapSettings.Metadata.Version);
+
+            if (!File.Exists(path))
+                throw new FileNotFoundException("hitobjects file not found");
+            
+            Console.WriteLine(path);
+
             // Reading HitObjects file, which contains all the objects used in the beatmap
             // HitObjects file uses this format: "Column Position" for a Click, and "Column Position EndPosition" for a Hold
             using (StreamReader sr = new StreamReader(path))
             {
-                LogHelper.Log($"BeatmapReader: Found Beatmap Hit Objects file '{settings.HitObjectsFilename}'");
+                LogHelper.Log($"BeatmapReader: Found Beatmap Hit Objects file '{beatmapSettings.HitObjectsFilename}'");
 
                 string full = sr.ReadToEnd();
                 string[] lines = full.Split('\n');
@@ -245,10 +118,6 @@ namespace BeatTheNotes.Framework.Beatmaps
                     string[] tokens = Array.ConvertAll(line.Split(' '), p => p.Trim());
 
                     // If length is 3, the object is a 'Hold', else it's 'Click'
-                    /*var ho = ((tokens.Length == 3)
-                        ? (new HitObject(int.Parse(tokens[0]), int.Parse(tokens[1]), int.Parse(tokens[2])))
-                        : (new HitObject(int.Parse(tokens[0]), int.Parse(tokens[1])))
-                    );*/
                     HitObject ho;
                     if (tokens.Length == 2)
                         ho = new NoteClick(int.Parse(tokens[0]), int.Parse(tokens[1]));
@@ -256,21 +125,55 @@ namespace BeatTheNotes.Framework.Beatmaps
                         ho = new NoteHold(int.Parse(tokens[0]), int.Parse(tokens[1]), int.Parse(tokens[2]));
                     else throw new Exception("Unknown note type");
 
-                    hitObjects.Add(ho);
+                    hitObjectContainer.Add(ho);
                 }
             }
-            LogHelper.Log($"BeatmapReader: Successfully Read Beatmap Hit Objects. Total Hit Objects count: {hitObjects.Count}");
+            LogHelper.Log($"BeatmapReader: Successfully Read Beatmap Hit Objects. Total Hit Objects count: {hitObjectContainer.Count}");
 
-            Beatmap bm = new Beatmap(settings, timingPoints, hitObjects);
+            return hitObjectContainer;
+        }
 
-            LogHelper.Log($"BeatmapReader: Successfully Read Beatmap '{mapname}'");
+        /// <summary>
+        /// Load Beatmap from a JSON file with file path and filename specified
+        /// </summary>
+        /// <returns>Beatmap</returns>
+        public Beatmap ReadBeatmap(GraphicsDevice graphicsDevice, string beatmapName, string versionName)
+        {
+            LogHelper.Log($"BeatmapReader: Load Beatmap from file '{beatmapName}'");
 
-            using (FileStream fs = new FileStream(Path.Combine(beatmapFolder, mapname, bm.Settings.General.BackgroundFileName), FileMode.Open))
+            BeatmapSettings settings = ReadBeatmapSettings(beatmapName, versionName);
+
+            if (string.IsNullOrEmpty(settings.HitObjectsFilename))
+                throw new FileLoadException("HitObjectsFilename is null");
+            if (string.IsNullOrEmpty(settings.TimingPointsFilename))
+                throw new FileLoadException("TimingPointsFilename is null");
+            //if (!File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ProcessorSettings.BeatmapsFolder, beatmapName, settings.HitObjectsFilename)))
+            //    throw new FileNotFoundException("HitObjects file not found");
+            //if (!File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ProcessorSettings.BeatmapsFolder, beatmapName, settings.TimingPointsFilename)))
+            //    throw new FileNotFoundException("TimingPoints file not found");
+
+            LogHelper.Log("BeatmapReader: Sucessfully Read Beatmap Settings");
+
+            var timingPoints = ReadTimingPoints(beatmapName, settings);
+            var hitObjects = ReadHitObjects(beatmapName, settings);
+
+            
+
+            LogHelper.Log($"BeatmapReader: Successfully Read Beatmap '{beatmapName}'");
+
+            Texture2D background;
+
+            using (FileStream fs =
+                new FileStream(
+                    Path.Combine(ProcessorSettings.BeatmapsFolder, beatmapName, settings.General.BackgroundFileName),
+                    FileMode.Open))
             {
-                background = Texture2D.FromStream(gd, fs);
+                background = Texture2D.FromStream(graphicsDevice, fs);
             }
 
-            music = new Music(Path.Combine(beatmapFolder, mapname, bm.Settings.General.AudioFileName));
+            var music = new Music(Path.Combine(ProcessorSettings.BeatmapsFolder, beatmapName, settings.General.AudioFileName));
+
+            Beatmap bm = new Beatmap(settings, background, music, timingPoints, hitObjects);
 
             return bm;
         }
