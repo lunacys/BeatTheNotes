@@ -19,11 +19,9 @@ namespace BeatTheNotes.Framework.Beatmaps
             ProcessorSettings = processorSettings;
         }
 
-        public BeatmapSettings ReadBeatmapSettings(string beatmapName, string versionName)
+        public BeatmapSettings ReadBeatmapSettings(string beatmapSettingsFilename)
         {
-            // the format is: /BeatmapFolder/TestArtist - TestName/TestArtist - TestName [Version].btn
-            string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ProcessorSettings.BeatmapsFolder,
-                beatmapName, beatmapName + " [" + versionName + "]" + ProcessorSettings.BeatmapFileExtension);
+            string file = beatmapSettingsFilename;
 
             if (!File.Exists(file))
                 throw new FileNotFoundException("Beatmap file not found");
@@ -33,7 +31,7 @@ namespace BeatTheNotes.Framework.Beatmaps
             using (StreamReader sr = new StreamReader(file))
                 str = sr.ReadToEnd();
             
-            LogHelper.Log($"BeatmapReader: Parsing Beatmap '{beatmapName}'");
+            LogHelper.Log($"BeatmapReader: Parsing Beatmap '{beatmapSettingsFilename}'");
 
             JObject obj = JObject.Parse(str);
 
@@ -141,15 +139,18 @@ namespace BeatTheNotes.Framework.Beatmaps
         {
             LogHelper.Log($"BeatmapReader: Load Beatmap from file '{beatmapName}'");
 
-            BeatmapSettings settings = ReadBeatmapSettings(beatmapName, versionName);
+            var absPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ProcessorSettings.BeatmapsFolder,
+                beatmapName, beatmapName + " [" + versionName + "]" + ProcessorSettings.BeatmapFileExtension);
+
+            BeatmapSettings settings = ReadBeatmapSettings(absPath);
 
             if (string.IsNullOrEmpty(settings.HitObjectsFilename))
                 throw new FileLoadException("HitObjectsFilename is null");
             if (string.IsNullOrEmpty(settings.TimingPointsFilename))
                 throw new FileLoadException("TimingPointsFilename is null");
-            //if (!File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ProcessorSettings.BeatmapsFolder, beatmapName, settings.HitObjectsFilename)))
+            //if (!File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ProcessorSettings.BeatmapsFolder, beatmapSettingsFilename, settings.HitObjectsFilename)))
             //    throw new FileNotFoundException("HitObjects file not found");
-            //if (!File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ProcessorSettings.BeatmapsFolder, beatmapName, settings.TimingPointsFilename)))
+            //if (!File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ProcessorSettings.BeatmapsFolder, beatmapSettingsFilename, settings.TimingPointsFilename)))
             //    throw new FileNotFoundException("TimingPoints file not found");
 
             LogHelper.Log("BeatmapReader: Sucessfully Read Beatmap Settings");

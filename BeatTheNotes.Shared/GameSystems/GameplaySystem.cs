@@ -28,16 +28,22 @@ namespace BeatTheNotes.GameSystems
 
         private SpriteBatch _spriteBatch;
 
+        private BeatmapProcessor _beatmapProcessor;
+
         private readonly InputHandler _input;
 
         public GameplaySystem(GameRoot game, string beatmapName)
         {
             _game = game;
+
+            _beatmapProcessor = new BeatmapProcessor(Settings);
             Beatmap = LoadBeatmap(beatmapName);
 
             Skin = _game.Services.GetService<Skin>();
 
             _input = new InputHandler(game);
+
+            
 
             _input.RegisterKeyCommand(Settings.GameKeys["KL1"], new KeyLineCommand(this, Beatmap.HitObjects, 1));
             _input.RegisterKeyCommand(Settings.GameKeys["KL2"], new KeyLineCommand(this, Beatmap.HitObjects, 2));
@@ -305,7 +311,7 @@ namespace BeatTheNotes.GameSystems
             Beatmap beatmap;
 
             // Load Beatmap
-            BeatmapReader beatmapReader = new BeatmapReader(new BeatmapProcessorSettings(".btn", "Maps", "timing_points", "hit_objects"));
+            BeatmapReader beatmapReader = new BeatmapReader(_beatmapProcessor.ProcessorSettings);
 
             try
             {

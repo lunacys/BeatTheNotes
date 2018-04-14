@@ -30,7 +30,6 @@ namespace BeatTheNotes.Framework.Objects
 
         public void Add(HitObject hitObject)
         {
-            Console.WriteLine($"Adding hitobject: {hitObject.Position}");
             _hitObjects[hitObject.Column - 1].Add(hitObject);
             _rawHitObjects.Add(hitObject);
         }
