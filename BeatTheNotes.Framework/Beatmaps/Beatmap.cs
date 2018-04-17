@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using BeatTheNotes.Framework.Audio;
+﻿using BeatTheNotes.Framework.Audio;
 using BeatTheNotes.Framework.Objects;
 using BeatTheNotes.Framework.TimingPoints;
 using Microsoft.Xna.Framework.Graphics;

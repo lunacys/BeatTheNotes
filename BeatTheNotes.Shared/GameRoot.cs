@@ -33,7 +33,7 @@ namespace BeatTheNotes
 
         public GameRoot()
         {
-            LogHelper.Log($"======= Starting Jackhammer at {DateTime.Now} =======");
+            LogHelper.Log($"======= Starting BeatTheNotes at {DateTime.Now} =======");
 
             if (File.Exists("settings.json"))
             {
@@ -63,7 +63,7 @@ namespace BeatTheNotes
             _graphics.PreferredBackBufferWidth = _settings.WindowWidth;
             _graphics.PreferredBackBufferHeight = _settings.WindowHeight;
 
-
+            
 #if WIN || LINUX
             _graphics.IsFullScreen = _settings.IsFullscreen;
 #elif ANDROID

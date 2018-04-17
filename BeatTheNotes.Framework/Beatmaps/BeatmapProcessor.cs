@@ -74,7 +74,7 @@ namespace BeatTheNotes.Framework.Beatmaps
             string fileExt = ProcessorSettings.BeatmapFileExtension;
 
             BeatmapReader bmReader = new BeatmapReader(ProcessorSettings);
-
+            
             SQLiteConnection dbConnection =
                 new SQLiteConnection($"Data Source={ProcessorSettings.DatabaseName};Version=3;");
             dbConnection.Open();
