@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
+using BeatTheNotes.Framework.Logging;
 using BeatTheNotes.Framework.Settings;
 
 namespace BeatTheNotes.Framework.Beatmaps
@@ -11,7 +12,7 @@ namespace BeatTheNotes.Framework.Beatmaps
     {
         public BeatmapProcessorSettings ProcessorSettings { get; private set; }
 
-        private List<BeatmapSettings> _beatmapSettingsList;
+        private List<BeatmapProcessorContainerEntry> _beatmapSettingsList;
 
         public int BeatmapCount => _beatmapSettingsList.Count;
 
@@ -27,7 +28,7 @@ namespace BeatTheNotes.Framework.Beatmaps
         {
             ProcessorSettings = processorSettings;
             
-            _beatmapSettingsList = new List<BeatmapSettings>();
+            _beatmapSettingsList = new List<BeatmapProcessorContainerEntry>();
 
             string folder = ProcessorSettings.BeatmapsFolder;
 
@@ -45,6 +46,8 @@ namespace BeatTheNotes.Framework.Beatmaps
                 else 
                     ProcessDatabase();
             }
+
+            LogHelper.Log($"BeatmapProcessor: Found {_beatmapSettingsList.Count} beatmaps");
         }
 
         private void ProcessDatabase()
@@ -61,8 +64,30 @@ namespace BeatTheNotes.Framework.Beatmaps
             
             while (dbDataReader.Read())
             {
-                var text = dbDataReader.GetString(0) + " " + dbDataReader.GetString(1) + " " + dbDataReader.GetString(2) + " " + dbDataReader.GetString(3) + "\n";
-                Console.WriteLine($"text is: {text}");
+                string beatmapFolder = dbDataReader.GetString(0);
+                string beatmapFilename = dbDataReader.GetString(1);
+                string beatmapName = dbDataReader.GetString(2);
+                string beatmapVersion = dbDataReader.GetString(3);
+
+                var bmSettingsGeneral = new BeatmapSettingsGeneral(
+                    dbDataReader.GetString(4), 
+                    dbDataReader.GetInt32(5),
+                    dbDataReader.GetString(6));
+                var bmSettingsEditor = new BeatmapSettingsEditor(dbDataReader.GetInt32(7));
+                var bmSettingsMetadata = new BeatmapSettingsMetadata(dbDataReader.GetString(8),
+                    dbDataReader.GetString(9), dbDataReader.GetString(10), dbDataReader.GetString(11),
+                    dbDataReader.GetString(12), dbDataReader.GetInt32(13), dbDataReader.GetInt32(14));
+                var bmSettingsDifficutly = new BeatmapSettingsDifficulty(dbDataReader.GetFloat(15),
+                    dbDataReader.GetFloat(16), dbDataReader.GetInt32(17));
+                var bmSettings = new BeatmapSettings(bmSettingsGeneral, bmSettingsEditor, bmSettingsMetadata, bmSettingsDifficutly);
+
+                var hitObjectCount = dbDataReader.GetInt32(20);
+                var bpm = dbDataReader.GetDouble(21);
+
+                var entry = new BeatmapProcessorContainerEntry(bmSettings, beatmapFolder, beatmapFilename, beatmapName,
+                    beatmapVersion, hitObjectCount, bpm);
+
+                _beatmapSettingsList.Add(entry);
             }
 
             dbConnection.Close();
@@ -85,6 +110,7 @@ namespace BeatTheNotes.Framework.Beatmaps
                     [beatmap_folder]                            VARCHAR(2048) DEFAULT NULL,               
                     [beatmap_filename]                          VARCHAR(256) DEFAULT NULL,
                     [beatmap_name]                              VARCHAR(256) DEFAULT NULL,
+                    [beatmap_version]                           VARCHAR(256) DEFAULT NULL,
                     [beatmap_settings_audio_filename]           VARCHAR(128) DEFAULT NULL,
                     [beatmap_settings_preview_time]             INTEGER NOT NULL,
                     [beatmap_settings_background_filename]      VARCHAR(128) DEFAULT NULL,
@@ -115,20 +141,25 @@ namespace BeatTheNotes.Framework.Beatmaps
                     foreach (var file in files)
                     {
                         var settings = bmReader.ReadBeatmapSettings(file);
-                        
-                        var timingPoints = bmReader.ReadTimingPoints(GetBeatmapNameWithoutVersion(Path.GetFileNameWithoutExtension(file)), settings);
-                        var hitOjects = bmReader.ReadHitObjects(GetBeatmapNameWithoutVersion(Path.GetFileNameWithoutExtension(file)), settings);
 
-                        _beatmapSettingsList.Add(settings);
+                        var version = settings.Metadata.Version;
+                        var timingPoints = bmReader.ReadTimingPoints(GetBeatmapNameWithoutVersion(Path.GetFileNameWithoutExtension(file)), settings);
+                        var hitObjects = bmReader.ReadHitObjects(GetBeatmapNameWithoutVersion(Path.GetFileNameWithoutExtension(file)), settings);
+
+                        var entry = new BeatmapProcessorContainerEntry(settings, directory, Path.GetFileName(file),
+                            Path.GetFileNameWithoutExtension(file), version, hitObjects.Count,
+                            timingPoints[0].BeatsPerMinute);
+                        _beatmapSettingsList.Add(entry);
 
                         // Insert a new value into the table
                         SQLiteCommand dbCmd = dbConnection.CreateCommand();
                         dbCmd.CommandText =
-                                $@"INSERT INTO beatmaps (beatmap_folder, beatmap_filename, beatmap_name, beatmap_settings_audio_filename, beatmap_settings_preview_time, beatmap_settings_background_filename, beatmap_settings_beat_divisor, beatmap_settings_title, beatmap_settings_artist, beatmap_settings_creator, beatmap_settings_version, beatmap_settings_tags, beatmap_settings_beatmap_id, beatmap_settings_beatmap_set_id, beatmap_settings_hp_drain_rate, beatmap_settings_overall_difficulty, beatmap_settings_key_amount, beatmap_settings_timing_points_filename, beatmap_settings_hit_objects_filename, beatmap_hit_object_count, beatmap_bpm) 
+                                $@"INSERT INTO beatmaps (beatmap_folder, beatmap_filename, beatmap_name, beatmap_version, beatmap_settings_audio_filename, beatmap_settings_preview_time, beatmap_settings_background_filename, beatmap_settings_beat_divisor, beatmap_settings_title, beatmap_settings_artist, beatmap_settings_creator, beatmap_settings_version, beatmap_settings_tags, beatmap_settings_beatmap_id, beatmap_settings_beatmap_set_id, beatmap_settings_hp_drain_rate, beatmap_settings_overall_difficulty, beatmap_settings_key_amount, beatmap_settings_timing_points_filename, beatmap_settings_hit_objects_filename, beatmap_hit_object_count, beatmap_bpm) 
                                 VALUES ( 
                                 '{directory}', 
                                 '{Path.GetFileName(file)}', 
                                 '{Path.GetFileNameWithoutExtension(file)}',
+                                '{version}',
                                 '{settings.General.AudioFileName}',
                                 {settings.General.PreviewTime},
                                 '{settings.General.BackgroundFileName}',
@@ -145,7 +176,7 @@ namespace BeatTheNotes.Framework.Beatmaps
                                 {settings.Difficulty.KeyAmount},
                                 '{settings.TimingPointsFilename}',
                                 '{settings.HitObjectsFilename}',
-                                {hitOjects.Count},
+                                {hitObjects.Count},
                                 {timingPoints[0].BeatsPerMinute:F2});";
                         dbCmd.ExecuteNonQuery();
                     }
@@ -153,6 +184,8 @@ namespace BeatTheNotes.Framework.Beatmaps
             }
 
             dbConnection.Close();
+
+            
         }
 
         private string GetBeatmapNameWithoutVersion(string beatmapName)
