@@ -16,14 +16,25 @@ namespace BeatTheNotes.Framework.Beatmaps
 
         public int BeatmapCount => _beatmapSettingsList.Count;
 
+        /// <summary>
+        /// Initialize <see cref="BeatmapProcessor"/> with default settings.
+        /// </summary>
         public BeatmapProcessor()
             : this(new BeatmapProcessorSettings(".btn", "Maps", "timing_points", "hit_objects", "BeatTheNotes.db"))
         { }
 
+        /// <summary>
+        /// Initialize <see cref="BeatmapProcessor"/> with default proccesor but with beatmap folder specified in <see cref="GameSettings"/>.
+        /// </summary>
+        /// <param name="gameSettings"><see cref="GameSettings"/></param>
         public BeatmapProcessor(GameSettings gameSettings)
             : this(new BeatmapProcessorSettings(".btn", gameSettings.BeatmapFolder, "timing_points", "hit_objects", "BeatTheNotes.db"))
         { }
 
+        /// <summary>
+        /// Initialize <see cref="BeatmapProcessor"/> with unique settings.
+        /// </summary>
+        /// <param name="processorSettings"><see cref="BeatmapProcessorSettings"/></param>
         public BeatmapProcessor(BeatmapProcessorSettings processorSettings)
         {
             ProcessorSettings = processorSettings;
@@ -32,15 +43,19 @@ namespace BeatTheNotes.Framework.Beatmaps
 
             string folder = ProcessorSettings.BeatmapsFolder;
 
+            // Is beatmap folder empty
             bool isFolderEmpty = true;
+            
 
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
+            // If there is at least one folder in beatmap directory, the beatmap folder is not empty
             if (Directory.EnumerateFileSystemEntries(folder).Any())
                 isFolderEmpty = false;
 
             if (!isFolderEmpty)
             {
+                // If there is no database file, initialize it
                 if (!File.Exists(ProcessorSettings.DatabaseName))
                     InitializeDatabase();
                 else 
@@ -52,6 +67,7 @@ namespace BeatTheNotes.Framework.Beatmaps
 
         private void ProcessDatabase()
         {
+            // TODO: Encapsulate work with the data base
             var dbConnection = new SQLiteConnection($"Data Source={ProcessorSettings.DatabaseName};Version=3;");
 
             dbConnection.Open();
@@ -62,13 +78,17 @@ namespace BeatTheNotes.Framework.Beatmaps
 
             var dbDataReader = dbCommand.ExecuteReader();
             
+            // Read all entries while there is any
             while (dbDataReader.Read())
             {
+                // There are 22 values (from 0 to 21)
+                // 0-3 values are information about beatmap location
                 string beatmapFolder = dbDataReader.GetString(0);
                 string beatmapFilename = dbDataReader.GetString(1);
                 string beatmapName = dbDataReader.GetString(2);
                 string beatmapVersion = dbDataReader.GetString(3);
 
+                // 4-17 values are beatmap settings data
                 var bmSettingsGeneral = new BeatmapSettingsGeneral(
                     dbDataReader.GetString(4), 
                     dbDataReader.GetInt32(5),
@@ -81,6 +101,7 @@ namespace BeatTheNotes.Framework.Beatmaps
                     dbDataReader.GetFloat(16), dbDataReader.GetInt32(17));
                 var bmSettings = new BeatmapSettings(bmSettingsGeneral, bmSettingsEditor, bmSettingsMetadata, bmSettingsDifficutly);
 
+                // 20th - hit object count, 21st - the first beats per minute value
                 var hitObjectCount = dbDataReader.GetInt32(20);
                 var bpm = dbDataReader.GetDouble(21);
 
@@ -93,8 +114,12 @@ namespace BeatTheNotes.Framework.Beatmaps
             dbConnection.Close();
         }
 
+        /// <summary>
+        /// Initialize a database and fill it with all available beatmaps.
+        /// </summary>
         private void InitializeDatabase()
         {
+            // TODO: Encapsulate work with the data base
             string folder = ProcessorSettings.BeatmapsFolder;
             string fileExt = ProcessorSettings.BeatmapFileExtension;
 
@@ -104,6 +129,7 @@ namespace BeatTheNotes.Framework.Beatmaps
                 new SQLiteConnection($"Data Source={ProcessorSettings.DatabaseName};Version=3;");
             dbConnection.Open();
             SQLiteCommand dbCreateTableCommand = dbConnection.CreateCommand();
+            // SQLite table contains all the each beatmap's settings and some other necessary values
             dbCreateTableCommand.CommandText =
                 @"CREATE TABLE IF NOT EXISTS
                     [beatmaps] (                  
@@ -130,12 +156,16 @@ namespace BeatTheNotes.Framework.Beatmaps
                     [beatmap_hit_object_count]                  INTEGER NOT NULL,
                     [beatmap_bpm]                               REAL NOT NULL)";
 
+            // Do create table
             dbCreateTableCommand.ExecuteNonQuery();
 
+            // Enumerate each directory in the beatmap dir and process them
             foreach (var directory in Directory.EnumerateDirectories(folder))
             {
+                // Get all files with beatmap extension
                 var files = Directory.GetFiles(directory, $"*{fileExt}");
 
+                // If there is any, process it
                 if (files.Length != 0)
                 {
                     foreach (var file in files)
@@ -184,10 +214,13 @@ namespace BeatTheNotes.Framework.Beatmaps
             }
 
             dbConnection.Close();
-
-            
         }
 
+        /// <summary>
+        /// Removes the version string from a beatmap name. Version string is the last entry of square brackets.
+        /// </summary>
+        /// <param name="beatmapName">Beatmap name with version string</param>
+        /// <returns>Beatmap name without version string</returns>
         private string GetBeatmapNameWithoutVersion(string beatmapName)
         {
             var index = beatmapName.LastIndexOf("[", StringComparison.Ordinal);
