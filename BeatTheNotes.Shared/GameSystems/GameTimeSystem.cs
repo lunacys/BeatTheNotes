@@ -1,6 +1,7 @@
 ﻿using BeatTheNotes.Framework.GameSystems;
 using BeatTheNotes.GameSystems;
 using Microsoft.Xna.Framework;
+using MonoGame.Extended.Screens;
 
 namespace BeatTheNotes.Shared.GameSystems
 {

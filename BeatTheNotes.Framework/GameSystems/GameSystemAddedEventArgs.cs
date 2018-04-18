@@ -2,12 +2,12 @@
 
 namespace BeatTheNotes.Framework.GameSystems
 {
-    public class SystemAddedEventArgs : EventArgs
+    public class GameSystemAddedEventArgs : EventArgs
     {
         public IGameSystemManager GameSystemManager { get; }
         public GameSystem GameSystem { get; }
 
-        public SystemAddedEventArgs(IGameSystemManager gameSystemManager, GameSystem gameSystem)
+        public GameSystemAddedEventArgs(IGameSystemManager gameSystemManager, GameSystem gameSystem)
         {
             GameSystemManager = gameSystemManager;
             GameSystem = gameSystem;

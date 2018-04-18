@@ -1,6 +1,7 @@
 ﻿using System;
 using BeatTheNotes.Framework.Audio;
 using BeatTheNotes.Framework.GameSystems;
+using MonoGame.Extended.Screens;
 
 namespace BeatTheNotes.GameSystems
 {

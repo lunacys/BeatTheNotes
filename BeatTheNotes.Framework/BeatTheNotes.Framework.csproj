@@ -99,7 +99,7 @@
     <Compile Include="GameSystems\GameSystemComponent.cs" />
     <Compile Include="GameSystems\IGameSystemManager.cs" />
     <Compile Include="GameSystems\IGameSystemProcessHitObject.cs" />
-    <Compile Include="GameSystems\SystemAddedEventArgs.cs" />
+    <Compile Include="GameSystems\GameSystemAddedEventArgs.cs" />
     <Compile Include="Graphs\Graph.cs" />
     <Compile Include="Input\IInputCommand.cs" />
     <Compile Include="Input\InputCommandAlreadyRegisteredException.cs" />

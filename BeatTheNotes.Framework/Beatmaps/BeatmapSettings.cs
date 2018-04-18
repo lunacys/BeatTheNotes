@@ -28,5 +28,16 @@ namespace BeatTheNotes.Framework.Beatmaps
             TimingPointsFilename = "timing_points";
             HitObjectsFilename = "hit_objects";
         }
+
+        public override string ToString()
+        {
+            return
+                $" > General:\n{General}\n" +
+                $" > Editor:\n{Editor}\n" +
+                $" > Metadata:\n{Metadata}\n" +
+                $" > Difficulty:\n{Difficulty}\n" +
+                $" > Timing Points Filename: {TimingPointsFilename}\n" +
+                $" > Hit Objects Filename: {HitObjectsFilename}";
+        }
     }
 }

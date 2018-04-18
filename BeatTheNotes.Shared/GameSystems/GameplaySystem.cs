@@ -8,15 +8,20 @@ using BeatTheNotes.Framework;
 using BeatTheNotes.Framework.Input;
 using BeatTheNotes.Framework.Logging;
 using BeatTheNotes.Framework.Objects;
+using BeatTheNotes.Screens;
 using BeatTheNotes.Shared.GameSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using MonoGame.Extended.Screens;
 
 namespace BeatTheNotes.GameSystems
 {
     public class GameplaySystem : GameSystem
     {
+        public event EventHandler OnReachedEnd;
+
         public Beatmap Beatmap { get; }
         public Skin Skin { get; }
 
@@ -35,15 +40,13 @@ namespace BeatTheNotes.GameSystems
         public GameplaySystem(GameRoot game, string beatmapName)
         {
             _game = game;
-
+            
             _beatmapProcessor = new BeatmapProcessor(Settings);
             Beatmap = LoadBeatmap(beatmapName);
 
             Skin = _game.Services.GetService<Skin>();
 
             _input = new InputHandler(game);
-
-            
 
             _input.RegisterKeyCommand(Settings.GameKeys["KL1"], new KeyLineCommand(this, Beatmap.HitObjects, 1));
             _input.RegisterKeyCommand(Settings.GameKeys["KL2"], new KeyLineCommand(this, Beatmap.HitObjects, 2));
@@ -79,6 +82,7 @@ namespace BeatTheNotes.GameSystems
             if (_input.WasKeyPressed(Settings.GameKeys["BeatmapScrollingSpeedDown"]))
                 if (ScrollingSpeed > 0.2f)
                     Settings.ScrollingSpeedF -= 0.1f;
+           
             /*if (_input.WasKeyPressed(Keys.F5))
                 Settings.IsReversedDirection = !IsUpsideDown;*/
 
@@ -105,7 +109,10 @@ namespace BeatTheNotes.GameSystems
                     FindSystem<MusicSystem>().Volume -= gameTime.ElapsedGameTime.Milliseconds / 5000.0f;
 
                 if (FindSystem<MusicSystem>().Volume <= 0.05f)
-                    Reset();
+                {
+                    //HostScreen.Show<PlaySongSelectScreen>(true);
+                    OnReachedEnd?.Invoke(this, EventArgs.Empty);
+                }
             }
         }
 
@@ -308,6 +315,7 @@ namespace BeatTheNotes.GameSystems
         /// <returns>Beatmap class</returns>
         private Beatmap LoadBeatmap(string beatmapName)
         {
+            // TODO: Remove this
             Beatmap beatmap;
 
             // Load Beatmap

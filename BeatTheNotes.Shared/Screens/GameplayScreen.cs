@@ -45,6 +45,12 @@ namespace BeatTheNotes.Screens
             GameSystemComponent.Register(new GameTimeSystem());
             GameSystemComponent.Register(new HealthSystem(0.0f));
 
+            GameSystemComponent.FindSystem<GameplaySystem>().OnReachedEnd += (sender, args) =>
+            {
+                Restart();
+                Show<PlaySongSelectScreen>(true);
+            };
+
             GameSystemComponent.Initialize();
 
             LogHelper.Log("GameplayScreen: Successfully Initialized");
@@ -63,8 +69,9 @@ namespace BeatTheNotes.Screens
 
             if (_input.WasKeyPressed(Keys.Escape))
             {
-                Show<PauseScreen>(true);
-                MediaPlayer.Pause();
+                Restart();
+                Show<PlaySongSelectScreen>(true);
+                //Show<PauseScreen>(true);
             }
 
             if (_input.WasKeyPressed(Settings.GameKeys["BeatmapRestart"]))

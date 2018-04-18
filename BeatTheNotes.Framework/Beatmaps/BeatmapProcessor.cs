@@ -65,6 +65,12 @@ namespace BeatTheNotes.Framework.Beatmaps
             LogHelper.Log($"BeatmapProcessor: Found {_beatmapSettingsList.Count} beatmaps");
         }
 
+        public IEnumerable<BeatmapProcessorContainerEntry> GetContainerEntries()
+        {
+            foreach (var entry in _beatmapSettingsList)
+                yield return entry;
+        }
+
         private void ProcessDatabase()
         {
             // TODO: Encapsulate work with the data base

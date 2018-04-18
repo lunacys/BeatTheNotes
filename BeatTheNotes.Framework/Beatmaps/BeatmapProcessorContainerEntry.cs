@@ -27,5 +27,17 @@
             HitObjectCount = hitObjectCount;
             BeatsPerMinute = beatsPerMinute;
         }
+
+        public override string ToString()
+        {
+            return
+                $"BM Folder: {BeatmapFolder}\n" +
+                $"BM Filename: {BeatmapFilename}\n" +
+                $"BM Name: {BeatmapName}\n" +
+                $"BM Version: {BeatmapVersion}\n" +
+                $"Hit Object Count: {HitObjectCount}\n" +
+                $"BPM: {BeatsPerMinute}\n" +
+                $"Settings:\n{BeatmapSettings}";
+        }
     }
 }
