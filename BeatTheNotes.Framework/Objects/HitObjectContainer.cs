@@ -91,6 +91,15 @@ namespace BeatTheNotes.Framework.Objects
             return Math.Abs(time - first.Position) <= (threshold) ? first : null;
         }
 
+        public IEnumerable<HitObject> GetEnumeratorAtColumn(int column)
+        {
+            if (column< 1 || column > ColumnCount)
+                throw new InvalidOperationException("The value cannot be less than 1 and more than ColumnCount");
+
+            foreach (var hitObject in _hitObjects)
+                yield return hitObject.Where(o => o.Column == column).GetEnumerator().Current;
+        }
+
         public IEnumerator<HitObject> GetEnumerator()
         {
             foreach (var hitObject in _hitObjects)
