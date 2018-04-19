@@ -38,6 +38,8 @@ namespace BeatTheNotes.Framework.Beatmaps
             BeatmapSettings settings =
                 JsonConvert.DeserializeObject<BeatmapSettings>(obj["Settings"].ToString());
 
+            Console.WriteLine(settings.General.BackgroundFileName);
+
             return settings;
         }
 
@@ -131,6 +133,28 @@ namespace BeatTheNotes.Framework.Beatmaps
             return hitObjectContainer;
         }
 
+        public Texture2D LoadBeatmapBackgroundTexture(GraphicsDevice graphicsDevice, BeatmapSettings settings, string beatmapName)
+        {
+            Texture2D background;
+
+            Console.WriteLine($"Loading BG: {settings.General.BackgroundFileName}, ID: {settings.Metadata.BeatmapId}");
+            using (FileStream fs =
+                new FileStream(
+                    Path.Combine(ProcessorSettings.BeatmapsFolder, beatmapName, settings.General.BackgroundFileName),
+                    FileMode.Open))
+            {
+                
+                background = Texture2D.FromStream(graphicsDevice, fs);
+            }
+
+            return background;
+        }
+
+        public Music LoadBeatmapMusicTrack(BeatmapSettings settings, string beatmapName)
+        {
+            return new Music(Path.Combine(ProcessorSettings.BeatmapsFolder, beatmapName, settings.General.AudioFileName));
+        }
+
         /// <summary>
         /// Load Beatmap from a JSON file with file path and filename specified
         /// </summary>
@@ -157,24 +181,14 @@ namespace BeatTheNotes.Framework.Beatmaps
 
             var timingPoints = ReadTimingPoints(beatmapName, settings);
             var hitObjects = ReadHitObjects(beatmapName, settings);
-
             
 
             LogHelper.Log($"BeatmapReader: Successfully Read Beatmap '{beatmapName}'");
 
-            Texture2D background;
-
-            using (FileStream fs =
-                new FileStream(
-                    Path.Combine(ProcessorSettings.BeatmapsFolder, beatmapName, settings.General.BackgroundFileName),
-                    FileMode.Open))
-            {
-                background = Texture2D.FromStream(graphicsDevice, fs);
-            }
-
-            var music = new Music(Path.Combine(ProcessorSettings.BeatmapsFolder, beatmapName, settings.General.AudioFileName));
-
-            Beatmap bm = new Beatmap(settings, background, music, timingPoints, hitObjects);
+            Beatmap bm = new Beatmap(settings, 
+                LoadBeatmapBackgroundTexture(graphicsDevice, settings, beatmapName),
+                LoadBeatmapMusicTrack(settings, beatmapName), 
+                timingPoints, hitObjects);
 
             return bm;
         }

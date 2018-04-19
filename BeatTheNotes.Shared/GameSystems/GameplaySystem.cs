@@ -22,7 +22,7 @@ namespace BeatTheNotes.GameSystems
     {
         public event EventHandler OnReachedEnd;
 
-        public Beatmap Beatmap { get; }
+        public Beatmap Beatmap { get; set; }
         public Skin Skin { get; }
 
         private GameSettings Settings => _game.Services.GetService<GameSettings>();
@@ -33,16 +33,14 @@ namespace BeatTheNotes.GameSystems
 
         private SpriteBatch _spriteBatch;
 
-        private BeatmapProcessor _beatmapProcessor;
-
         private readonly InputHandler _input;
 
-        public GameplaySystem(GameRoot game, string beatmapName)
+        public GameplaySystem(GameRoot game, Beatmap beatmap)
         {
             _game = game;
             
-            _beatmapProcessor = new BeatmapProcessor(Settings);
-            Beatmap = LoadBeatmap(beatmapName);
+            //Beatmap = LoadBeatmap(beatmapName);
+            Beatmap = beatmap;
 
             Skin = _game.Services.GetService<Skin>();
 
@@ -313,7 +311,7 @@ namespace BeatTheNotes.GameSystems
         /// </summary>
         /// <param name="beatmapName">Name of the beatmap</param>
         /// <returns>Beatmap class</returns>
-        private Beatmap LoadBeatmap(string beatmapName)
+        /*private Beatmap LoadBeatmap(string beatmapName)
         {
             // TODO: Remove this
             Beatmap beatmap;
@@ -324,7 +322,7 @@ namespace BeatTheNotes.GameSystems
             try
             {
                 beatmap = beatmapReader.ReadBeatmap(_game.GraphicsDevice,
-                    beatmapName, /* version name: */ "test");
+                    beatmapName, "test");
             }
             catch (Exception e)
             {
@@ -334,7 +332,7 @@ namespace BeatTheNotes.GameSystems
             }
 
             return beatmap;
-        }
+        }*/
 
         /// <summary>
         /// Add event handlers to all the hit objects from all the game systems if it should process hit objects

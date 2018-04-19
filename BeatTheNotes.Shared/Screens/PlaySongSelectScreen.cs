@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using BeatTheNotes.Framework;
 using BeatTheNotes.Framework.Beatmaps;
 using BeatTheNotes.Framework.Input;
 using BeatTheNotes.Framework.Logging;
@@ -25,7 +27,7 @@ namespace BeatTheNotes.Screens
             LogHelper.Log("PlaySongSelectScreen: Constructor");
             _game = game;
             _input = new InputHandler(game);
-            _beatmapProcessor = new BeatmapProcessor(game.Services.GetService<GameSettings>());
+            _beatmapProcessor = new BeatmapProcessor(game.Services.GetService<GameSettings>(), game.GraphicsDevice);
             _bmEntries = _beatmapProcessor.GetContainerEntries().ToList();
             LogHelper.Log("PlaySongSelectScreen: End Constructor");
         }
@@ -48,8 +50,8 @@ namespace BeatTheNotes.Screens
 
         public override void Update(GameTime gameTime)
         {
-            if (_input.WasKeyPressed(Keys.Escape))
-                Show<GameplayScreen>(true);
+            //if (_input.WasKeyPressed(Keys.Escape))
+            //    Show<GameplayScreen>(true);
 
             _input.Update(gameTime);
         }
@@ -58,11 +60,41 @@ namespace BeatTheNotes.Screens
         {
             _spriteBatch.Begin();
 
+            DrawBeatmapEntries();
+            
+            _spriteBatch.End();
+        }
+
+        private void DrawBeatmapEntries()
+        {
+            var font = _game.Services.GetService<Skin>().Font;
             for (int i = 0; i < _bmEntries.Count; i++)
             {
-                _spriteBatch.DrawString(_game.Services.GetService<Skin>().Font, $"Found beatmap:\n{_bmEntries[i]}", new Vector2(15 + i * 400, 15), Color.Black);
+                var e = _bmEntries[i];
+                _spriteBatch.Draw(e.BackgroundTexture, new Rectangle(15, 0 + i * 102, 178, 100), Color.White);
+
+                var str =
+                    $"{e.BeatmapSettings.Metadata.Title}\n" +
+                    $" {e.BeatmapSettings.Metadata.Artist} // {e.BeatmapSettings.Metadata.Creator}\n" +
+                    $" > {e.BeatmapSettings.Metadata.Version}";
+                _spriteBatch.DrawString(font, str, new Vector2(15 + 184, 15 + i * 102), Color.Black);
+
+                var rect = new Rectangle(15, 0 + i * 102, 500, 100);
+                if (rect.Intersects(_input.MouseRect))
+                {
+                    rect.Width = 520;
+                    if (_input.WasMouseButtonPressed(MouseButton.Left))
+                    {
+                        Console.WriteLine($"Starting beatmap {e.BeatmapSettings.Metadata.Version}");
+                        var gameplayScreen = FindScreen<GameplayScreen>();
+                        gameplayScreen.Beatmap = _beatmapProcessor.CreateBeatmapFromEntry(e);
+                        gameplayScreen.Show();
+                    }
+                }
+                else
+                    rect.Width = 500;
+                _spriteBatch.DrawRectangle(rect, Color.Black, 2.0f);
             }
-            _spriteBatch.End();
         }
     }
 }

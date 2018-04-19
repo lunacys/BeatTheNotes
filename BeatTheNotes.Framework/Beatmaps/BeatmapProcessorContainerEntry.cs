@@ -1,8 +1,13 @@
-﻿namespace BeatTheNotes.Framework.Beatmaps
+﻿using BeatTheNotes.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace BeatTheNotes.Framework.Beatmaps
 {
     public class BeatmapProcessorContainerEntry
     {
         public BeatmapSettings BeatmapSettings { get; }
+        public Texture2D BackgroundTexture { get; }
+        public Music Music { get; }
         public string BeatmapFolder { get; }
         public string BeatmapFilename { get; }
         public string BeatmapName { get; }
@@ -12,6 +17,8 @@
 
         public BeatmapProcessorContainerEntry(
             BeatmapSettings beatmapSettings, 
+            Texture2D backgroundTexture,
+            Music music,
             string beatmapFolder,
             string beatmapFilename, 
             string beatmapName, 
@@ -20,6 +27,8 @@
             double beatsPerMinute)
         {
             BeatmapSettings = beatmapSettings;
+            BackgroundTexture = backgroundTexture;
+            Music = music;
             BeatmapFilename = beatmapFilename;
             BeatmapFolder = beatmapFolder;
             BeatmapName = beatmapName;

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using BeatTheNotes.Framework.Logging;
 using BeatTheNotes.Framework.Settings;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace BeatTheNotes.Framework.Beatmaps
 {
@@ -14,31 +15,38 @@ namespace BeatTheNotes.Framework.Beatmaps
 
         private List<BeatmapProcessorContainerEntry> _beatmapSettingsList;
 
+        private GraphicsDevice _graphicsDevice;
+
         public int BeatmapCount => _beatmapSettingsList.Count;
 
         /// <summary>
         /// Initialize <see cref="BeatmapProcessor"/> with default settings.
         /// </summary>
-        public BeatmapProcessor()
-            : this(new BeatmapProcessorSettings(".btn", "Maps", "timing_points", "hit_objects", "BeatTheNotes.db"))
+        /// <param name="graphicsDevice"><see cref="GraphicsDevice"/> used to loading <see cref="Texture2D"/></param>
+        public BeatmapProcessor(GraphicsDevice graphicsDevice)
+            : this(new BeatmapProcessorSettings(".btn", "Maps", "timing_points", "hit_objects", "BeatTheNotes.db"), graphicsDevice)
         { }
 
         /// <summary>
         /// Initialize <see cref="BeatmapProcessor"/> with default proccesor but with beatmap folder specified in <see cref="GameSettings"/>.
         /// </summary>
         /// <param name="gameSettings"><see cref="GameSettings"/></param>
-        public BeatmapProcessor(GameSettings gameSettings)
-            : this(new BeatmapProcessorSettings(".btn", gameSettings.BeatmapFolder, "timing_points", "hit_objects", "BeatTheNotes.db"))
+        /// <param name="graphicsDevice"><see cref="GraphicsDevice"/> used to loading <see cref="Texture2D"/></param>
+        public BeatmapProcessor(GameSettings gameSettings, GraphicsDevice graphicsDevice)
+            : this(new BeatmapProcessorSettings(".btn", gameSettings.BeatmapFolder, "timing_points", "hit_objects", "BeatTheNotes.db"), graphicsDevice)
         { }
 
         /// <summary>
         /// Initialize <see cref="BeatmapProcessor"/> with unique settings.
         /// </summary>
         /// <param name="processorSettings"><see cref="BeatmapProcessorSettings"/></param>
-        public BeatmapProcessor(BeatmapProcessorSettings processorSettings)
+        /// <param name="graphicsDevice"><see cref="GraphicsDevice"/> used to loading <see cref="Texture2D"/></param>
+        public BeatmapProcessor(BeatmapProcessorSettings processorSettings, GraphicsDevice graphicsDevice)
         {
             ProcessorSettings = processorSettings;
-            
+
+            _graphicsDevice = graphicsDevice;
+
             _beatmapSettingsList = new List<BeatmapProcessorContainerEntry>();
 
             string folder = ProcessorSettings.BeatmapsFolder;
@@ -57,9 +65,9 @@ namespace BeatTheNotes.Framework.Beatmaps
             {
                 // If there is no database file, initialize it
                 if (!File.Exists(ProcessorSettings.DatabaseName))
-                    InitializeDatabase();
+                    InitializeDatabase(graphicsDevice);
                 else 
-                    ProcessDatabase();
+                    ProcessDatabase(graphicsDevice);
             }
 
             LogHelper.Log($"BeatmapProcessor: Found {_beatmapSettingsList.Count} beatmaps");
@@ -71,7 +79,7 @@ namespace BeatTheNotes.Framework.Beatmaps
                 yield return entry;
         }
 
-        private void ProcessDatabase()
+        private void ProcessDatabase(GraphicsDevice graphicsDevice)
         {
             // TODO: Encapsulate work with the data base
             var dbConnection = new SQLiteConnection($"Data Source={ProcessorSettings.DatabaseName};Version=3;");
@@ -84,6 +92,8 @@ namespace BeatTheNotes.Framework.Beatmaps
 
             var dbDataReader = dbCommand.ExecuteReader();
             
+            BeatmapReader bmReader = new BeatmapReader(ProcessorSettings);
+
             // Read all entries while there is any
             while (dbDataReader.Read())
             {
@@ -111,7 +121,11 @@ namespace BeatTheNotes.Framework.Beatmaps
                 var hitObjectCount = dbDataReader.GetInt32(20);
                 var bpm = dbDataReader.GetDouble(21);
 
-                var entry = new BeatmapProcessorContainerEntry(bmSettings, beatmapFolder, beatmapFilename, beatmapName,
+                var bg = bmReader.LoadBeatmapBackgroundTexture(graphicsDevice, bmSettings, GetBeatmapNameWithoutVersion(beatmapName));
+                var music = bmReader.LoadBeatmapMusicTrack(bmSettings, GetBeatmapNameWithoutVersion(beatmapName));
+
+                var entry = new BeatmapProcessorContainerEntry(bmSettings,
+                    bg, music, beatmapFolder, beatmapFilename, beatmapName,
                     beatmapVersion, hitObjectCount, bpm);
 
                 _beatmapSettingsList.Add(entry);
@@ -123,7 +137,7 @@ namespace BeatTheNotes.Framework.Beatmaps
         /// <summary>
         /// Initialize a database and fill it with all available beatmaps.
         /// </summary>
-        private void InitializeDatabase()
+        private void InitializeDatabase(GraphicsDevice graphicsDevice)
         {
             // TODO: Encapsulate work with the data base
             string folder = ProcessorSettings.BeatmapsFolder;
@@ -178,11 +192,15 @@ namespace BeatTheNotes.Framework.Beatmaps
                     {
                         var settings = bmReader.ReadBeatmapSettings(file);
 
-                        var version = settings.Metadata.Version;
-                        var timingPoints = bmReader.ReadTimingPoints(GetBeatmapNameWithoutVersion(Path.GetFileNameWithoutExtension(file)), settings);
-                        var hitObjects = bmReader.ReadHitObjects(GetBeatmapNameWithoutVersion(Path.GetFileNameWithoutExtension(file)), settings);
+                        var beatmapName = GetBeatmapNameWithoutVersion(Path.GetFileNameWithoutExtension(file));
 
-                        var entry = new BeatmapProcessorContainerEntry(settings, directory, Path.GetFileName(file),
+                        var version = settings.Metadata.Version;
+                        var timingPoints = bmReader.ReadTimingPoints(beatmapName, settings);
+                        var hitObjects = bmReader.ReadHitObjects(beatmapName, settings);
+                        var bg = bmReader.LoadBeatmapBackgroundTexture(graphicsDevice, settings, GetBeatmapNameWithoutVersion(beatmapName));
+                        var music = bmReader.LoadBeatmapMusicTrack(settings, GetBeatmapNameWithoutVersion(beatmapName));
+
+                        var entry = new BeatmapProcessorContainerEntry(settings, bg, music, directory, Path.GetFileName(file),
                             Path.GetFileNameWithoutExtension(file), version, hitObjects.Count,
                             timingPoints[0].BeatsPerMinute);
                         _beatmapSettingsList.Add(entry);
@@ -230,7 +248,15 @@ namespace BeatTheNotes.Framework.Beatmaps
         private string GetBeatmapNameWithoutVersion(string beatmapName)
         {
             var index = beatmapName.LastIndexOf("[", StringComparison.Ordinal);
-            return beatmapName.Substring(0, index - 1);
+            return index <= 1 ? beatmapName : beatmapName.Substring(0, index - 1);
+        }
+
+        public Beatmap CreateBeatmapFromEntry(BeatmapProcessorContainerEntry entry)
+        {
+            BeatmapReader bmReader = new BeatmapReader(ProcessorSettings);
+            var bm = bmReader.ReadBeatmap(_graphicsDevice, GetBeatmapNameWithoutVersion(entry.BeatmapName),
+                entry.BeatmapVersion);
+            return bm;
         }
     }
 }

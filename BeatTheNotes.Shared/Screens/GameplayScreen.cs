@@ -1,4 +1,5 @@
-﻿using BeatTheNotes.Framework.GameSystems;
+﻿using BeatTheNotes.Framework.Beatmaps;
+using BeatTheNotes.Framework.GameSystems;
 using BeatTheNotes.Framework.Input;
 using BeatTheNotes.Framework.Logging;
 using BeatTheNotes.Framework.Settings;
@@ -17,16 +18,25 @@ namespace BeatTheNotes.Screens
 
         public GameSystemComponent GameSystemComponent { get; }
 
-        private readonly string _beatmapName;
+        public Beatmap Beatmap
+        {
+            get => _beatmap;
+            set
+            {
+                _beatmap = value;
+                Initialize();
+                GameSystemComponent.FindSystem<GameplaySystem>().Beatmap = value;
+            }
+        }
+        private Beatmap _beatmap;
 
         private readonly InputHandler _input;
 
         private GameSettings Settings => _game.Services.GetService<GameSettings>();
 
-        public GameplayScreen(GameRoot game, string beatmapName)
+        public GameplayScreen(GameRoot game)
         {
             _game = game;
-            _beatmapName = beatmapName;
 
             _input = new InputHandler(game);
             GameSystemComponent = new GameSystemComponent(game);
@@ -38,20 +48,27 @@ namespace BeatTheNotes.Screens
 
             base.Initialize();
 
-            GameSystemComponent.Register(new GameplaySystem(_game, _beatmapName));
-            GameSystemComponent.Register(new MusicSystem());
-            GameSystemComponent.Register(new ScoreV1System(_game.GraphicsDevice));
-            GameSystemComponent.Register(new ScoremeterSystem(_game.GraphicsDevice));
-            GameSystemComponent.Register(new GameTimeSystem());
-            GameSystemComponent.Register(new HealthSystem(0.0f));
+            if (GameSystemComponent.GetAllGameSystems().Count == 0)
+            {
+                GameSystemComponent.Register(new GameplaySystem(_game, Beatmap));
+                GameSystemComponent.Register(new MusicSystem());
+                GameSystemComponent.Register(new ScoreV1System(_game.GraphicsDevice));
+                GameSystemComponent.Register(new ScoremeterSystem(_game.GraphicsDevice));
+                GameSystemComponent.Register(new GameTimeSystem());
+                GameSystemComponent.Register(new HealthSystem(0.0f)); // TODO: Add health drain rate support
 
-            GameSystemComponent.FindSystem<GameplaySystem>().OnReachedEnd += (sender, args) =>
+                GameSystemComponent.FindSystem<GameplaySystem>().OnReachedEnd += (sender, args) =>
+                {
+                    Restart();
+                    Show<PlaySongSelectScreen>(true);
+                };
+
+                GameSystemComponent.Initialize();
+            }
+            else
             {
                 Restart();
-                Show<PlaySongSelectScreen>(true);
-            };
-
-            GameSystemComponent.Initialize();
+            }
 
             LogHelper.Log("GameplayScreen: Successfully Initialized");
         }
@@ -69,7 +86,7 @@ namespace BeatTheNotes.Screens
 
             if (_input.WasKeyPressed(Keys.Escape))
             {
-                Restart();
+                GameSystemComponent.FindSystem<MusicSystem>().Music.Stop();
                 Show<PlaySongSelectScreen>(true);
                 //Show<PauseScreen>(true);
             }
@@ -113,6 +130,9 @@ namespace BeatTheNotes.Screens
         private void Restart()
         {
             GameSystemComponent.Reset();
+            // TODO: Rework this
+            GameSystemComponent.FindSystem<MusicSystem>().Volume = 1.0f;
+            GameSystemComponent.FindSystem<MusicSystem>().Music.Play();
         }
     }
 }

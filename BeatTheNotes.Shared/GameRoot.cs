@@ -63,7 +63,7 @@ namespace BeatTheNotes
             _graphics.PreferredBackBufferWidth = _settings.WindowWidth;
             _graphics.PreferredBackBufferHeight = _settings.WindowHeight;
 
-            
+            IsMouseVisible = true;
 #if WIN || LINUX
             _graphics.IsFullScreen = _settings.IsFullscreen;
 #elif ANDROID
@@ -103,7 +103,7 @@ namespace BeatTheNotes
             Components.Add(_screenComponent);
             PlaySongSelectScreen playSongSelectScreen = new PlaySongSelectScreen(this);
             _screenComponent.Register(playSongSelectScreen);
-            GameplayScreen gameplayScreen = new GameplayScreen(this, "NOMA - Brain Power");
+            GameplayScreen gameplayScreen = new GameplayScreen(this);
             _screenComponent.Register(gameplayScreen);
             PauseScreen ps = new PauseScreen(this);
             _screenComponent.Register(ps);
