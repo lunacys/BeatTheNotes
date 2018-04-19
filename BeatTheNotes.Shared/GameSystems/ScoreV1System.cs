@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using BeatTheNotes.Framework.Beatmaps;
 using BeatTheNotes.Framework.GameSystems;
+using BeatTheNotes.Framework.Objects;
 using BeatTheNotes.Shared.GameSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.Screens;
 
 namespace BeatTheNotes.GameSystems
 {
-    public class ScoreSystem : GameSystem, IGameSystemProcessHitObject
+    /// <summary>
+    /// ScoremeterScore System where maximum score possible is one million
+    /// </summary>
+    public class ScoreV1System : GameSystem, IGameSystemProcessHitObject
     {
         public string ScoreMarvelous => "Marvelous";
         public string ScorePerfect => "Perfect";
@@ -46,7 +50,7 @@ namespace BeatTheNotes.GameSystems
 
         public float Od => _gameplay.Beatmap.Settings.Difficulty.OverallDifficutly;
 
-        public Splash CurrentSplash { get; private set; }
+        public ScoreSplash CurrentScoreSplash { get; private set; }
 
         public event EventHandler<OnScoreGetEventHandler> OnScoreGet;
 
@@ -54,7 +58,7 @@ namespace BeatTheNotes.GameSystems
 
         private GameplaySystem _gameplay;
 
-        public ScoreSystem(GraphicsDevice graphicsDevice)
+        public ScoreV1System(GraphicsDevice graphicsDevice)
         {
             Accuracy = 1.0f;
 
@@ -127,7 +131,7 @@ namespace BeatTheNotes.GameSystems
 
         public override void Update(GameTime gameTime)
         {
-            CurrentSplash?.Update(gameTime);
+            CurrentScoreSplash?.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
@@ -135,7 +139,7 @@ namespace BeatTheNotes.GameSystems
             _spriteBatch.Begin();
 
             // If there is a splash set, draw it
-            if (CurrentSplash != null)
+            if (CurrentScoreSplash != null)
             {
                 var pos = new Vector2(
                     // x
@@ -144,11 +148,11 @@ namespace BeatTheNotes.GameSystems
                     // y
                     300);
 
-                var color = Color.White * (CurrentSplash.MsBeforeExpire / 1000.0f);
-                var origin = new Vector2(CurrentSplash.Texture.Width / 2.0f, CurrentSplash.Texture.Height / 2.0f);
-                var size = new Vector2(0.9f * ((CurrentSplash.MsBeforeExpire / 1000.0f)), 0.9f * ((CurrentSplash.MsBeforeExpire / 1000.0f)));
+                var color = Color.White * (CurrentScoreSplash.MsBeforeExpire / 1000.0f);
+                var origin = new Vector2(CurrentScoreSplash.Texture.Width / 2.0f, CurrentScoreSplash.Texture.Height / 2.0f);
+                var size = new Vector2(0.9f * ((CurrentScoreSplash.MsBeforeExpire / 1000.0f)), 0.9f * ((CurrentScoreSplash.MsBeforeExpire / 1000.0f)));
 
-                _spriteBatch.Draw(CurrentSplash.Texture, pos, null, color, 0.0f, origin, size, SpriteEffects.None, 0.0f);
+                _spriteBatch.Draw(CurrentScoreSplash.Texture, pos, null, color, 0.0f, origin, size, SpriteEffects.None, 0.0f);
             }
 
             _spriteBatch.End();
@@ -157,6 +161,7 @@ namespace BeatTheNotes.GameSystems
         private void Calculate(HitObject hitObject)
         {
             int hitVal = GetHitValue(hitObject);
+            if (hitVal < 0) return;
 
             DoScore(hitObject, hitVal);
         }
@@ -169,7 +174,7 @@ namespace BeatTheNotes.GameSystems
 
             Accuracy = 1.0f;
 
-            CurrentSplash = null;
+            CurrentScoreSplash = null;
         }
 
         private void CalculateScore(string hitValueName)
@@ -200,7 +205,7 @@ namespace BeatTheNotes.GameSystems
             {
                 Combo = 0;
             }
-            else 
+            else
             {
                 Combo++;
                 if (Combo > MaxCombo)
@@ -221,7 +226,7 @@ namespace BeatTheNotes.GameSystems
 
         private int GetHitValue(HitObject hitObject)
         {
-            var timeOffset = (hitObject.IsLongNote ? hitObject.EndPosition : hitObject.Position) -
+            var timeOffset = ((hitObject as NoteHold)?.EndPosition ?? hitObject.Position) -
                              FindSystem<GameTimeSystem>().Time;
             var absTimeOffset = Math.Abs(timeOffset);
 
@@ -239,6 +244,8 @@ namespace BeatTheNotes.GameSystems
                 score = HitValues[ScoreBad];
             else if (timeOffset <= HitThresholds[ScoreMiss])
                 score = HitValues[ScoreMiss];
+            else
+                return -1;
 
             return score;
         }
@@ -251,46 +258,46 @@ namespace BeatTheNotes.GameSystems
 
             if (hitValue == HitValues[ScoreMarvelous])
             {
-                CurrentSplash = new Splash(_gameplay.Skin.ScoreMarvelousTexture);
+                CurrentScoreSplash = new ScoreSplash(_gameplay.Skin.ScoreMarvelousTexture);
                 MarvelousCount++;
                 hitValueName = ScoreMarvelous;
             }
             else if (hitValue == HitValues[ScorePerfect])
             {
-                CurrentSplash = new Splash(_gameplay.Skin.ScorePerfectTexture);
+                CurrentScoreSplash = new ScoreSplash(_gameplay.Skin.ScorePerfectTexture);
                 PerfectCount++;
                 hitValueName = ScorePerfect;
             }
             else if (hitValue == HitValues[ScoreGreat])
             {
-                CurrentSplash = new Splash(_gameplay.Skin.ScoreGreatTexture);
+                CurrentScoreSplash = new ScoreSplash(_gameplay.Skin.ScoreGreatTexture);
                 GreatCount++;
                 hitValueName = ScoreGreat;
             }
             else if (hitValue == HitValues[ScoreGood])
             {
-                CurrentSplash = new Splash(_gameplay.Skin.ScoreGoodTexture);
+                CurrentScoreSplash = new ScoreSplash(_gameplay.Skin.ScoreGoodTexture);
                 GoodCount++;
                 hitValueName = ScoreGood;
             }
             else if (hitValue == HitValues[ScoreBad])
             {
-                CurrentSplash = new Splash(_gameplay.Skin.ScoreBadTexture);
+                CurrentScoreSplash = new ScoreSplash(_gameplay.Skin.ScoreBadTexture);
                 BadCount++;
                 hitValueName = ScoreBad;
             }
             else if (hitValue == HitValues[ScoreMiss])
             {
-                CurrentSplash = new Splash(_gameplay.Skin.ScoreMissTexture);
+                CurrentScoreSplash = new ScoreSplash(_gameplay.Skin.ScoreMissTexture);
                 MissCount++;
                 DoBreakCombo();
                 hitValueName = ScoreMiss;
             }
-            else throw new InvalidDataException("Score not found");
+            else throw new InvalidDataException("ScoremeterScore not found");
 
             OnScoreGet?.Invoke(this, new OnScoreGetEventHandler(hitValueName, HitValues[hitValueName]));
             GameSystemManager.FindSystem<ScoremeterSystem>()?.AddScore((long)FindSystem<GameTimeSystem>().Time,
-                hitObject.IsLongNote ? hitObject.EndPosition : hitObject.Position, hitValueName);
+                (hitObject as NoteHold)?.EndPosition ?? hitObject.Position, hitValueName);
 
             ProceedCombo(hitValue);
             CalculateScore(hitValueName);
@@ -304,7 +311,7 @@ namespace BeatTheNotes.GameSystems
             Combo = 0;
         }
 
-        public void OnHitObjectHit(object sender, HitObjectOnPressEventArgs args)
+        public void OnHitObjectHit(object sender, HitObjectOnHitEventArgs args)
         {
             Calculate(args.HitObject);
         }

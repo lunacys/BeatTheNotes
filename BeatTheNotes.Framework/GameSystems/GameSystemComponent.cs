@@ -10,7 +10,7 @@ namespace BeatTheNotes.Framework.GameSystems
     {
         private readonly List<GameSystem> _gameSystems;
 
-        public event EventHandler<SystemAddedEventArgs> SystemAdded;
+        public event EventHandler<GameSystemAddedEventArgs> SystemAdded;
 
         public GameSystemComponent(Game game, IEnumerable<GameSystem> systems) : this(game)
         {
@@ -41,7 +41,7 @@ namespace BeatTheNotes.Framework.GameSystems
         public T Register<T>(T system) where T : GameSystem
         {
             LogHelper.Log($"GameSystemManager: Registering System {typeof(T)}");
-            SystemAdded?.Invoke(this, new SystemAddedEventArgs(this));
+            SystemAdded?.Invoke(this, new GameSystemAddedEventArgs(this, system));
 
             system.GameSystemManager = this;
             system.IsWorking = true;

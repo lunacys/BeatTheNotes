@@ -60,6 +60,8 @@ namespace BeatTheNotes.Framework.Skins
                 skin.NoteClickTexture = content.Load<Texture2D>(Path.Combine("Images", "NoteClick"));
                 skin.NoteHoldTexture = content.Load<Texture2D>(Path.Combine("Images", "NoteHold"));
                 skin.PlayfieldLineTexture = content.Load<Texture2D>(Path.Combine("Images", "PlayfieldLine"));
+                skin.PlayfieldLinePressedTexture =
+                    content.Load<Texture2D>(Path.Combine("Images", "PlayfieldLinePressed"));
                 skin.ButtonTexture = content.Load<Texture2D>(Path.Combine("Images", "Button"));
 
                 skin.Font = content.Load<SpriteFont>(Path.Combine("Fonts", "MainFont"));

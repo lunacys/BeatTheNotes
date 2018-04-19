@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BeatTheNotes.Shared.GameSystems
+﻿namespace BeatTheNotes.Shared.GameSystems
 {
     public class OnScoreGetEventHandler
     {

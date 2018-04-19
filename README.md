@@ -33,10 +33,11 @@ git clone https://github.com/lunacys/BeatTheNotes.git
 
 Next, open the ```BeatTheNotes.sln``` file and select the required solution configuration - ```Debug``` or ```Release```.
 
-Before you can go building the game, you should clone ```BeatTheNotes.Dist``` repo which contains ```SoundTouch.dll``` x64 & x86:
+Before you can go building the game, you should update the submodules:
 
 ```
-git clone https://github.com/lunacys/BeatTheNotes.Dist.git
+cd BeatTheNotes
+git submodule update --init --recursive
 ```
 
 Next copy ```x86``` and ```x64``` folders to ```{root directory}/BeatTheNotes.DesktopGL```.
@@ -50,7 +51,6 @@ Please note that this repo doesn't contain any maps to play, you can get some fr
 - ```BeatTheNotes.Framework``` - Game framework (In fact, just a game library)
 - ```BeatTheNotes.Shared``` - Shared code for all platforms
 - ```BeatTheNotes.DesktopGL``` - Windows, Linux and OS X version
-- ```BeatTheNotes.Android``` - Android version
 - ```SoundTouch``` - Music Varispeed
 
 Following dependencies are used in the projects as NuGet packages:

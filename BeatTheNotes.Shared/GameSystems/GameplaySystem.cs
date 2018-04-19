@@ -1,57 +1,55 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using BeatTheNotes.Framework.Beatmaps;
 using BeatTheNotes.Framework.GameSystems;
-using BeatTheNotes.Framework.Logging;
 using BeatTheNotes.Framework.Settings;
 using BeatTheNotes.Framework.Skins;
-using BeatTheNotes.Input;
 using BeatTheNotes.Framework;
-using BeatTheNotes.Framework.Audio;
 using BeatTheNotes.Framework.Input;
+using BeatTheNotes.Framework.Logging;
+using BeatTheNotes.Framework.Objects;
+using BeatTheNotes.Screens;
 using BeatTheNotes.Shared.GameSystems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using MonoGame.Extended.Screens;
 
 namespace BeatTheNotes.GameSystems
 {
     public class GameplaySystem : GameSystem
     {
-        public Beatmap Beatmap { get; }
+        public event EventHandler OnReachedEnd;
+
+        public Beatmap Beatmap { get; set; }
         public Skin Skin { get; }
 
-        public GameSettings Settings => _game.Services.GetService<GameSettings>();
+        private GameSettings Settings => _game.Services.GetService<GameSettings>();
 
-        public float ScrollingSpeed => Settings.ScrollingSpeedF;
-        public bool IsUpsideDown => Settings.IsReversedDirection;
-
-        public List<HitObject>[] SeparatedLines { get; private set; }
+        private float ScrollingSpeed => Settings.ScrollingSpeedF;
 
         private readonly GameRoot _game;
-        private Texture2D _background;
 
         private SpriteBatch _spriteBatch;
-        private Music _music;
 
         private readonly InputHandler _input;
 
-
-        public GameplaySystem(GameRoot game, string beatmapName)
+        public GameplaySystem(GameRoot game, Beatmap beatmap)
         {
             _game = game;
-            Beatmap = LoadBeatmap(beatmapName);
+            
+            //Beatmap = LoadBeatmap(beatmapName);
+            Beatmap = beatmap;
 
             Skin = _game.Services.GetService<Skin>();
 
-            _input = new InputHandler();
+            _input = new InputHandler(game);
 
-            _input.RegisterKeyCommand(Settings.GameKeys["KL1"], new KeyLineCommand(this, 1));
-            _input.RegisterKeyCommand(Settings.GameKeys["KL2"], new KeyLineCommand(this, 2));
-            _input.RegisterKeyCommand(Settings.GameKeys["KL3"], new KeyLineCommand(this, 3));
-            _input.RegisterKeyCommand(Settings.GameKeys["KL4"], new KeyLineCommand(this, 4));
+            _input.RegisterKeyCommand(Settings.GameKeys["KL1"], new KeyLineCommand(this, Beatmap.HitObjects, 1));
+            _input.RegisterKeyCommand(Settings.GameKeys["KL2"], new KeyLineCommand(this, Beatmap.HitObjects, 2));
+            _input.RegisterKeyCommand(Settings.GameKeys["KL3"], new KeyLineCommand(this, Beatmap.HitObjects, 3));
+            _input.RegisterKeyCommand(Settings.GameKeys["KL4"], new KeyLineCommand(this, Beatmap.HitObjects, 4));
         }
 
         public override void Initialize()
@@ -60,7 +58,7 @@ namespace BeatTheNotes.GameSystems
 
             _spriteBatch = new SpriteBatch(_game.GraphicsDevice);
 
-            FindSystem<MusicSystem>().Music = _music;
+            FindSystem<MusicSystem>().Music = Beatmap.Music;
             MediaPlayer.Volume = Settings.SongVolumeF;
 
             FindSystem<HealthSystem>().HpDrainRate = Beatmap.Settings.Difficulty.HpDrainRate;
@@ -74,7 +72,7 @@ namespace BeatTheNotes.GameSystems
 
             var time = FindSystem<GameTimeSystem>().Time;
 
-            _input.Update(_game);
+            _input.Update(gameTime);
 
             if (_input.WasKeyPressed(Settings.GameKeys["BeatmapScrollingSpeedUp"]))
                 if (ScrollingSpeed < 20.0f)
@@ -82,6 +80,7 @@ namespace BeatTheNotes.GameSystems
             if (_input.WasKeyPressed(Settings.GameKeys["BeatmapScrollingSpeedDown"]))
                 if (ScrollingSpeed > 0.2f)
                     Settings.ScrollingSpeedF -= 0.1f;
+           
             /*if (_input.WasKeyPressed(Keys.F5))
                 Settings.IsReversedDirection = !IsUpsideDown;*/
 
@@ -108,7 +107,10 @@ namespace BeatTheNotes.GameSystems
                     FindSystem<MusicSystem>().Volume -= gameTime.ElapsedGameTime.Milliseconds / 5000.0f;
 
                 if (FindSystem<MusicSystem>().Volume <= 0.05f)
-                    Reset();
+                {
+                    //HostScreen.Show<PlaySongSelectScreen>(true);
+                    OnReachedEnd?.Invoke(this, EventArgs.Empty);
+                }
             }
         }
 
@@ -118,7 +120,7 @@ namespace BeatTheNotes.GameSystems
 
             _spriteBatch.Begin();
             // Draw background before all the screen components
-            _spriteBatch.Draw(_background, new Rectangle(0, 0, Settings.WindowWidth, Settings.WindowHeight), Color.White);
+            _spriteBatch.Draw(Beatmap.BackgroundTexture, new Rectangle(0, 0, Settings.WindowWidth, Settings.WindowHeight), Color.White);
 
             // Draw screen components in the order
             DrawPlayfield();
@@ -157,14 +159,12 @@ namespace BeatTheNotes.GameSystems
 
             // Draw buttons
             _spriteBatch.Draw(Skin.ButtonTexture,
-            IsUpsideDown
-                ? new Vector2(Skin.Settings.PlayfieldPositionX, 0)
-                : new Vector2(Skin.Settings.PlayfieldPositionX,
+                    new Vector2(Skin.Settings.PlayfieldPositionX,
                     Settings.WindowHeight - Skin.ButtonTexture.Height),
             Color.White);
 
 
-            // Init health bar settings
+            // Initialize health bar settings
             float hpX = Skin.Settings.PlayfieldPositionX +
                         Skin.PlayfieldLineTexture.Width * Beatmap.Settings.Difficulty.KeyAmount;
             float hpY = _game.Services.GetService<GameSettings>().WindowHeight;
@@ -181,7 +181,7 @@ namespace BeatTheNotes.GameSystems
             // Set source rectangle for making health bar dynamic
             var srcRect = new Rectangle(0, 0, (int)hpW, (int)(Skin.HealthBar.Height * (curVal / (maxVal - minVal))));
 
-            // Interpolate color from Green (max health) to Red (min health)
+            // Interpolate color from Red (min health) to Green (max health)
             Color col = Color.Lerp(Color.Red, Color.Green, curVal / 100.0f);
 
             // Draw health bar
@@ -196,7 +196,6 @@ namespace BeatTheNotes.GameSystems
 
             // Debug things
             _spriteBatch.DrawString(Skin.Font, time.ToString(), new Vector2(12, 12), Color.Red);
-            _spriteBatch.DrawString(Skin.Font, IsUpsideDown.ToString(), new Vector2(12, 30), Color.Red);
             _spriteBatch.DrawString(Skin.Font, ScrollingSpeed.ToString("F1"), new Vector2(12, 48), Color.Red);
 
             _spriteBatch.DrawString(Skin.Font,
@@ -204,7 +203,7 @@ namespace BeatTheNotes.GameSystems
                 new Vector2(12, 64),
                 Color.DarkRed);
 
-            var scoreSystem = GameSystemManager.FindSystem<ScoreSystem>();
+            var scoreSystem = GameSystemManager.FindSystem<ScoreV1System>();
 
             string scores = $"Marvelous: {scoreSystem.MarvelousCount}\n" +
                             $"Perfect: {scoreSystem.PerfectCount}\n" +
@@ -214,9 +213,9 @@ namespace BeatTheNotes.GameSystems
                             $"Miss: {scoreSystem.MissCount}";
             _spriteBatch.DrawString(Skin.Font, scores, new Vector2(800, 10), Color.Black);
             _spriteBatch.DrawString(Skin.Font,
-                $"Score: {scoreSystem.Score}\n" +
+                $"ScoremeterScore: {scoreSystem.Score}\n" +
                 $"Combo: {scoreSystem.Combo}\n" +
-                $"Acc: {scoreSystem.Accuracy * 100:F2}%\n" +
+                $"Accuracy: {scoreSystem.Accuracy * 100:F2}%\n" +
                 $"HP: {FindSystem<HealthSystem>().Health}",
                 new Vector2(15, 300), Color.Black);
         }
@@ -225,9 +224,9 @@ namespace BeatTheNotes.GameSystems
         {
             var time = (long)FindSystem<GameTimeSystem>().Time;
 
-            foreach (var lines in SeparatedLines)
+            //foreach (var lines in SeparatedLines)
             {
-                foreach (var o in lines)
+                foreach (var o in Beatmap.HitObjects)
                 {
                     // TODO: Make more precise work on the numbers
                     // TODO: Make _isUpsideDown (upside down) work
@@ -238,7 +237,7 @@ namespace BeatTheNotes.GameSystems
                     Vector2 position = new Vector2(
                         // x
                         Skin.Settings.PlayfieldPositionX +
-                        ((o.Line - 1) * (Skin.PlayfieldLineTexture.Width)),
+                        ((o.Column - 1) * (Skin.PlayfieldLineTexture.Width)),
                         // y
                         (ScrollingSpeed * (time - o.Position) +
                          (Settings.WindowHeight - Skin.ButtonTexture.Height)) +
@@ -250,37 +249,38 @@ namespace BeatTheNotes.GameSystems
                     if (Skin.Settings.NoteType.ToLower() == "arrow")
                     {
                         // For 'arrow' skin type use texture collection
-                        hitObjectTexture = Skin.NoteClickTextures[o.Line - 1];
+                        hitObjectTexture = Skin.NoteClickTextures[o.Column - 1];
                     }
 
                     // if it is a 'Click' note, just draw its texture
-                    if (o.Position == o.EndPosition)
+                    if (o is NoteClick)
                     {
-                        _spriteBatch.Draw(hitObjectTexture, position, o.IsPressed ? Color.Black : Color.White);
+                        _spriteBatch.Draw(hitObjectTexture, position, o.IsExpired ? Color.Black : Color.White);
                     }
-                    else // if it is a 'Hold' note, draw its texure one time per 5 pixels
+                    else if (o is NoteHold) // if it is a 'Hold' note, draw its texture one time per 5 pixels
                     {
-                        for (int i = 0; i <= o.EndPosition - o.Position; i += 5)
+                        var noteHold = o as NoteHold;
+                        for (int i = 0; i <= noteHold.EndPosition - noteHold.Position; i += 5)
                         {
                             position = new Vector2(
                                 // x
                                 Skin.Settings.PlayfieldPositionX +
-                                ((o.Line - 1) * (Skin.PlayfieldLineTexture.Width)),
+                                ((noteHold.Column - 1) * (Skin.PlayfieldLineTexture.Width)),
                                 // y
-                                (ScrollingSpeed * (time - (o.Position + i)) +
+                                (ScrollingSpeed * (time - (noteHold.Position + i)) +
                                  (Settings.WindowHeight - Skin.ButtonTexture.Height)) +
                                 Skin.Settings.HitPosition
                             );
 
-                            _spriteBatch.Draw(hitObjectTexture, position, null, o.IsPressed ? Color.Black : Color.White);
+                            _spriteBatch.Draw(hitObjectTexture, position, null, noteHold.IsExpired ? Color.Black : Color.White);
                         }
                     }
 
                     // Proceed miss
                     // It handles in draw method because of optimization
-                    if (o.IsPressed) continue;
+                    if (o.IsExpired) continue;
 
-                    var scoreSys = GameSystemManager.FindSystem<ScoreSystem>();
+                    var scoreSys = GameSystemManager.FindSystem<ScoreV1System>();
 
                     if (o.Position + scoreSys.HitThresholds[scoreSys.ScoreMiss] < time)
                     {
@@ -293,9 +293,7 @@ namespace BeatTheNotes.GameSystems
         private void DrawBeatDivisors()
         {
             // TODO: Skip unnecessary loops
-            var tp = GetCurrentTimingPoint();
-
-            //Console.WriteLine($"current TP pos: {tp.Position}");
+            var tp = Beatmap.TimingPoints[0];
 
             for (int i = tp.Position; i <= Beatmap.HitObjects.Last().Position; i += (int)Math.Floor(tp.MsPerBeat * 4))
             {
@@ -307,107 +305,44 @@ namespace BeatTheNotes.GameSystems
                     3.0f);
             }
         }
-
-        public TimingPoint GetCurrentTimingPoint()
-        {
-            // TODO: This
-            // If there's no timing point at the time, return the first timing point
-            if (Beatmap.TimingPoints[0].Position > FindSystem<GameTimeSystem>().Time)
-                return Beatmap.TimingPoints[0];
-
-            // If there's the only one timing point on the map, return that timing point
-            if (Beatmap.TimingPoints.Count == 1)
-                return Beatmap.TimingPoints[0];
-
-            return FindTimingPointByTime(FindSystem<GameTimeSystem>().Time);
-        }
-
-        private TimingPoint FindTimingPointByTime(double time)
-        {
-            // TODO: This
-            var timingPoint = Beatmap.TimingPoints[0];
-            var cur = Beatmap.TimingPoints[0];
-            var next = Beatmap.TimingPoints[1];
-            foreach (var tp in Beatmap.TimingPoints)
-            {
-                if (cur.Position < time && next.Position > time)
-                {
-                    timingPoint = cur;
-                }
-
-                cur = next;
-            }
-
-            return timingPoint;
-        }
-
-        /// <summary>
-        /// Find and return the nearest object on the specified line. The nearest object is the first object on the line.
-        /// </summary>
-        /// <param name="line">Line starting from 1 to KeyAmount</param>
-        /// <param name="isLongNote">If using Hold Note</param>
-        /// <returns>Nearest object on specified line within the threshold if found one, otherwise return null</returns>
-        public HitObject GetNearestHitObjectOnLine(int line, bool isLongNote = false)
-        {
-            // If there are no objects on the line, return null
-            if (SeparatedLines[line - 1].Count == 0)
-                return null;
-
-            // If there are only already pressed objects on the line, return null
-            if (SeparatedLines[line - 1].Count(o => !o.IsPressed) == 0)
-                return null;
-
-            // Find first unpressed object on the line
-            var first = SeparatedLines[line - 1].First(o => !o.IsPressed);
-
-            var ss = GameSystemManager.FindSystem<ScoreSystem>();
-
-            if (!isLongNote)
-                return Math.Abs(FindSystem<GameTimeSystem>().Time - first.Position) <= (ss.HitThresholds[ss.ScoreMiss]) ? first : null;
-
-            // If we're using "Click" notes, we checking the end position of the object
-            return Math.Abs(FindSystem<GameTimeSystem>().Time - first.EndPosition) <= (ss.HitThresholds[ss.ScoreMiss]) ? first : null;
-        }
-
+        
         /// <summary>
         /// Load beatmap from a file with background texture and music file into memory
         /// </summary>
         /// <param name="beatmapName">Name of the beatmap</param>
         /// <returns>Beatmap class</returns>
-        private Beatmap LoadBeatmap(string beatmapName)
+        /*private Beatmap LoadBeatmap(string beatmapName)
         {
+            // TODO: Remove this
             Beatmap beatmap;
 
             // Load Beatmap
+            BeatmapReader beatmapReader = new BeatmapReader(_beatmapProcessor.ProcessorSettings);
+
             try
             {
-                beatmap = BeatmapReader.LoadFromFile(_game.GraphicsDevice,
-                    _game.Services.GetService<GameSettings>().BeatmapFolder, beatmapName, out _background, out _music);
+                beatmap = beatmapReader.ReadBeatmap(_game.GraphicsDevice,
+                    beatmapName, "test");
             }
             catch (Exception e)
             {
+                LogHelper.Log($"Error while reading beatmap: {e.Message}");
                 // TODO: If there was an error while loading map, return to the song select menu and pop up a notification to user
                 throw new Exception(e.Message);
             }
 
-            // Create separated lines collection and fill them
-            SeparatedLines = new List<HitObject>[beatmap.Settings.Difficulty.KeyAmount];
-            for (int i = 0; i < SeparatedLines.Length; i++)
-                SeparatedLines[i] = beatmap.HitObjects.FindAll(o => o.Line == i + 1);
-
             return beatmap;
-        }
+        }*/
 
         /// <summary>
         /// Add event handlers to all the hit objects from all the game systems if it should process hit objects
         /// </summary>
         private void InitializeAllHitObjects()
         {
-            foreach (var separatedLine in SeparatedLines)
-                foreach (var hitObject in separatedLine)
-                    foreach (var system in GameSystemManager.GetAllGameSystems())
-                        if (system is IGameSystemProcessHitObject)
-                            hitObject.OnPress += (system as IGameSystemProcessHitObject).OnHitObjectHit;
+            foreach (var hitObject in Beatmap.HitObjects)
+                foreach (var system in GameSystemManager.GetAllGameSystems())
+                    if (system is IGameSystemProcessHitObject)
+                        hitObject.OnHit += (system as IGameSystemProcessHitObject).OnHitObjectHit;
         }
     }
 }

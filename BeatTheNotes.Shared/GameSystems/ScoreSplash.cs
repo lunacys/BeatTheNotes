@@ -3,12 +3,12 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BeatTheNotes.GameSystems
 {
-    public class Splash
+    public class ScoreSplash
     {
         public Texture2D Texture { get; }
         public int MsBeforeExpire { get; private set; }
 
-        public Splash(Texture2D texture)
+        public ScoreSplash(Texture2D texture)
         {
             Texture = texture;
             MsBeforeExpire = 900;

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using BeatTheNotes.Framework.GameSystems;
+﻿using BeatTheNotes.Framework.GameSystems;
 using BeatTheNotes.GameSystems;
 using Microsoft.Xna.Framework;
+using MonoGame.Extended.Screens;
 
 namespace BeatTheNotes.Shared.GameSystems
 {
@@ -28,10 +26,10 @@ namespace BeatTheNotes.Shared.GameSystems
         {
             base.Initialize();
 
-            var scoreSys = FindSystem<ScoreSystem>();
+            var scoreSys = FindSystem<ScoreV1System>();
             scoreSys.OnScoreGet += OnScoreGet;
         }
-        
+
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
@@ -54,7 +52,7 @@ namespace BeatTheNotes.Shared.GameSystems
 
         private void OnScoreGet(object sender, OnScoreGetEventHandler eh)
         {
-            var scoreSys = FindSystem<ScoreSystem>();
+            var scoreSys = FindSystem<ScoreV1System>();
 
             if (eh.HitValueName == scoreSys.ScoreMarvelous)
                 Health += 2 * HpDrainRate;

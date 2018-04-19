@@ -4,7 +4,6 @@ using System.IO;
 using BeatTheNotes.Framework.Logging;
 using BeatTheNotes.Framework.Settings;
 using BeatTheNotes.Framework.Skins;
-using BeatTheNotes.Input;
 using BeatTheNotes.Screens;
 using BeatTheNotes.GameSystems;
 using Microsoft.Xna.Framework;
@@ -34,7 +33,7 @@ namespace BeatTheNotes
 
         public GameRoot()
         {
-            LogHelper.Log($"======= Starting Jackhammer at {DateTime.Now} =======");
+            LogHelper.Log($"======= Starting BeatTheNotes at {DateTime.Now} =======");
 
             if (File.Exists("settings.json"))
             {
@@ -64,7 +63,7 @@ namespace BeatTheNotes
             _graphics.PreferredBackBufferWidth = _settings.WindowWidth;
             _graphics.PreferredBackBufferHeight = _settings.WindowHeight;
 
-
+            IsMouseVisible = true;
 #if WIN || LINUX
             _graphics.IsFullScreen = _settings.IsFullscreen;
 #elif ANDROID
@@ -102,7 +101,9 @@ namespace BeatTheNotes
 
             _screenComponent = new ScreenGameComponent(this);
             Components.Add(_screenComponent);
-            GameplayScreen gameplayScreen = new GameplayScreen(this, "test");
+            PlaySongSelectScreen playSongSelectScreen = new PlaySongSelectScreen(this);
+            _screenComponent.Register(playSongSelectScreen);
+            GameplayScreen gameplayScreen = new GameplayScreen(this);
             _screenComponent.Register(gameplayScreen);
             PauseScreen ps = new PauseScreen(this);
             _screenComponent.Register(ps);

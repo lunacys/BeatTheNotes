@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using BeatTheNotes.Framework.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace BeatTheNotes.Framework.Input
 {
-    public class InputHandler
+    public class InputHandler : GameComponent
     {
         public Vector2 MousePosition { get; private set; }
         public Vector2 MouseVelocity { get; private set; }
@@ -17,17 +16,28 @@ namespace BeatTheNotes.Framework.Input
         private MouseState _mouseState, _oldMouseState;
         private Vector2 _oldMousePosition;
 
+        private readonly GameWindow _window;
+
         private readonly IInputCommand _nullCommand;
 
         // input commands for the keys from 0 to 9 (0 is 1k mode, 1 is 2k and so on)
         private readonly Dictionary<Keys, IInputCommand> _inputCommands;
 
+        public event EventHandler<InputHandlerOnCommandAdd> OnCommandAdded;
 
-        public InputHandler()
+        public InputHandler(Game game) : base(game)
         {
             _inputCommands = new Dictionary<Keys, IInputCommand>();
 
             _nullCommand = new InputNullCommand();
+
+            _window = game.Window;
+        }
+
+        public IInputCommand this[Keys key]
+        {
+            get => _inputCommands[key];
+            set => RegisterKeyCommand(key, value);
         }
 
         public void RegisterKeyCommand(Keys key, IInputCommand command)
@@ -36,6 +46,8 @@ namespace BeatTheNotes.Framework.Input
                 throw new InputCommandAlreadyRegisteredException(command);
 
             _inputCommands[key] = command;
+
+            OnCommandAdded?.Invoke(this, new InputHandlerOnCommandAdd(this, key, command));
         }
 
         /// <summary>
@@ -56,14 +68,14 @@ namespace BeatTheNotes.Framework.Input
             yield return _nullCommand;
         }
 
-        public void Update(Game game)
+        public override void Update(GameTime gameTime)
         {
             _oldKeyboardState = _keyboardState;
             _oldMouseState = _mouseState;
             _oldMousePosition = _oldMouseState.Position.ToVector2();
 
             _keyboardState = Keyboard.GetState();
-            _mouseState = Mouse.GetState(game.Window);
+            _mouseState = Mouse.GetState(_window);
             MousePosition = _mouseState.Position.ToVector2();
 
             MouseVelocity = MousePosition - _oldMousePosition;

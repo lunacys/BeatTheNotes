@@ -1,8 +1,7 @@
-﻿using System;
-using System.Linq;
-using BeatTheNotes.Framework.GameSystems;
+﻿using BeatTheNotes.Framework.GameSystems;
 using BeatTheNotes.GameSystems;
 using Microsoft.Xna.Framework;
+using MonoGame.Extended.Screens;
 
 namespace BeatTheNotes.Shared.GameSystems
 {
@@ -26,12 +25,12 @@ namespace BeatTheNotes.Shared.GameSystems
         {
             base.Reset();
 
-            var gm = FindSystem<GameplaySystem>();
-            var pos = gm.Beatmap.HitObjects[0].Position;
-            
+            //var gm = FindSystem<GameplaySystem>();
+            //var pos = gm.Beatmap.HitObjects[0].Position;
+
 
             Time = -220;
-            
+
         }
     }
 }

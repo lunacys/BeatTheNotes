@@ -4,6 +4,7 @@ using BeatTheNotes.Framework.GameSystems;
 using BeatTheNotes.Framework;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.Screens;
 
 namespace BeatTheNotes.GameSystems
 {
@@ -22,13 +23,11 @@ namespace BeatTheNotes.GameSystems
             set;
         }
 
-        private List<Score> _scores;
+        private List<ScoremeterScore> _scores;
 
         public ScoremeterSystem(GraphicsDevice graphicsDevice)
         {
             _spriteBatch = new SpriteBatch(graphicsDevice);
-
-            
         }
 
         public override void Initialize()
@@ -38,12 +37,12 @@ namespace BeatTheNotes.GameSystems
             GameplaySystem gs = GameSystemManager.FindSystem<GameplaySystem>();
 
             
-            _scores = new List<Score>();
+            _scores = new List<ScoremeterScore>();
             _od = gs.Beatmap.Settings.Difficulty.OverallDifficutly;
 
             SizeMultiplier = 1.0f;
 
-            var scoreSys = FindSystem<ScoreSystem>();
+            var scoreSys = FindSystem<ScoreV1System>();
 
             Size = new Vector2((float)scoreSys.HitThresholds[scoreSys.ScoreMiss] * 2.0f, 8);
             Position = new Vector2(
@@ -76,7 +75,7 @@ namespace BeatTheNotes.GameSystems
 
         public void AddScore(long currentTime, long hitObjectPosition, string hit)
         {
-            _scores.Add(new Score(currentTime - hitObjectPosition, 3000, hit));
+            _scores.Add(new ScoremeterScore(currentTime - hitObjectPosition, 3000, hit));
         }
 
         public override void Draw(GameTime gameTime)
@@ -99,7 +98,7 @@ namespace BeatTheNotes.GameSystems
 
         private void DrawBaseRect()
         {
-            var scoreSys = FindSystem<ScoreSystem>();
+            var scoreSys = FindSystem<ScoreV1System>();
 
             // miss
             _spriteBatch.FillRectangle(Position, Size, _hitColors[scoreSys.ScoreMiss]);

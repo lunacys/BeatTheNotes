@@ -2,7 +2,7 @@
 
 namespace BeatTheNotes.GameSystems
 {
-    public class Score
+    public class ScoremeterScore
     {
         public long Position { get; }
         public int MsBeforeExpire { get; private set; }
@@ -10,7 +10,7 @@ namespace BeatTheNotes.GameSystems
 
         public bool IsExpired => MsBeforeExpire <= 0;
 
-        public Score(long position, int msBeforeExpire, string hit)
+        public ScoremeterScore(long position, int msBeforeExpire, string hit)
         {
             Position = position;
             MsBeforeExpire = msBeforeExpire;
