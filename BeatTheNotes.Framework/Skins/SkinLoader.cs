@@ -22,7 +22,7 @@ namespace BeatTheNotes.Framework.Skins
                 t = Texture2D.FromStream(device, fs);
             }
 
-            LogHelper.Log($"SkinLoader: Sucessfully loaded asset '{filename}'");
+            LogHelper.Log($"SkinLoader: Successfully loaded asset '{filename}'");
 
             return t;
         }
@@ -37,7 +37,7 @@ namespace BeatTheNotes.Framework.Skins
             using (var fs = new FileStream(filename, FileMode.Open))
                 se = SoundEffect.FromStream(fs);
 
-            LogHelper.Log($"SkinLoader: Sucessfully loaded asset '{filename}'");
+            LogHelper.Log($"SkinLoader: Successfully loaded asset '{filename}'");
 
             return se;
         }
