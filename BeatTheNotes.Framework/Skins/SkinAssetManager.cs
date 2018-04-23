@@ -28,14 +28,21 @@ namespace BeatTheNotes.Framework.Skins
         public T Load<T>(string assetName)
         {
             // Get current assembly
-            var loaderAssembly = Assembly.GetCallingAssembly();
+            var loaderAssembly = Assembly.GetExecutingAssembly();
 
-            // TODO: Maybe should check the type if its interface type is T
-            // Get first class than realizes ISkinAssetLoader interface
+            Console.WriteLine($"Name: {loaderAssembly.FullName}");
+
+            // Get first class than implements ISkinAssetLoader interface with generic type T
             var type = loaderAssembly
-                .GetTypes().FirstOrDefault(t => t.IsClass && t.GetInterface(nameof(ISkinAssetLoader<T>)) != null);
+                .GetTypes()
+                .FirstOrDefault(t => t.IsClass && t.GetInterfaces().Any(x =>
+                                         x.IsGenericType &&
+                                         x.GetGenericTypeDefinition() == typeof(ISkinAssetLoader<>) &&
+                                         x.GetGenericArguments()[0] == typeof(T)));
 
             if (type == null) throw new InvalidOperationException("Cannot find loader for this asset type");
+
+            Console.WriteLine($"Full Name: {type.FullName}");
 
             foreach (var attribute in type.GetCustomAttributes(false)
                 .Where(a => a is SkinAssetLoaderAttribute))
@@ -45,6 +52,7 @@ namespace BeatTheNotes.Framework.Skins
             }
 
             // Create instance of it
+            // TODO: Need to pass constructor parameters to the instance if it has ones
             var assetLoader = (ISkinAssetLoader<T>)loaderAssembly.CreateInstance(type.FullName, true);
 
             // Pass through the Load method 
