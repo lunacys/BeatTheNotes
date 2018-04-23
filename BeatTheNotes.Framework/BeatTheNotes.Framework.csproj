@@ -87,6 +87,14 @@
     <Compile Include="Beatmaps\BeatmapSettingsMetadata.cs" />
     <Compile Include="Beatmaps\BeatmapWriter.cs" />
     <Compile Include="Beatmaps\GameMode.cs" />
+    <Compile Include="Skins\AssetLoaders\BitmapFontAssetLoader.cs" />
+    <Compile Include="Skins\AssetLoaders\SoundEffectAssetLoader.cs" />
+    <Compile Include="Skins\AssetLoaders\SpriteFontAssetLoader.cs" />
+    <Compile Include="Skins\AssetLoaders\TextureAssetLoader.cs" />
+    <Compile Include="Skins\AssetLoaders\ISkinAssetLoader.cs" />
+    <Compile Include="Skins\SkinAsset.cs" />
+    <Compile Include="Skins\SkinAssetLoaderAttribute.cs" />
+    <Compile Include="Skins\SkinAssetManager.cs" />
     <Compile Include="TimingPoints\TimingPointContainer.cs" />
     <Compile Include="Objects\HitObject.cs" />
     <Compile Include="Objects\HitObjectContainer.cs" />

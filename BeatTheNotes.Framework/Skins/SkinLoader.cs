@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 
 namespace BeatTheNotes.Framework.Skins
 {
+    [Obsolete("Use the SkinAssetManager instead")]
     public static class SkinLoader
     {
         private static Texture2D LoadTextureFromFile(GraphicsDevice device, string filename)
@@ -42,7 +43,7 @@ namespace BeatTheNotes.Framework.Skins
             return se;
         }
 
-        public static Skin LoadDefault(ContentManager content)
+        private static Skin LoadDefault(ContentManager content)
         {
             Skin skin = new Skin();
             try
