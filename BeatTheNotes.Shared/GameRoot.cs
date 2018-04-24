@@ -29,6 +29,8 @@ namespace BeatTheNotes
         private Skin _usedSkin;
         private GameSettings _settings;
 
+        private SkinAssetManager _skinAssetManager;
+
         private int _minFps = Int32.MaxValue, _maxFps = 0;
 
         public GameRoot()
@@ -97,7 +99,11 @@ namespace BeatTheNotes
                 _settings.Skin = "Default";
             }
 
+            _skinAssetManager = new SkinAssetManager(GraphicsDevice, _settings);
+            _skinAssetManager.Load<Texture2D>("Button.png");
+
             Services.AddService(_usedSkin);
+            Services.AddService(_skinAssetManager);
 
             _screenComponent = new ScreenGameComponent(this);
             Components.Add(_screenComponent);

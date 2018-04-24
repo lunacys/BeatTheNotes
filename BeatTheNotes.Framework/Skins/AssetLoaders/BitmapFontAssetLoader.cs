@@ -13,6 +13,8 @@ namespace BeatTheNotes.Framework.Skins.AssetLoaders
 
         public BitmapFont LoadAsset(string filename)
         {
+            //BitmapFont bmFont = new BitmapFont(filename, );
+
             throw new System.NotImplementedException();
         }
     }

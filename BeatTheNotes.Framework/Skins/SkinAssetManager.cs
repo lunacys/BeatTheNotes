@@ -6,26 +6,41 @@ using System.Reflection;
 using BeatTheNotes.Framework.Settings;
 using BeatTheNotes.Framework.Skins.AssetLoaders;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
 
 namespace BeatTheNotes.Framework.Skins
 {
-    public sealed class SkinAssetManager
+    public class SkinAssetManager
     {
-        private Dictionary<string, object> _loadedAssets = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _loadedAssets = new Dictionary<string, object>();
 
-        private GraphicsDevice _graphicsDevice;
+        private readonly GraphicsDevice _graphicsDevice;
+        private readonly GameSettings _gameSettings;
 
         public string SkinFolder { get; }
+        public string CurrentSkinName { get; set; }
+
+        public string SkinSettingsFilename => "Settings.json";
 
         public SkinAssetManager(GraphicsDevice graphicsDevice, GameSettings gameSettings)
         {
             _graphicsDevice = graphicsDevice;
+            _gameSettings = gameSettings;
+
             SkinFolder = gameSettings.SkinsFolder;
+
+            CurrentSkinName = gameSettings.Skin;
         }
 
         public object this[string name] => _loadedAssets[name];
 
-        public T Load<T>(string assetName)
+        /// <summary>
+        /// Load an asset from the <see cref="SkinFolder"/> using the <see cref="CurrentSkinName"/>
+        /// </summary>
+        /// <typeparam name="T">Type of asset</typeparam>
+        /// <param name="assetName">Asset name</param>
+        /// <returns>The asset</returns>
+        public virtual T Load<T>(string assetName)
         {
             // Get current assembly
             var loaderAssembly = Assembly.GetExecutingAssembly();
@@ -44,16 +59,26 @@ namespace BeatTheNotes.Framework.Skins
 
             Console.WriteLine($"Full Name: {type.FullName}");
 
-            foreach (var attribute in type.GetCustomAttributes(false)
+            /*foreach (var attribute in type.GetCustomAttributes(false)
                 .Where(a => a is SkinAssetLoaderAttribute))
             {
                 var a = attribute as SkinAssetLoaderAttribute;
+            }*/
 
+            ISkinAssetLoader<T> assetLoader;
+
+            // If it is a graphic asset, we should set its GraphicsDevice property
+            if (type.GetInterfaces().Any(x => x == typeof(ISkinAssetGraphic)))
+            {
+                var graphAsset = (ISkinAssetGraphic)Activator.CreateInstance(type);
+                graphAsset.GraphicsDevice = _graphicsDevice;
+
+                assetLoader = graphAsset as ISkinAssetLoader<T>;
             }
-
-            // Create instance of it
-            // TODO: Need to pass constructor parameters to the instance if it has ones
-            var assetLoader = (ISkinAssetLoader<T>)loaderAssembly.CreateInstance(type.FullName, true);
+            else
+            {
+                assetLoader = (ISkinAssetLoader<T>)Activator.CreateInstance(type);
+            }
 
             // Pass through the Load method 
             var asset = Load(assetName, assetLoader);
@@ -61,9 +86,14 @@ namespace BeatTheNotes.Framework.Skins
             return asset;
         }
 
-        public T Load<T>(string assetName, ISkinAssetLoader<T> assetLoader)
+        private bool CanRead(Type type)
         {
-            var filepath = Path.Combine(SkinFolder, assetLoader.AssetSubdirectory, assetName);
+            return true;
+        }
+
+        private T Load<T>(string assetName, ISkinAssetLoader<T> assetLoader)
+        {
+            var filepath = Path.Combine(SkinFolder, CurrentSkinName, assetLoader.AssetSubdirectory, assetName);
 
             if (!File.Exists(filepath))
                 throw new FileNotFoundException();

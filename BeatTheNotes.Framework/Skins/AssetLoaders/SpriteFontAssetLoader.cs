@@ -13,6 +13,7 @@ namespace BeatTheNotes.Framework.Skins.AssetLoaders
 
         public SpriteFont LoadAsset(string filename)
         {
+            SpriteFont spriteFont;
             throw new System.NotImplementedException();
         }
     }

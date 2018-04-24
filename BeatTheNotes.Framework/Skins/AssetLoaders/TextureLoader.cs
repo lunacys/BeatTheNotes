@@ -1,22 +1,25 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BeatTheNotes.Framework.Skins.AssetLoaders
 {
-    [SkinAssetLoader(".png", ".jpg", ".bmp", ".gif", ".tif", ".dds")]
-    public class TextureAssetLoader : ISkinAssetLoader<Texture2D>
+    [SkinAssetLoader("Texture", ".png", ".jpg", ".bmp", ".gif", ".tif", ".dds")]
+    public class TextureLoader : ISkinAssetLoader<Texture2D>, ISkinAssetGraphic
     {
         public string AssetSubdirectory { get; }
-        public GraphicsDevice GraphicsDevice { get; }
+        public GraphicsDevice GraphicsDevice { get; set; }
 
-        public TextureAssetLoader(GraphicsDevice graphicsDevice)
+        public TextureLoader()
         {
-            GraphicsDevice = graphicsDevice;
             AssetSubdirectory = "Images";
         }
 
         public Texture2D LoadAsset(string filename)
         {
+            if (GraphicsDevice == null)
+                throw new InvalidOperationException("Please initialize GrapicsDevice first");
+
             Texture2D t;
 
             using (var fs = new FileStream(filename, FileMode.Open))

@@ -67,6 +67,7 @@ namespace BeatTheNotes.Framework.Skins
         }
 
         public SkinSettings(GameSettings gameSettings)
+            : this()
         {
             // TODO: Initialize all values by GameSettings
         }

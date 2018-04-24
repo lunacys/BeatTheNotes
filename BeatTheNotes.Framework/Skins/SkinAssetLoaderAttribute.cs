@@ -8,15 +8,19 @@ namespace BeatTheNotes.Framework.Skins
     {
         private readonly List<string> _fileExtensions = new List<string>();
 
+        public string Name { get; set; }
+
         public IEnumerable<string> FileExtensions => _fileExtensions;
 
-        public SkinAssetLoaderAttribute(string fileExtension)
+        public SkinAssetLoaderAttribute(string name, string fileExtension)
         {
+            Name = name;
             _fileExtensions.Add(fileExtension);
         }
 
-        public SkinAssetLoaderAttribute(params string[] fileExtensions)
+        public SkinAssetLoaderAttribute(string name, params string[] fileExtensions)
         {
+            Name = name;
             _fileExtensions.AddRange(fileExtensions);
         }
     }

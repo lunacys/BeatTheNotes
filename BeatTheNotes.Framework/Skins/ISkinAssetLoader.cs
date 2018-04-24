@@ -1,4 +1,4 @@
-﻿namespace BeatTheNotes.Framework.Skins.AssetLoaders
+﻿namespace BeatTheNotes.Framework.Skins
 {
     public interface ISkinAssetLoader<out T>
     {
