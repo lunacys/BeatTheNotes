@@ -41,6 +41,8 @@ namespace BeatTheNotes.Framework.Settings
         public int SongVolume { get; set; }
         public int ScrollingSpeed { get; set; }
 
+        public string SkinsFolder { get; set; }
+
         public string Skin { get; set; }
 
         public string BeatmapFolder { get; set; }
@@ -83,6 +85,8 @@ namespace BeatTheNotes.Framework.Settings
 
             HitsoundVolumeF = 1.0f;
             SongVolumeF = 1.0f;
+
+            SkinsFolder = "Skins";
 
             Skin = "Default";
 

@@ -87,6 +87,19 @@
     <Compile Include="Beatmaps\BeatmapSettingsMetadata.cs" />
     <Compile Include="Beatmaps\BeatmapWriter.cs" />
     <Compile Include="Beatmaps\GameMode.cs" />
+    <Compile Include="FpsCounter.cs" />
+    <Compile Include="Graphs\GraphCanvas.cs" />
+    <Compile Include="Graphs\GraphNode.cs" />
+    <Compile Include="MathHelperExtensions.cs" />
+    <Compile Include="Skins\AssetLoaders\BitmapFontAssetLoader.cs" />
+    <Compile Include="Skins\ISkinAssetGraphic.cs" />
+    <Compile Include="Skins\AssetLoaders\SoundEffectAssetLoader.cs" />
+    <Compile Include="Skins\AssetLoaders\SpriteFontAssetLoader.cs" />
+    <Compile Include="Skins\AssetLoaders\TextureLoader.cs" />
+    <Compile Include="Skins\ISkinAssetLoader.cs" />
+    <Compile Include="Skins\SkinAssetDefaultManager.cs" />
+    <Compile Include="Skins\SkinAssetLoaderAttribute.cs" />
+    <Compile Include="Skins\SkinAssetManager.cs" />
     <Compile Include="TimingPoints\TimingPointContainer.cs" />
     <Compile Include="Objects\HitObject.cs" />
     <Compile Include="Objects\HitObjectContainer.cs" />
@@ -100,7 +113,6 @@
     <Compile Include="GameSystems\IGameSystemManager.cs" />
     <Compile Include="GameSystems\IGameSystemProcessHitObject.cs" />
     <Compile Include="GameSystems\GameSystemAddedEventArgs.cs" />
-    <Compile Include="Graphs\Graph.cs" />
     <Compile Include="Input\IInputCommand.cs" />
     <Compile Include="Input\InputCommandAlreadyRegisteredException.cs" />
     <Compile Include="Input\InputHandler.cs" />
