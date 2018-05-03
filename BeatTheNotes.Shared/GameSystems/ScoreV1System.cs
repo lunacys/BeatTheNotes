@@ -295,9 +295,9 @@ namespace BeatTheNotes.GameSystems
             }
             else throw new InvalidDataException("ScoremeterScore not found");
 
-            OnScoreGet?.Invoke(this, new OnScoreGetEventHandler(hitValueName, HitValues[hitValueName]));
+            OnScoreGet?.Invoke(this, new OnScoreGetEventHandler(hitValueName, HitValues[hitValueName], (float)FindSystem<GameTimeSystem>().Time - hitObject.Position));
             GameSystemManager.FindSystem<ScoremeterSystem>()?.AddScore((long)FindSystem<GameTimeSystem>().Time,
-                (hitObject as NoteHold)?.EndPosition ?? hitObject.Position, hitValueName);
+                hitObject.Position, hitValueName);
 
             ProceedCombo(hitValue);
             CalculateScore(hitValueName);

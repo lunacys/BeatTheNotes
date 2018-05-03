@@ -1,6 +1,8 @@
 ﻿#region Using Statements
 using System;
 using System.IO;
+using BeatTheNotes.Framework;
+using BeatTheNotes.Framework.Graphs;
 using BeatTheNotes.Framework.Logging;
 using BeatTheNotes.Framework.Settings;
 using BeatTheNotes.Framework.Skins;
@@ -23,7 +25,7 @@ namespace BeatTheNotes
     {
         private readonly GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private FramesPerSecondCounter fps;
+        private FpsCounter _fpsCounter;
         private ScreenGameComponent _screenComponent;
 
         private Skin _usedSkin;
@@ -31,7 +33,9 @@ namespace BeatTheNotes
 
         private SkinAssetManager _skinAssetManager;
 
-        private int _minFps = Int32.MaxValue, _maxFps = 0;
+        private GraphCanvas _graphCanvas;
+
+        private float _minFps = float.MaxValue, _maxFps = 0;
 
         public GameRoot()
         {
@@ -57,10 +61,9 @@ namespace BeatTheNotes
 
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            fps = new FramesPerSecondCounter();
 
-            _graphics.SynchronizeWithVerticalRetrace = _settings.IsUsedVSync;
-            TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 2000.0f);
+            _graphics.SynchronizeWithVerticalRetrace = true;//_settings.IsUsedVSync;
+            //TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 2000.0f);
 
             _graphics.PreferredBackBufferWidth = _settings.WindowWidth;
             _graphics.PreferredBackBufferHeight = _settings.WindowHeight;
@@ -76,6 +79,23 @@ namespace BeatTheNotes
         protected override void Initialize()
         {
             LogHelper.Log("Game Root: Initialize..");
+
+            _fpsCounter = new FpsCounter(this);
+
+            Components.Add(_fpsCounter);
+
+            _graphCanvas = new GraphCanvas(this)
+            {
+                Position = new Vector2(660, 256),
+                Size = new Size2(600, 100)
+            };
+            Components.Add(_graphCanvas);
+
+            _fpsCounter.OnFpsUpdate += (sender, args) =>
+            {
+                FpsCounter fpsCounter = (FpsCounter)sender;
+                _graphCanvas.PushValue(fpsCounter.FramesPerSecond);
+            };
 
             base.Initialize();
 
@@ -105,6 +125,8 @@ namespace BeatTheNotes
             Services.AddService(_usedSkin);
             Services.AddService(_skinAssetManager);
 
+
+
             _screenComponent = new ScreenGameComponent(this);
             Components.Add(_screenComponent);
             PlaySongSelectScreen playSongSelectScreen = new PlaySongSelectScreen(this);
@@ -113,6 +135,8 @@ namespace BeatTheNotes
             _screenComponent.Register(gameplayScreen);
             PauseScreen ps = new PauseScreen(this);
             _screenComponent.Register(ps);
+
+            _graphCanvas.Font = _usedSkin.Font;
 
             base.LoadContent();
 
@@ -167,28 +191,26 @@ namespace BeatTheNotes
                 SoundEffect.MasterVolume = _settings.HitsoundVolumeF;
             }*/
 
-            fps.Update(gameTime);
-            if (fps.FramesPerSecond < _minFps)
-                _minFps = fps.FramesPerSecond;
-            if (fps.FramesPerSecond > _maxFps)
-                _maxFps = fps.FramesPerSecond;
-
             base.Update(gameTime);
+
+            if (_fpsCounter.FramesPerSecond < _minFps)
+                _minFps = _fpsCounter.FramesPerSecond;
+            if (_fpsCounter.FramesPerSecond > _maxFps)
+                _maxFps = _fpsCounter.FramesPerSecond;
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            fps.Draw(gameTime);
             base.Draw(gameTime);
 
+            _graphCanvas.Draw(gameTime);
+
             _spriteBatch.Begin();
-            _spriteBatch.DrawString(_usedSkin.Font, $"FPS: {fps.FramesPerSecond}\nMin: {_minFps}\nMax: {_maxFps}",
+            _spriteBatch.DrawString(_usedSkin.Font, $"FPS: {_fpsCounter.FramesPerSecond:F1}\nMin: {_minFps}\nMax: {_maxFps:F1}",
                 new Vector2(_settings.WindowWidth - 80, _settings.WindowHeight - 18 * 3), Color.Red);
             _spriteBatch.End();
-
-
         }
     }
 }
