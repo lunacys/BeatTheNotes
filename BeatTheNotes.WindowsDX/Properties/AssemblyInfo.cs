@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("BeatTheNotes.DesktopGL")]
-[assembly: AssemblyProduct("BeatTheNotes.DesktopGL")]
+[assembly: AssemblyTitle("BeatTheNotes.WindowsDX")]
+[assembly: AssemblyProduct("BeatTheNotes.WindowsDX")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("7ab50f67-d8da-414e-8179-28a12982e286")]
+[assembly: Guid("dfb603b3-33c0-48e3-a74f-2dbc4ac85bd5")]
 
 // Version information for an assembly consists of the following four values:
 //

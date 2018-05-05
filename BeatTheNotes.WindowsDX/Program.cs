@@ -1,8 +1,9 @@
 ﻿using System;
 using BeatTheNotes.Shared;
 
-namespace BeatTheNotes.DesktopGL
+namespace BeatTheNotes.WindowsDX
 {
+#if WINDOWS || LINUX
     /// <summary>
     /// The main class.
     /// </summary>
@@ -18,4 +19,5 @@ namespace BeatTheNotes.DesktopGL
                 game.Run();
         }
     }
+#endif
 }
