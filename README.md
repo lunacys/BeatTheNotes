@@ -8,7 +8,7 @@ It means that no code is ready yet. We'll get to write code after the game & eng
 
 **BeatTheNotes** is an open-source cross-platform rhythm game with rich capabilities of enhancing your gameplay expireince.
 
-The game will have modules (extensions) support, which allows anyone who knows C# at the basic level create an add-on to the game or even to the game editor. See more in the [Modding](#Modding) section.
+The game will have modules (extensions) support, which allows anyone who knows C# at the basic level create an add-on to the game or even to the game editor. See more in the [Modding](#modding) section.
 
 In fact, it is a '*reincarnation*' of my university course work [Notemania](https://github.com/lunacys/Notemania).
 
