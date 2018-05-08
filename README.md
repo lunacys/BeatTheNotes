@@ -2,6 +2,8 @@
 
 ## Current project stage: Creating Game & Engine Architecture
 
+It means that no code is ready yet. We'll get to write code after the game & engine architecture is done.
+
 ## Description
 
 **BeatTheNotes** is an open-source cross-platform rhythm game with rich capabilities of enhancing your gameplay expireince.
@@ -12,11 +14,12 @@ In fact, it is a '*reincarnation*' of my university course work [Notemania](http
 
 **BeatTheNotes** is fully written in C# using [MonoGame Framework](http://monogame.net) and [MonoGame.Extended](https://github.com/craftworkgames/MonoGame.Extended).
 
-**BeatTheNotes** will be available in **Windows**, **Linux**, **OS X** and **Android** systems.
+**BeatTheNotes** will be available on **Windows**, **Linux**, **OS X** and **Android**.
 
 ## Platform support
 
-- [x] Windows
+- [ ] Windows (DirectX)
+- [ ] Windows (OpenGL)
 - [ ] Linux
 - [ ] OS X
 - [ ] Android
