@@ -24,6 +24,18 @@ In fact, it is a '*reincarnation*' of my university course work [Notemania](http
 - [ ] OS X
 - [ ] Android
 
+## Current goals
+
+- Good platform support, it means that the game should both look and plays the same on all the platforms
+- A simple customization tools for skins and in-game UI
+- Competitive Vs and Co-op multiplayer mode
+- Competitions with user replays and bots. Players can play against either an other player's replay or a bot
+- Practice and training game modes
+- A good game tutorial throughout all the game components
+- An each instrument game mode. This mode will separate all the music instruments into different column group, it will allow players to co-op, each player will play his own instrument. Instrument examples: drums, leads, bass line, etc.
+- Modding support using the simple built-in Lua API. Using the API players can create a new game mode or a map editor extension
+- The game should be as easier to get into as possible
+
 ## Building
 
 To be able to build **BeatTheNotes.DesktopGL** or **BeatTheNotes.WindowsDX** project you need [Visual Studio 2015](https://www.visualstudio.com/) or higher and [MonoGame Framework](http://www.monogame.net/) **3.6** or higher. **MonoGame** will be useful if you would create additional game content using the **Content Pipeline**. If you're sure you will not need it, don't install it.
