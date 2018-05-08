@@ -26,6 +26,8 @@ In fact, it is a '*reincarnation*' of my university course work [Notemania](http
 
 ## Current goals
 
+### Game client
+
 - Good platform support, it means that the game should both look and plays the same on all the platforms
 - A simple customization tools for skins and in-game UI
 - Competitive Vs and Co-op multiplayer mode
@@ -35,6 +37,14 @@ In fact, it is a '*reincarnation*' of my university course work [Notemania](http
 - An each instrument game mode. This mode will separate all the music instruments into different column group, it will allow players to co-op, each player will play his own instrument. Instrument examples: drums, leads, bass line, etc.
 - Modding support using the simple built-in Lua API. Using the API players can create a new game mode or a map editor extension
 - The game should be as easier to get into as possible
+
+### Game server
+
+### Website & Wiki
+
+- Fill wiki with all information about the game and modding
+- See maps, user leaderboards and game mods
+- Store all user data
 
 ## Building
 
