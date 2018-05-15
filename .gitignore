@@ -22,10 +22,6 @@ bld/
 [Oo]bj/
 [Ll]og/
 
-
-# Ignore Android project
-[Bb]eat[Tt]he[Nn]otes[Aa]ndroid/
-
 # Visual Studio 2015 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
