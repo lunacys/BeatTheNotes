@@ -35,8 +35,8 @@ In fact, it is a '*reincarnation*' of my university course work [Notemania](http
 - Practice and training game modes
 - A good game tutorial throughout all the game components
 - An each instrument game mode. This mode will separate all the music instruments into different column group, it will allow players to co-op, each player will play his own instrument. Instrument examples: drums, leads, bass line, etc.
-- Modding support using the simple built-in Lua API. Using the API players can create a new game mode or a map editor extension
-- The game should be as easier to get into as possible
+- Modding support using the simple built-in C# API. Using the API players can create a new game mode or a map editor extension
+- The game should be as easy to get into as possible
 
 ### Game server
 
