@@ -28,7 +28,6 @@ In fact, it is a '*reincarnation*' of my university course work [Notemania](http
 
 ### Game client
 
-- Good platform support, it means that the game should both look and plays the same on all the platforms
 - A simple customization tools for skins and in-game UI
 - Competitive Vs and Co-op multiplayer mode
 - Competitions with user replays and bots. Players can play against either an other player's replay or a bot
@@ -92,7 +91,7 @@ Please note that this repo doesn't contain any maps to play, you can get some fr
 
 - ```BeatTheNotes.WindowsDX``` - **Windows** platform (uses **DirectX**).
 - ```BeatTheNotes.DesktopGL``` - **Windows**, **Linux** & **OS X** platforms (uses **OpenGL**).
-- ```BeatTheNotes.Android``` - **Android** platform.
+- ~~~```BeatTheNotes.Android``` - **Android** platform.~~~
 
 ## Resources
 
