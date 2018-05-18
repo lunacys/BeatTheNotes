@@ -14,15 +14,13 @@ In fact, it is a '*reincarnation*' of my university course work [Notemania](http
 
 **BeatTheNotes** is fully written in C# using [MonoGame Framework](http://monogame.net) and [MonoGame.Extended](https://github.com/craftworkgames/MonoGame.Extended).
 
-**BeatTheNotes** will be available on **Windows**, **Linux**, **OS X** and **Android**.
+**BeatTheNotes** will be available on **Windows**, **Linux**, **OS X**, **Android** and maybe in future on **iOS**.
 
 ## Platform support
 
-- [ ] Windows (DirectX)
-- [ ] Windows (OpenGL)
-- [ ] Linux
-- [ ] OS X
+- [ ] Windows, Linux & OS X (OpenGL)
 - [ ] Android
+- [ ] iOS
 
 ## Current goals
 
@@ -47,11 +45,7 @@ In fact, it is a '*reincarnation*' of my university course work [Notemania](http
 
 ## Building
 
-To be able to build **BeatTheNotes.DesktopGL** or **BeatTheNotes.WindowsDX** project you need [Visual Studio 2015](https://www.visualstudio.com/) or higher and [MonoGame Framework](http://www.monogame.net/) **3.6** or higher. **MonoGame** will be useful if you would create additional game content using the **Content Pipeline**. If you're sure you will not need it, don't install it.
-
-**Please note, that the game uses .NET Framework 4.6.1. You may need to install it.**
-
-If you want to build **Android** project, you'll need to get [Visual Studio](https://www.visualstudio.com/) with **Android Tools** (*Xamarin for Android*).
+Both **BeatTheNotes** and **BeatTheNotes.Framework** uses the **.NET Core 2.0**. Thus you need to download it [.NET Core SDK](https://www.microsoft.com/net/download/windows) **2.0** *or higher*.
 
 First of all, you need to clone the repo:
 
@@ -61,37 +55,23 @@ git clone https://github.com/lunacys/BeatTheNotes.git
 
 Next, open the solution ```BeatTheNotes.sln``` and select required solution configuration - ```Debug``` or ```Release```.
 
-Before you can go building the game, you should update the submodules. The game uses [BeatTheNotes.Dist](https://github.com/lunacys/BeatTheNotes.Dist) submodule, that includes a test map and a test skin:
-
-```bash
-cd BeatTheNotes
-git submodule update --init
-```
-
 Now you can build and run the game.
-
-Please note that this repo doesn't contain any maps to play, you can get some from the ```BeatTheNotes.Dist``` repo. You need the ```Maps``` folder. Just place it into your run directory where executable file is placed, for example:
-
-```bash
-{root directory}/BeatTheNotes.DesktopGL/bin/AnyCPU/Debug
-```
 
 ### Solution Structure
 
 #### Framework
 
-- ```BeatTheNotes.Framework.Portable``` - the game framework that implements all the necessary functions you (and I) can reuse in other games later.
-- ```BeatTheNotes.Framework.Tests``` - game framework unit tests.
-
-#### Shared Code
-
-- ```BeatTheNotes.Shared``` - shared code between the platforms.
+- ```BeatTheNotes.Framework``` (.NET Core 2.0) - the game framework that implements all the necessary functions you (and I) can reuse in, for example, other games.
+- ```BeatTheNotes.Framework.Tests``` (.NET Core 2.0) - game framework unit tests.
 
 #### Platforms
 
-- ```BeatTheNotes.WindowsDX``` - **Windows** platform (uses **DirectX**).
-- ```BeatTheNotes.DesktopGL``` - **Windows**, **Linux** & **OS X** platforms (uses **OpenGL**).
-- ~~~```BeatTheNotes.Android``` - **Android** platform.~~~
+- ```BeatTheNotes``` (.NET Core 2.0) - **Windows**, **Linux** & **OS X** platforms (uses **OpenGL**).
+- ~~~```BeatTheNotes.Android``` (.NET Framework 4.6.2) - **Android** platform.~~~ Removed at the time.
+
+### Dependencies
+
+Both **BeatTheNotes** and **BeatTheNotes.Framework** uses the **MonoGame Framework** as a NuGet package. It will be restored automaticaly once you open your IDE, or you may need to restore it manually.
 
 ## Resources
 
