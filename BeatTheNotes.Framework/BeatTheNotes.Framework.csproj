@@ -24,6 +24,9 @@
     <Reference Include="MonoGame.Extended">
       <HintPath>..\Deps\MonoGame.Extended.dll</HintPath>
     </Reference>
+    <Reference Include="MonoGame.Extended.Input">
+      <HintPath>..\Deps\MonoGame.Extended.Input.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
