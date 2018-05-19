@@ -71,7 +71,7 @@ Now you can build and run the game.
 
 ### Dependencies
 
-Both **BeatTheNotes** and **BeatTheNotes.Framework** uses the **MonoGame Framework** as a NuGet package. It will be restored automaticaly once you open your IDE, or you may need to restore it manually.
+Both **BeatTheNotes** and **BeatTheNotes.Framework** uses the **MonoGame Framework** as a NuGet package. It will be restored automaticaly once you open your IDE, or you may need to restore it manually. Also additional deps are stored in ```Deps/``` directory. Those are .NET Core versions of **MonoGame.Extended** and its modules.
 
 ## Resources
 
