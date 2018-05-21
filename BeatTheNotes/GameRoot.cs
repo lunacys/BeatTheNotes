@@ -4,14 +4,14 @@ using Microsoft.Xna.Framework.Input;
 
 namespace BeatTheNotes
 {
-    public class Game1 : Game
+    public class GameRoot : Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        GraphicsDeviceManager _graphics;
+        SpriteBatch _spriteBatch;
 
-        public Game1()
+        public GameRoot()
         {
-            graphics = new GraphicsDeviceManager(this);
+            _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -20,14 +20,16 @@ namespace BeatTheNotes
         {
             // TODO: Add your initialization logic here
 
+
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+
         }
 
         protected override void Update(GameTime gameTime)
@@ -37,6 +39,7 @@ namespace BeatTheNotes
 
             // TODO: Add your update logic here
 
+
             base.Update(gameTime);
         }
 
@@ -45,6 +48,9 @@ namespace BeatTheNotes
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
+            _spriteBatch.Begin();
+
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }
