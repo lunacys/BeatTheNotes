@@ -164,6 +164,12 @@ namespace BeatTheNotes.Framework.Input
                 case MouseButton.Middle:
                     return _oldMouseState.MiddleButton == ButtonState.Released
                            && _mouseState.MiddleButton == ButtonState.Pressed;
+                case MouseButton.X1:
+                    return _oldMouseState.XButton1 == ButtonState.Released
+                           && _mouseState.XButton1 == ButtonState.Pressed;
+                case MouseButton.X2:
+                    return _oldMouseState.XButton2 == ButtonState.Released
+                           && _mouseState.XButton2 == ButtonState.Pressed;
             }
             return false;
         }
@@ -181,6 +187,12 @@ namespace BeatTheNotes.Framework.Input
                 case MouseButton.Middle:
                     return _oldMouseState.MiddleButton == ButtonState.Pressed
                            && _mouseState.MiddleButton == ButtonState.Released;
+                case MouseButton.X1:
+                    return _oldMouseState.XButton1 == ButtonState.Pressed
+                           && _mouseState.XButton1 == ButtonState.Released;
+                case MouseButton.X2:
+                    return _oldMouseState.XButton2 == ButtonState.Pressed
+                           && _mouseState.XButton2 == ButtonState.Released;
             }
             return false;
         }
@@ -195,6 +207,10 @@ namespace BeatTheNotes.Framework.Input
                     return _mouseState.RightButton == ButtonState.Pressed;
                 case MouseButton.Middle:
                     return _mouseState.MiddleButton == ButtonState.Pressed;
+                case MouseButton.X1:
+                    return _mouseState.XButton1 == ButtonState.Pressed;
+                case MouseButton.X2:
+                    return _mouseState.XButton2 == ButtonState.Pressed;
             }
             return false;
         }
@@ -209,6 +225,10 @@ namespace BeatTheNotes.Framework.Input
                     return _mouseState.RightButton == ButtonState.Released;
                 case MouseButton.Middle:
                     return _mouseState.MiddleButton == ButtonState.Released;
+                case MouseButton.X1:
+                    return _mouseState.XButton1 == ButtonState.Released;
+                case MouseButton.X2:
+                    return _mouseState.XButton2 == ButtonState.Released;
             }
             return false;
         }
