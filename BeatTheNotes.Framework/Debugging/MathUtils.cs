@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 
-namespace BeatTheNotes.Framework.Debug
+namespace BeatTheNotes.Framework.Debugging
 {
     /// <summary>
     /// Implements some useful mathematical functions

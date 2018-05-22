@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace BeatTheNotes.Framework.Debug.Logging
+namespace BeatTheNotes.Framework.Debugging.Logging
 {
     /// <summary>
     /// Provides a logging system which might work on either sync or async.

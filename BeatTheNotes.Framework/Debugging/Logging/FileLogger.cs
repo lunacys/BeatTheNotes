@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace BeatTheNotes.Framework.Debug.Logging
+namespace BeatTheNotes.Framework.Debugging.Logging
 {
     public class FileLogger : Logger
     {

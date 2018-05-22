@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
-namespace BeatTheNotes.Framework.Debug
+namespace BeatTheNotes.Framework.Debugging
 {
     /// <summary>
     /// Smooth FPS counter. Uses the average value from the last <see cref="MaximumSamples"/>. 
@@ -25,6 +25,9 @@ namespace BeatTheNotes.Framework.Debug
 
         public event EventHandler OnFpsUpdate;
 
+        /// <summary>
+        /// Gets the current frames per second
+        /// </summary>
         public float FramesPerSecond { get; protected set; }
 
         //public float AverageFramesPerSecond { get; private set; }
