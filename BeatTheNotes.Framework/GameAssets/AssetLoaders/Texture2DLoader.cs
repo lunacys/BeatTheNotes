@@ -12,7 +12,7 @@ namespace BeatTheNotes.Framework.GameAssets.AssetLoaders
         public Texture2D LoadAsset(string assetFilePath)
         {
             if (GraphicsDevice == null)
-                throw new InvalidOperationException("Please initialize GrapicsDevice first");
+                throw new InvalidOperationException("Please initialize GraphicsDevice first");
 
             Texture2D texture;
 
