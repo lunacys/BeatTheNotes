@@ -8,7 +8,7 @@ namespace BeatTheNotes.Framework.Debugging.Logging
         {
             lock (LockObject)
             {
-                System.Diagnostics.Debug.WriteLine(message);
+                System.Console.WriteLine(message);
             }
         }
 
