@@ -14,15 +14,16 @@ namespace BeatTheNotes.Framework.GameAssets
     public class AssetManager
     {
         private readonly Dictionary<string, object> _loadedAssets = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _assetLoaders = new Dictionary<string, object>();
 
         private readonly GraphicsDevice _graphicsDevice;
 
         /// <summary>
         /// Gets asset directory which is in use
         /// </summary>
-        public string AssetDirectory { get; }
+        public string AssetDirectory { get; set; }
 
-        public AssetManager(GraphicsDevice graphicsDevice, string assetDirectory)
+        public AssetManager(GraphicsDevice graphicsDevice, string assetDirectory = "Content")
         {
             _graphicsDevice = graphicsDevice;
 
@@ -62,28 +63,37 @@ namespace BeatTheNotes.Framework.GameAssets
             IEnumerable<string> assetFileExtensions = new List<string>();
 
             var attribute = type.GetCustomAttributes(false).FirstOrDefault(a => a is AssetLoaderAttribute);
-            if (attribute is AssetLoaderAttribute)
+            if (attribute is AssetLoaderAttribute a1)
             {
-                var a = attribute as AssetLoaderAttribute;
-                assetLoaderName = a.AssetLoaderName;
-                assetSubdirectory = a.AssetSubdirectory;
-                assetFilenameMask = a.AssetFilenameMask;
-                assetFileExtensions = a.AssetFileExtensions;
+                assetLoaderName = a1.AssetLoaderName;
+                assetSubdirectory = a1.AssetSubdirectory;
+                assetFilenameMask = a1.AssetFilenameMask;
+                assetFileExtensions = a1.AssetFileExtensions;
             }
 
             IAssetLoader<T> assetLoader;
 
-            // If it is a graphic asset, we should set its GraphicsDevice property
-            if (type.GetInterfaces().Any(x => x == typeof(IGraphicalAsset)))
+            // Optimization: if we've already used this asset loader we do not need to create instance of it again
+            if (_assetLoaders.ContainsKey(assetLoaderName))
             {
-                var graphAsset = (IGraphicalAsset)Activator.CreateInstance(type);
-                graphAsset.GraphicsDevice = _graphicsDevice;
-
-                assetLoader = graphAsset as IAssetLoader<T>;
+                assetLoader = (IAssetLoader<T>)_assetLoaders[assetLoaderName];
             }
             else
             {
-                assetLoader = (IAssetLoader<T>)Activator.CreateInstance(type);
+                // If it is a graphic asset, we should set its GraphicsDevice property
+                if (type.GetInterfaces().Any(x => x == typeof(IGraphicalAsset)))
+                {
+                    var graphAsset = (IGraphicalAsset)Activator.CreateInstance(type);
+                    graphAsset.GraphicsDevice = _graphicsDevice;
+
+                    assetLoader = graphAsset as IAssetLoader<T>;
+                }
+                else
+                {
+                    assetLoader = (IAssetLoader<T>)Activator.CreateInstance(type);
+                }
+
+                _assetLoaders[assetLoaderName] = assetLoader;
             }
 
             // Pass through the Load method 
