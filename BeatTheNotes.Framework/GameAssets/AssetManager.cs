@@ -40,6 +40,9 @@ namespace BeatTheNotes.Framework.GameAssets
         /// <returns>The asset</returns>
         public virtual T Load<T>(string assetName)
         {
+            if (_loadedAssets.ContainsKey(assetName))
+                return (T)_loadedAssets[assetName];
+
             // Get current assembly
             var loaderAssembly = Assembly.GetExecutingAssembly();
 
@@ -118,7 +121,7 @@ namespace BeatTheNotes.Framework.GameAssets
             if (!IsInCollection(assetFileExtensions, filepath))
                 throw new Exception("Cannot load an asset with this extension");
 
-            if (_loadedAssets.ContainsKey(assetName)) return (T)_loadedAssets[assetName];
+            //if (_loadedAssets.ContainsKey(assetName)) return (T)_loadedAssets[assetName];
 
             var asset = assetLoader.LoadAsset(filepath);
             _loadedAssets.Add(assetName, asset);
