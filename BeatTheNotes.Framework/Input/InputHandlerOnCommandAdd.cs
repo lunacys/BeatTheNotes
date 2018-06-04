@@ -1,4 +1,5 @@
 ﻿using System;
+using BeatTheNotes.Framework.Entities;
 using Microsoft.Xna.Framework.Input;
 
 namespace BeatTheNotes.Framework.Input
@@ -11,9 +12,9 @@ namespace BeatTheNotes.Framework.Input
         public InputHandler InputHandler { get; }
         public Keys? Key { get; }
         public MouseButton? MouseButton { get; }
-        public IInputCommand InputCommand { get; }
+        public Action InputCommand { get; }
 
-        public InputHandlerOnCommandAdd(InputHandler inputHandler, Keys? key, MouseButton? mouseButton, IInputCommand inputCommand)
+        public InputHandlerOnCommandAdd(InputHandler inputHandler, Keys? key, MouseButton? mouseButton, Action inputCommand)
         {
             InputHandler = inputHandler;
             Key = key;

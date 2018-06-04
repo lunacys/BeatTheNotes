@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using BeatTheNotes.Framework.Entities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
 
 namespace BeatTheNotes.Framework.Input
 {
@@ -9,8 +11,11 @@ namespace BeatTheNotes.Framework.Input
     {
         public Vector2 MousePosition { get; private set; }
         public Vector2 MouseVelocity { get; private set; }
-        public Rectangle MouseRect
-            => new Rectangle((int)MousePosition.X, (int)MousePosition.Y, 1, 1);
+        public RectangleF MouseRectangle
+            => new RectangleF(MousePosition, new Size2(1, 1));
+
+        public Func<Keys, bool> KeyboardHandler { get; set; }
+        public Func<MouseButton, bool> MouseHandler { get; set; }
 
         private KeyboardState _keyboardState, _oldKeyboardState;
         private MouseState _mouseState, _oldMouseState;
@@ -18,36 +23,36 @@ namespace BeatTheNotes.Framework.Input
 
         private readonly GameWindow _window;
 
-        private readonly IInputCommand _nullCommand;
-
-        private readonly Dictionary<Keys, IInputCommand> _inputKeyCommands;
-        private readonly Dictionary<MouseButton, IInputCommand> _inputMouseButtonCommands;
+        private readonly Dictionary<Keys, Action> _inputKeyCommands;
+        private readonly Dictionary<MouseButton, Action> _inputMouseButtonCommands;
 
         public event EventHandler<InputHandlerOnCommandAdd> OnCommandAdded;
 
-        public InputHandler(Game game) : base(game)
+        public InputHandler(Game game)
+            : base(game)
         {
-            _inputKeyCommands = new Dictionary<Keys, IInputCommand>();
-            _inputMouseButtonCommands = new Dictionary<MouseButton, IInputCommand>();
+            _inputKeyCommands = new Dictionary<Keys, Action>();
+            _inputMouseButtonCommands = new Dictionary<MouseButton, Action>();
 
-            _nullCommand = new InputNullCommand();
+            KeyboardHandler = WasKeyPressed;
+            MouseHandler = WasMouseButtonPressed;
 
             _window = game.Window;
         }
 
-        public IInputCommand this[Keys key]
+        public Action this[Keys key]
         {
             get => _inputKeyCommands[key];
             set => RegisterKeyCommand(key, value);
         }
 
-        public IInputCommand this[MouseButton mouseButton]
+        public Action this[MouseButton mouseButton]
         {
             get => _inputMouseButtonCommands[mouseButton];
             set => RegisterMouseButtonCommand(mouseButton, value);
         }
 
-        public void RegisterKeyCommand(Keys key, IInputCommand command)
+        public void RegisterKeyCommand(Keys key, Action command)
         {
             if (_inputKeyCommands.ContainsValue(command))
                 throw new InputCommandAlreadyRegisteredException(command);
@@ -57,7 +62,7 @@ namespace BeatTheNotes.Framework.Input
             OnCommandAdded?.Invoke(this, new InputHandlerOnCommandAdd(this, key, null, command));
         }
 
-        public void RegisterMouseButtonCommand(MouseButton mouseButton, IInputCommand command)
+        public void RegisterMouseButtonCommand(MouseButton mouseButton, Action command)
         {
             if (_inputMouseButtonCommands.ContainsValue(command))
                 throw new InputCommandAlreadyRegisteredException(command);
@@ -74,22 +79,27 @@ namespace BeatTheNotes.Framework.Input
         /// <param name="keyboardHandler">Functor for keyboard handling process, if null, set WasKeyPressed method as the handler</param>
         /// <param name="mouseHandler">Functor for mouse handling process, if null set WasMouseButtonPressed as the handler</param>
         /// <returns>Command interface Enumerable</returns>
-        public IEnumerable<IInputCommand> HandleInput(Func<Keys, bool> keyboardHandler = null, Func<MouseButton, bool> mouseHandler = null)
+        public IEnumerable<Action> HandleInput(Func<Keys, bool> keyboardHandler = null, Func<MouseButton, bool> mouseHandler = null)
         {
             if (keyboardHandler == null)
                 keyboardHandler = WasKeyPressed;
             if (mouseHandler == null)
                 mouseHandler = WasMouseButtonPressed;
 
+            // Process keyboard input
             foreach (var inputCommand in _inputMouseButtonCommands)
                 if (mouseHandler(inputCommand.Key))
                     yield return inputCommand.Value;
+            //yield return inputCommand.Value;
 
+            // Process mouse input
             foreach (var inputCommand in _inputKeyCommands)
                 if (keyboardHandler(inputCommand.Key))
                     yield return inputCommand.Value;
 
-            yield return _nullCommand;
+            // TODO: Process touch input
+
+            yield return () => { }; // do nothing
         }
 
         /// <summary>
@@ -107,6 +117,14 @@ namespace BeatTheNotes.Framework.Input
             MousePosition = _mouseState.Position.ToVector2();
 
             MouseVelocity = MousePosition - _oldMousePosition;
+
+            foreach (var inputCommand in _inputKeyCommands)
+                if (KeyboardHandler(inputCommand.Key))
+                    inputCommand.Value.Invoke();
+
+            foreach (var inputCommand in _inputMouseButtonCommands)
+                if (MouseHandler(inputCommand.Key))
+                    inputCommand.Value();
         }
 
         /// <summary>
@@ -174,6 +192,11 @@ namespace BeatTheNotes.Framework.Input
             return false;
         }
 
+        /// <summary>
+        /// Gets whether a mouse button was released after a press
+        /// </summary>
+        /// <param name="button"><see cref="MouseButton"/></param>
+        /// <returns>Whether a mouse button was released after a press</returns>
         public bool WasMouseButtonReleased(MouseButton button)
         {
             switch (button)

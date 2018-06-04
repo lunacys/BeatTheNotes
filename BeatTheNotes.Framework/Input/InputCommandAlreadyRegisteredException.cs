@@ -1,12 +1,13 @@
 ﻿using System;
+using BeatTheNotes.Framework.Entities;
 
 namespace BeatTheNotes.Framework.Input
 {
     public class InputCommandAlreadyRegisteredException : Exception
     {
-        public IInputCommand InputCommand { get; }
+        public Action InputCommand { get; }
 
-        public InputCommandAlreadyRegisteredException(IInputCommand inputCommand)
+        public InputCommandAlreadyRegisteredException(Action inputCommand)
         {
             InputCommand = inputCommand;
         }

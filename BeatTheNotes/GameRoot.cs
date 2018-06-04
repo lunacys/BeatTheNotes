@@ -3,6 +3,7 @@ using System.IO;
 using BeatTheNotes.Framework.Debugging.Logging;
 using BeatTheNotes.Framework.GameAssets;
 using BeatTheNotes.Framework.GameTimers;
+using BeatTheNotes.Framework.Input;
 using BeatTheNotes.Framework.Serialization;
 using BeatTheNotes.Framework.Settings;
 using Microsoft.Xna.Framework;
@@ -26,6 +27,10 @@ namespace BeatTheNotes
 
         private GameSettingsGameComponent _gameSettings;
 
+        private InputHandler _input;
+
+        private int _x = 0;
+
         public GameRoot()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -42,6 +47,15 @@ namespace BeatTheNotes
 
             _gameSettings = new GameSettingsGameComponent(this);
             Components.Add(_gameSettings);
+
+            _input = new InputHandler(this);
+            Components.Add(_input);
+
+            _input[Keys.G] = () =>
+            {
+                _x++;
+                Console.WriteLine($"Hello! x: {_x}");
+            };
         }
 
         protected override void Initialize()
@@ -78,7 +92,7 @@ namespace BeatTheNotes
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (_input.WasKeyPressed(Keys.Escape))
                 Exit();
 
             LogHelper.Update();

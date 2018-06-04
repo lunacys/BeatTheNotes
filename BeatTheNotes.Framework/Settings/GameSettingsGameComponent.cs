@@ -64,6 +64,7 @@ namespace BeatTheNotes.Framework.Settings
         public T Get<T>(string name)
         {
             var obj = GameSettings.Get(name);
+
             if (!(obj is T))
                 throw new InvalidCastException();
 
