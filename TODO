@@ -1,32 +1,31 @@
 
 Todo:
-  ✔ Переименовать в BeatTheNotes @started(18-03-24 12:20) @done(18-03-24 12:48) @lasted(28 minutes 45 seconds)
-  ✔ Splash названия очков (Marvelous, Pefrect etc) @done(18-03-18 20:48)
-  ✔ Вынесение музыки в отдельную систему MusicSystem @started(18-03-21 09:44) @done(18-03-22 13:40) @lasted(1 day 3 hours 56 minutes 25 seconds)
-  ✔ Зависимость игрового времени от позиции музыки @done(18-03-22 10:23)
-  ✘ Удалить NAudio.Vorbis и MonoGame.Extended, заменить своими @cancelled(18-03-22 23:06)
-  ✔ Создание игровой библиотеки Jackhammer.Framework @done(18-03-23 09:56)
-  ✔ Изменение решения и структуры проектов @done(18-03-23 09:57)
-  ✔ Система здоровья @started(18-03-25 10:32) @done(18-03-25 23:10) @lasted(12 hours 38 minutes 56 seconds)
-  ☐ Поддержка БД SQLite
-  ✔ Поддержка загрузки mp3 файлов музыки @done(18-03-22 23:08)
-  ☐ Поддержка графиков (Graphs):
-    ☐ FpsGraph
-    ☐ AccuracyGraph
-  ☐ Рефакторинг: @started(18-03-17 18:54)
+  ☐ Create game and game engine architecture @started(18-05-04 02:26)
+  ☐ Create game engine
+  ☐ Create game from scratch based on previously written code using the game engine
+  ✔ Rename to BeatTheNotes @started(18-03-24 12:20) @done(18-03-24 12:48) @lasted(28 minutes 45 seconds)
+  ✔ Splash scores (Marvelous, Pefrect etc) @done(18-03-18 20:48)
+  ✔ Create a MusicSystem @started(18-03-21 09:44) @done(18-03-22 13:40) @lasted(1 day 3 hours 56 minutes 25 seconds)
+  ✔ The game time is depended on the music position @done(18-03-22 10:23)
+  ✘ Remove NAudio.Vorbis and MonoGame.Extended packages @cancelled(18-03-22 23:06)
+  ✔ Create the game library BeatTheNotes.Framework @done(18-03-23 09:56)
+  ✔ Restructure the game solution @done(18-03-23 09:57)
+  ✔ HealthSystem @started(18-03-25 10:32) @done(18-03-25 23:10) @lasted(12 hours 38 minutes 56 seconds)
+  ✔ SQLite support @done(18-05-04 02:14)
+  ✔ Mp3 music loading @done(18-03-22 23:08)
+  ✔ Graphs: @done(18-05-04 02:14)
+    ✔ FpsGraph @done(18-05-04 02:14)
+    ✔ AccuracyGraph @done(18-05-04 02:14)
+  ✔ Refactor: @started(18-03-17 18:54) @done(18-04-20 00:20) @lasted(1 month 2 days 5 hours 26 minutes 1 second)
     ✔ Game Systems @started(18-03-17 18:54) @done(18-03-18 20:44) @lasted(1 day 1 hour 50 minutes 59 seconds)
-    ✔ Использование паттернов ServiceLocator и Component @done(18-03-18 20:45)
+    ✔ ServiceLocator & Component patterns @done(18-03-18 20:45)
     ✔ GameplayScreen.cs @started(18-03-18 20:45) @done(18-03-18 20:45) @lasted(19 seconds)
-    ☐ GameplaySystem.cs @started(18-03-18 20:47)
-    ☐ Jackhammer.cs
-    ✔ Перевод игрового времени в GameSystem @started(18-03-22 10:59) @done(18-03-25 10:33) @lasted(2 days 23 hours 34 minutes 8 seconds)
-  ✔ Переделать систему очков - добавить BonusScore @started(18-03-18 21:58) @done(18-03-18 22:57) @lasted(59 minutes 9 seconds)
-  ☐ Поддержка ноты Hold @started(18-03-26 12:15)
-  ☐ Поддержка анимации
-    ☐ Элементов игрового поля (линии)
-    ☐ Кнопок
-    ☐ Ноты Click
-    ☐ Ноты Hold
+    ✔ GameplaySystem.cs @started(18-03-18 20:47) @done(18-04-20 00:19) @lasted(1 month 1 day 3 hours 32 minutes 50 seconds)
+    ✔ BeatTheNotes.cs @done(18-04-20 00:19)
+    ✔ Create GameTimeSystem @started(18-03-22 10:59) @done(18-03-25 10:33) @lasted(2 days 23 hours 34 minutes 8 seconds)
+  ✔ Remake ScoreSystem - add BonusScore @started(18-03-18 21:58) @done(18-03-18 22:57) @lasted(59 minutes 9 seconds)
+  ☐ Hold note @started(18-03-26 12:15)
+  ☐ Animations
   ☐ GUI
     ☐ Canvas
     ☐ Button
@@ -35,5 +34,3 @@ Todo:
     ☐ Slider
     ☐ ComboBox
   ☐ BeatmapFonts
-    ☐ Для игры
-    ☐ Для скинов

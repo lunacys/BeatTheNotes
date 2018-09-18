@@ -5,6 +5,7 @@ using BeatTheNotes.Framework.GameSystems;
 using BeatTheNotes.Framework.Settings;
 using BeatTheNotes.Framework.Skins;
 using BeatTheNotes.Framework;
+using BeatTheNotes.Framework.Graphs;
 using BeatTheNotes.Framework.Input;
 using BeatTheNotes.Framework.Logging;
 using BeatTheNotes.Framework.Objects;
@@ -14,6 +15,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using MonoGame.Extended;
 using MonoGame.Extended.Screens;
 
 namespace BeatTheNotes.GameSystems
@@ -24,6 +26,8 @@ namespace BeatTheNotes.GameSystems
 
         public Beatmap Beatmap { get; set; }
         public Skin Skin { get; }
+
+        public GraphCanvas ScoreGraph { get; private set; }
 
         private GameSettings Settings => _game.Services.GetService<GameSettings>();
 
@@ -38,11 +42,13 @@ namespace BeatTheNotes.GameSystems
         public GameplaySystem(GameRoot game, Beatmap beatmap)
         {
             _game = game;
-            
+
             //Beatmap = LoadBeatmap(beatmapName);
             Beatmap = beatmap;
 
             Skin = _game.Services.GetService<Skin>();
+
+
 
             _input = new InputHandler(game);
 
@@ -63,6 +69,24 @@ namespace BeatTheNotes.GameSystems
 
             FindSystem<HealthSystem>().HpDrainRate = Beatmap.Settings.Difficulty.HpDrainRate;
 
+            ScoreGraph = new GraphCanvas(_game)
+            {
+                Position = new Vector2(Skin.Settings.PlayfieldPositionX, 300),
+                Size = new Size2(Skin.PlayfieldLineTexture.Width * 2, 100),
+                MinValue = -158,
+                MaxValue = 158,
+                Font = Skin.Font,
+                ShouldDrawBackground = false,
+                ShouldDrawBars = false,
+                CellSize = new Size2(5, 20)
+            };
+            _game.Components.Add(ScoreGraph);
+
+            FindSystem<ScoreV1System>().OnScoreGet += (sender, handler) =>
+            {
+                ScoreGraph.PushValue(handler.Offset);
+            };
+
             InitializeAllHitObjects();
         }
 
@@ -80,16 +104,24 @@ namespace BeatTheNotes.GameSystems
             if (_input.WasKeyPressed(Settings.GameKeys["BeatmapScrollingSpeedDown"]))
                 if (ScrollingSpeed > 0.2f)
                     Settings.ScrollingSpeedF -= 0.1f;
-           
+
             /*if (_input.WasKeyPressed(Keys.F5))
                 Settings.IsReversedDirection = !IsUpsideDown;*/
-
 
             // Handle Input for gameplay keys
             var command = _input.HandleInput(_input.WasKeyPressed);
             foreach (var input in command)
                 input.Execute();
 
+            if (_input.IsKeyDown(Keys.A))
+            {
+                ScoreGraph.Size = new Size2(ScoreGraph.Size.Width + 1.0f, ScoreGraph.Size.Height);
+                ScoreGraph.CellSize = new Size2(ScoreGraph.CellSize.Width + 0.1f, ScoreGraph.Size.Height);
+            }
+            if (_input.IsKeyDown(Keys.S))
+            {
+                ScoreGraph.Size = new Size2(ScoreGraph.Size.Width, ScoreGraph.Size.Height + 1.0f);
+            }
 
             // If one of keys was pressed, play a hit sound
             // TODO: Link to TimingPoint hit sound
@@ -121,16 +153,27 @@ namespace BeatTheNotes.GameSystems
             _spriteBatch.Begin();
             // Draw background before all the screen components
             _spriteBatch.Draw(Beatmap.BackgroundTexture, new Rectangle(0, 0, Settings.WindowWidth, Settings.WindowHeight), Color.White);
+            _spriteBatch.End();
 
+            _spriteBatch.Begin();
             // Draw screen components in the order
             DrawPlayfield();
+            _spriteBatch.End();
+            _spriteBatch.Begin();
             DrawBeatDivisors();
+            _spriteBatch.End();
+            _spriteBatch.Begin();
             DrawHitObjects();
+            _spriteBatch.End();
 
+            _spriteBatch.Begin();
             // Draw UI
             DrawUi();
-
             _spriteBatch.End();
+
+            //ScoreGraph.Draw(gameTime);
+
+
         }
 
         /// <summary>
@@ -179,7 +222,7 @@ namespace BeatTheNotes.GameSystems
             var minVal = FindSystem<HealthSystem>().MinHealth;
 
             // Set source rectangle for making health bar dynamic
-            var srcRect = new Rectangle(0, 0, (int)hpW, (int)(Skin.HealthBar.Height * (curVal / (maxVal - minVal))));
+            var srcRect = new Rectangle(0, 0, (int)hpW, (int)MathHelperExtensions.InBetween(Skin.HealthBar.Height, curVal, minVal, maxVal));
 
             // Interpolate color from Red (min health) to Green (max health)
             Color col = Color.Lerp(Color.Red, Color.Green, curVal / 100.0f);
@@ -300,12 +343,12 @@ namespace BeatTheNotes.GameSystems
                 float posY = (ScrollingSpeed * ((long)FindSystem<GameTimeSystem>().Time - i) +
                               (Settings.WindowHeight - Skin.ButtonTexture.Height) + Skin.NoteClickTexture.Height +
                               Skin.Settings.HitPosition);
-                _spriteBatch.DrawLine(new Vector2(Skin.Settings.PlayfieldPositionX, posY),
+                Primitives2D.DrawLine(_spriteBatch, new Vector2(Skin.Settings.PlayfieldPositionX, posY),
                     new Vector2(Skin.Settings.PlayfieldPositionX + Skin.PlayfieldLineTexture.Width * Beatmap.Settings.Difficulty.KeyAmount, posY), Color.Gray,
                     3.0f);
             }
         }
-        
+
         /// <summary>
         /// Load beatmap from a file with background texture and music file into memory
         /// </summary>
