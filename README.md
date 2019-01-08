@@ -1,11 +1,5 @@
 # BeatTheNotes (BTN)
 
-## The game engine is now being developed at the new repo which is private for now. This repo is frozen until the engine is done.
-
-## Current project stage: Creating Game & Engine Architecture
-
-It means that no code is ready yet. We'll get to write code after the game & engine architecture is done.
-
 ## Description
 
 **BeatTheNotes** is an open-source cross-platform rhythm game with rich capabilities of enhancing your gameplay expireince.
