@@ -32,9 +32,17 @@
 
   <ItemGroup>
     <Folder Include="GameSystems\" />
-    <Folder Include="Maps\" />
     <Folder Include="Skins\" />
     <Folder Include="Screens\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="SoundTouch.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SoundTouch_x64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
