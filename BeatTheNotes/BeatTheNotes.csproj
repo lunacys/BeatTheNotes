@@ -32,6 +32,8 @@
 
   <ItemGroup>
     <Folder Include="GameSystems\" />
+    <Folder Include="Maps\" />
+    <Folder Include="Skins\" />
     <Folder Include="Screens\" />
   </ItemGroup>
 
