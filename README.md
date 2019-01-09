@@ -1,5 +1,9 @@
 # BeatTheNotes (BTN)
 
+## Please note
+
+The game is being rewrited at `game-rewrite` branch using [lunge](https://github.com/lunacys/lunge), that is the actual one at the time.
+
 ## Description
 
 **BeatTheNotes** (with no spaces) is an open-source cross-platform rhythm game with rich capabilities of enhancing your gameplay expireince.
