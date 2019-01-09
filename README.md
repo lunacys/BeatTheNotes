@@ -10,13 +10,13 @@ In fact, it is a '*reincarnation*' of my university course work [Notemania](http
 
 **BeatTheNotes** is fully written in C# using [MonoGame Framework](http://monogame.net) and [MonoGame.Extended](https://github.com/craftworkgames/MonoGame.Extended).
 
-**BeatTheNotes** will be available on **Windows**, **Linux**, **OS X**, **Android** and maybe in future on **iOS**.
+**BeatTheNotes** will be available on **Windows**, **Linux** and **OS X**.
 
 ## Platform support
 
-- [ ] Windows, Linux & OS X (OpenGL)
-- [ ] Android
-- [ ] iOS
+- [ ] Windows (OpenGL)
+- [ ] Linux (OpenGL)
+- [ ] MacOS (OpenGL)
 
 ## Current goals
 
@@ -41,12 +41,25 @@ In fact, it is a '*reincarnation*' of my university course work [Notemania](http
 
 ## Building
 
-Both **BeatTheNotes** and **BeatTheNotes.Framework** uses the **.NET Core 2.0**. Thus you need to download it [.NET Core SDK](https://www.microsoft.com/net/download/windows) **2.0** *or higher*.
+**BeatTheNotes** uses the **.NET Core 2.0**. Thus you need to download it [.NET Core SDK](https://www.microsoft.com/net/download/windows) **2.0** *or higher*.
 
 First of all, you need to clone the repo:
 
 ```bash
 git clone https://github.com/lunacys/BeatTheNotes.git
+```
+
+Secondly, pull the [lunge](https://github.com/lunacys/lunge) repo at the root of the directory you've pulled the current repo:
+
+```bash
+git clone https://github.com/lunacys/lunge.git
+```
+
+So the tree looks like this:
+```
+ - repos
+ |-- BeatTheNotes
+ |-- lunge
 ```
 
 Next, open the solution ```BeatTheNotes.sln``` and select required solution configuration - ```Debug``` or ```Release```.
@@ -55,19 +68,13 @@ Now you can build and run the game.
 
 ### Solution Structure
 
-#### Framework
-
-- ```BeatTheNotes.Framework``` (.NET Core 2.0) - the game framework that implements all the necessary functions you (and I) can reuse in, for example, other games.
-- ```BeatTheNotes.Framework.Tests``` (.NET Core 2.0) - game framework unit tests.
-
 #### Platforms
 
 - ```BeatTheNotes``` (.NET Core 2.0) - **Windows**, **Linux** & **OS X** platforms (uses **OpenGL**).
-- ~~~```BeatTheNotes.Android``` (.NET Framework 4.6.2) - **Android** platform.~~~ Removed at the time.
 
 ### Dependencies
 
-Both **BeatTheNotes** and **BeatTheNotes.Framework** uses the **MonoGame Framework** as a NuGet package. It will be restored automaticaly once you open your IDE, or you may need to restore it manually. Also additional deps are stored in ```Deps/``` directory. Those are .NET Core versions of **MonoGame.Extended** and its modules.
+**BeatTheNotes** uses the **MonoGame Framework** as a NuGet package. It will be restored automaticaly once you open your IDE, or you may need to restore it manually. Also additional deps are stored in ```Deps/``` directory. Those are .NET Core versions of **MonoGame.Extended** and its modules.
 
 ## Resources
 
@@ -79,28 +86,6 @@ Plans on game resorces:
 - [ ] Discord Channel
 - [ ] Bot for Discord
 - [ ] [Game Wiki](https://wiki.beatthenotes.com) - also under dev
-
-## Modding
-
-**PLEASE NOTE: Modding API is not ready yet.**
-
-To be fair, we didn't even start creating it. We plan to add modding support after completing all the main milestones, but only if it will not take a lot of time.
-
-### What you can mod
-
-These game aspects you can mod (write an extension to the main game):
-
-- [ ] **Gameplay Modificators** - add new modificators which will slightly change the gameplay exprireince.
-- [ ] **Game Modes** - a brand new game mode, where you can anything you want. *Even make an RTS*. But please don't forget that the game is a rhythm game.
-- [ ] **Beatmap Editor** - if you create a new game mode you will want to create a beatmap editor extension to support editing things within the built-in editor.
-- [ ] **BeatmapReader**/**BeatmapWriter**/**BeatmapProcessor** - these ones are also really important to extend to create a complicated game mode.
-- [ ] **Skins** - it's a good idea to rework some art or sound stuff in your game mode, so I'm sure you'll find it useful.
-
-### How do I mod stuff
-
-*tl;dr:* there is no way to do it now.
-
-Every extension should be written in C# using the game API. More info you can find on the [Game Wiki](https://wiki.beatthenotes.com) (not ready now).
 
 ## License
 
